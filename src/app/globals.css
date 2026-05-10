@@ -1408,14 +1408,14 @@ p {
   border: 1px solid var(--line);
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(26, 60, 52, 0.06);
-  padding: 28px;
+  padding: 20px 24px;
 }
 
 .home-card-header {
   align-items: flex-start;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 14px;
 }
 
 .home-card-title {
@@ -1637,7 +1637,7 @@ p {
 .home-tourney-item {
   border-bottom: 1px solid rgba(216, 223, 219, 0.4);
   display: block;
-  padding: 16px 0;
+  padding: 12px 0;
   transition: background 120ms ease;
 }
 
@@ -1648,8 +1648,8 @@ p {
 .home-tourney-item:hover {
   background: var(--surface-low);
   border-radius: 8px;
-  margin: 0 -12px;
-  padding: 16px 12px;
+  margin: 0 -8px;
+  padding: 12px 8px;
 }
 
 .home-tourney-item-top {
@@ -1657,12 +1657,12 @@ p {
   display: flex;
   gap: 10px;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .home-tourney-item-top strong {
   color: var(--ink);
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .home-tourney-status {
@@ -1724,8 +1724,8 @@ p {
   font-weight: 800;
   gap: 6px;
   justify-content: center;
-  margin-top: 4px;
-  padding: 16px 0 4px;
+  margin-top: 0;
+  padding: 12px 0 0;
   transition: color 160ms ease;
 }
 
