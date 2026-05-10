@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
   { label: "경기결과", icon: "leaderboard", href: "/results" },
-  { label: "대회일정", icon: "event", href: "/schedule" },
+  { label: "대회정보", icon: "event", href: "/schedule" },
   { label: "공지사항", icon: "campaign", href: "/notices" }
 ];
 
@@ -33,7 +33,7 @@ export default function MyPage() {
           <article className="stitch-bento-card">
             <i />
             <strong>선수 등록</strong>
-            <p>선수 등록 서류를 이메일로 접수하면 관리자가 확인 후 승인합니다.</p>
+            <p>로그인 후 참가 신청을 진행하면 관리자가 확인 후 승인합니다.</p>
           </article>
         </div>
 
@@ -42,10 +42,9 @@ export default function MyPage() {
             <span>GENERAL</span>
             <strong>선수 등록 승인이 필요합니다</strong>
             <p>
-              가입 직후에는 일반 회원으로 시작합니다. 선수 등록 서류를 이메일로
-              접수하면 관리자가 확인 후 PLAYER로 전환합니다.
+              가입 직후에는 일반 회원으로 시작합니다. 로그인 후 참가 신청을
+              진행하면 관리자가 확인 후 PLAYER로 전환합니다.
             </p>
-            <small>접수 이메일: khusports2026@gmail.com</small>
           </div>
           <div className="profile-actions">
             <Link className="button primary" href="/login">
