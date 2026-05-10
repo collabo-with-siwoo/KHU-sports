@@ -1,10 +1,11 @@
 import Link from "next/link";
+import Header from "@/components/Header";
 
-const navItems = [
+const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
-  { label: "리더보드", icon: "leaderboard", href: "/results" },
-  { label: "공지사항", icon: "campaign", href: "/notices" },
-  { label: "내 기록", icon: "history_edu", href: "/mypage" }
+  { label: "경기결과", icon: "leaderboard", href: "/results" },
+  { label: "대회일정", icon: "event", href: "/schedule" },
+  { label: "공지사항", icon: "campaign", href: "/notices" }
 ];
 
 const rows = [
@@ -17,23 +18,8 @@ const rows = [
 
 export default function ResultsPage() {
   return (
-    <main className="stitch-app">
-      <header className="stitch-topbar">
-        <Link className="stitch-brand compact" href="/">
-          <span className="material-symbols-outlined">sports_golf</span>
-          <strong>KHU PRESIDENT&apos;S CUP</strong>
-        </Link>
-        <nav className="stitch-desktop-nav" aria-label="주요 메뉴">
-          {navItems.map((item) => (
-            <Link className={item.href === "/results" ? "active" : ""} href={item.href} key={item.href}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        <Link aria-label="로그인" className="stitch-icon-button" href="/login">
-          <span className="material-symbols-outlined">notifications</span>
-        </Link>
-      </header>
+    <main className="home-app">
+      <Header currentPath="/results" />
 
       <section className="stitch-page-canvas leaderboard-page">
         <div className="stitch-page-title">
@@ -88,7 +74,7 @@ export default function ResultsPage() {
       </section>
 
       <nav className="stitch-bottom-nav" aria-label="모바일 메뉴">
-        {navItems.map((item) => (
+        {mobileNavItems.map((item) => (
           <Link className={item.href === "/results" ? "active" : ""} href={item.href} key={item.href}>
             <span className="material-symbols-outlined">{item.icon}</span>
             <small>{item.label}</small>

@@ -1,10 +1,11 @@
 import Link from "next/link";
+import Header from "@/components/Header";
 
-const navItems = [
+const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
-  { label: "리더보드", icon: "leaderboard", href: "/results" },
-  { label: "공지사항", icon: "campaign", href: "/notices" },
-  { label: "내 기록", icon: "history_edu", href: "/mypage" }
+  { label: "경기결과", icon: "leaderboard", href: "/results" },
+  { label: "대회일정", icon: "event", href: "/schedule" },
+  { label: "공지사항", icon: "campaign", href: "/notices" }
 ];
 
 const notices = [
@@ -36,34 +37,10 @@ const notices = [
 
 export default function NoticesPage() {
   return (
-    <main className="stitch-app">
-      <header className="stitch-topbar">
-        <Link className="stitch-brand" href="/">
-          <span>KHU</span>
-          <strong>KHU 총장배</strong>
-        </Link>
-        <nav className="stitch-desktop-nav" aria-label="주요 메뉴">
-          {navItems.map((item) => (
-            <Link className={item.href === "/notices" ? "active" : ""} href={item.href} key={item.href}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        <Link aria-label="로그인" className="stitch-icon-button" href="/login">
-          <span className="material-symbols-outlined">notifications</span>
-        </Link>
-      </header>
+    <main className="home-app">
+      <Header currentPath="/notices" />
 
-      <aside className="stitch-sidebar" aria-label="데스크톱 보조 메뉴">
-        {navItems.map((item) => (
-          <Link className={item.href === "/notices" ? "active" : ""} href={item.href} key={item.href}>
-            <span className="material-symbols-outlined">{item.icon}</span>
-            {item.label}
-          </Link>
-        ))}
-      </aside>
-
-      <section className="stitch-page-canvas notices-page">
+      <section className="stitch-page-canvas">
         <div className="stitch-page-title">
           <p className="stitch-label">Official Notice</p>
           <h1>공지사항</h1>
@@ -99,7 +76,7 @@ export default function NoticesPage() {
       </section>
 
       <nav className="stitch-bottom-nav" aria-label="모바일 메뉴">
-        {navItems.map((item) => (
+        {mobileNavItems.map((item) => (
           <Link className={item.href === "/notices" ? "active" : ""} href={item.href} key={item.href}>
             <span className="material-symbols-outlined">{item.icon}</span>
             <small>{item.label}</small>

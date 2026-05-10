@@ -1,17 +1,11 @@
 import Link from "next/link";
+import Header from "@/components/Header";
 
 const heroBackgroundUrl =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuC1AWWs8FEyFx31sSOG-AP7Y_Vu-PfrUdJPPeHErDTXqEM_f2gpYQQsC7swnWFOkLxghN5vvwJ7km__bMzwWjtca5E0AdTwRPlVT1ordq-RqDRdA8g8hI1lw-t-idqokTQbbaydUynXbbk2zXCqLPPlA_BlAfcRyGMpoI6CJ7h-vHO9o2WrAizCPMQnN9Tv2GIujQB5KObneFQynkx_HUfs_HBDCI6d2Fknzf1VA63ZQL99EVkxBLTNmcPAVO94W_7GkRrf4PsFn0P4";
 
 const weatherImgUrl =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBuFw25q4FMGCj_FSURyPmFVb3JxQ-weBC3NW4tGdogCmPSSEhcRZbDLaZv-tv95rwQbFUMMYeb1xjZD6WR-KTB756oZBhOdhwsyAlhk-doN-FPndTNVyd-Pni9lGq81QgoO5dBlg-5ojQLIZeCW5LLAtQMeLYCBPNoTQfTApeqJLxENsarmZXeKNrON5SHe5QsX4oijUQF6LxLHzBDY650o5Uu9rDY_zrBh-lUdSCTz1rXl75XfUv2bM2KNSZuMHhevuvjeB6oZXRk";
-
-const gnbItems = [
-  { label: "홈", href: "/" },
-  { label: "경기결과", href: "/results" },
-  { label: "대회일정", href: "/schedule" },
-  { label: "공지사항", href: "/notices" }
-];
 
 const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
@@ -36,36 +30,7 @@ const recentNotices = [
 export default function HomePage() {
   return (
     <main className="home-app">
-      {/* ===== HEADER ===== */}
-      <header className="home-header">
-        <div className="home-header-inner">
-          <Link className="home-logo" href="/">
-            KHU Sports Golf
-          </Link>
-          <nav className="home-gnb" aria-label="주요 메뉴">
-            {gnbItems.map((item) => (
-              <Link
-                className={item.href === "/" ? "active" : ""}
-                href={item.href}
-                key={item.href}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="home-header-actions">
-            <button aria-label="검색" className="home-icon-btn">
-              <span className="material-symbols-outlined">search</span>
-            </button>
-            <Link className="home-cta-btn" href="/signup">
-              지금 등록하기
-            </Link>
-            <Link aria-label="로그인" className="home-icon-btn" href="/login">
-              <span className="material-symbols-outlined">account_circle</span>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header currentPath="/" />
 
       {/* ===== HERO ===== */}
       <section
@@ -96,7 +61,6 @@ export default function HomePage() {
 
       {/* ===== CONTENT GRID ===== */}
       <section className="home-content">
-        {/* LEFT: Leaderboard */}
         <div className="home-leaderboard-card">
           <div className="home-card-header">
             <div className="home-card-title">
@@ -126,9 +90,7 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* RIGHT: Weather + Notices */}
         <div className="home-sidebar">
-          {/* Weather Card */}
           <div
             className="home-weather-card"
             style={{ backgroundImage: `url("${weatherImgUrl}")` }}
@@ -146,7 +108,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Notices Card */}
           <div className="home-notices-card">
             <div className="home-card-header">
               <div className="home-card-title">
@@ -167,7 +128,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== MOBILE BOTTOM NAV ===== */}
       <nav className="stitch-bottom-nav" aria-label="모바일 메뉴">
         {mobileNavItems.map((item) => (
           <Link className={item.href === "/" ? "active" : ""} href={item.href} key={item.href}>

@@ -1,31 +1,17 @@
 import Link from "next/link";
+import Header from "@/components/Header";
 
-const navItems = [
+const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
-  { label: "리더보드", icon: "leaderboard", href: "/results" },
-  { label: "공지사항", icon: "campaign", href: "/notices" },
-  { label: "내 기록", icon: "history_edu", href: "/mypage" }
+  { label: "경기결과", icon: "leaderboard", href: "/results" },
+  { label: "대회일정", icon: "event", href: "/schedule" },
+  { label: "공지사항", icon: "campaign", href: "/notices" }
 ];
 
 export default function MyPage() {
   return (
-    <main className="stitch-app">
-      <header className="stitch-topbar">
-        <Link className="stitch-brand" href="/">
-          <span>KHU</span>
-          <strong>KHU 경희대학교 총장배</strong>
-        </Link>
-        <nav className="stitch-desktop-nav" aria-label="주요 메뉴">
-          {navItems.map((item) => (
-            <Link className={item.href === "/mypage" ? "active" : ""} href={item.href} key={item.href}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-        <Link aria-label="로그인" className="stitch-icon-button" href="/login">
-          <span className="material-symbols-outlined">account_circle</span>
-        </Link>
-      </header>
+    <main className="home-app">
+      <Header currentPath="/mypage" />
 
       <section className="stitch-page-canvas">
         <div className="stitch-page-title">
@@ -72,7 +58,7 @@ export default function MyPage() {
       </section>
 
       <nav className="stitch-bottom-nav" aria-label="모바일 메뉴">
-        {navItems.map((item) => (
+        {mobileNavItems.map((item) => (
           <Link className={item.href === "/mypage" ? "active" : ""} href={item.href} key={item.href}>
             <span className="material-symbols-outlined">{item.icon}</span>
             <small>{item.label}</small>

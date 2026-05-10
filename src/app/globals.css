@@ -1103,6 +1103,10 @@ p {
   padding-bottom: 0;
 }
 
+.home-app .stitch-page-canvas {
+  padding-top: 112px;
+}
+
 /* Header */
 .home-header {
   background: rgba(248, 249, 250, 0.92);
