@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>경희대학교 스포츠 골프 - 실시간 리더보드</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Lexend:wght@400;600;700;800&amp;family=Hanken+Grotesk:wght@400;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Pretendard', 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e1e3e4",
+                    "surface-container-high": "#e7e8e9",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed-dim": "#aacec3",
+                    "surface-variant": "#e1e3e4",
+                    "secondary-fixed-dim": "#e9c349",
+                    "surface-bright": "#f8f9fa",
+                    "on-secondary-fixed-variant": "#574500",
+                    "outline": "#717976",
+                    "surface-container": "#edeeef",
+                    "on-primary-fixed": "#00201a",
+                    "on-secondary-fixed": "#241a00",
+                    "surface-container-low": "#f3f4f5",
+                    "outline-variant": "#c1c8c4",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#d9dadb",
+                    "surface": "#f8f9fa",
+                    "on-secondary-container": "#745c00",
+                    "tertiary-container": "#483200",
+                    "primary-fixed": "#c5eadf",
+                    "surface-tint": "#43655c",
+                    "tertiary-fixed-dim": "#e9c176",
+                    "secondary-container": "#fed65b",
+                    "on-primary-fixed-variant": "#2b4d44",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#ffe088",
+                    "inverse-on-surface": "#f0f1f2",
+                    "on-surface": "#191c1d",
+                    "secondary": "#735c00",
+                    "on-surface-variant": "#414846",
+                    "primary-container": "#1a3c34",
+                    "on-tertiary-fixed": "#261900",
+                    "on-tertiary-container": "#be9953",
+                    "error-container": "#ffdad6",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed": "#ffdea5",
+                    "tertiary": "#2d1e00",
+                    "on-primary-container": "#83a69c",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#2e3132",
+                    "on-background": "#191c1d",
+                    "on-secondary": "#ffffff",
+                    "inverse-primary": "#aacec3",
+                    "background": "#f8f9fa",
+                    "on-tertiary-fixed-variant": "#5d4201",
+                    "on-error": "#ffffff",
+                    "primary": "#01261f"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1280px",
+                    "xl": "80px",
+                    "md": "24px",
+                    "gutter": "24px",
+                    "base": "8px",
+                    "xs": "4px",
+                    "margin-mobile": "16px",
+                    "sm": "12px",
+                    "lg": "48px"
+            },
+            "fontFamily": {
+                    "body-md": ["Pretendard", "Inter"],
+                    "stat-number": ["Lexend"],
+                    "display-lg": ["Pretendard", "Hanken Grotesk"],
+                    "headline-lg": ["Pretendard", "Hanken Grotesk"],
+                    "label-bold": ["Pretendard", "Lexend"],
+                    "headline-md": ["Pretendard", "Hanken Grotesk"],
+                    "display-lg-mobile": ["Pretendard", "Hanken Grotesk"],
+                    "body-lg": ["Pretendard", "Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "stat-number": ["24px", {"lineHeight": "24px", "fontWeight": "700"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                    "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-surface text-on-surface selection:bg-secondary-container">
+<!-- Top Navigation Bar -->
+<header class="bg-surface/80 dark:bg-primary/80 backdrop-blur-md border-b border-outline-variant/30 dark:border-outline/20 shadow-sm docked full-width top-0 sticky z-50">
+<div class="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto w-full">
+<div class="flex items-center gap-md">
+<span class="font-display-lg text-display-lg-mobile lg:text-headline-md font-extrabold text-primary dark:text-primary-fixed-dim">KHU Sports Golf</span>
+<nav class="hidden md:flex gap-md ml-lg">
+<a class="text-on-surface-variant dark:text-surface-variant font-body-md hover:text-primary dark:hover:text-primary-fixed transition-colors active:scale-95 duration-150" href="#">홈</a>
+<a class="text-primary dark:text-secondary-fixed border-b-2 border-secondary font-label-bold pb-1 active:scale-95 duration-150" href="#">리더보드</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-body-md hover:text-primary dark:hover:text-primary-fixed transition-colors active:scale-95 duration-150" href="#">경기 일정</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-body-md hover:text-primary dark:hover:text-primary-fixed transition-colors active:scale-95 duration-150" href="#">공지사항</a>
+<a class="text-on-surface-variant dark:text-surface-variant font-body-md hover:text-primary dark:hover:text-primary-fixed transition-colors active:scale-95 duration-150" href="#">갤러리</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-primary dark:text-primary-fixed-dim p-2 hover:bg-surface-container-low/50 rounded-full transition-all">account_circle</button>
+<button class="bg-primary text-on-primary px-md py-sm rounded-lg font-label-bold active:scale-95 transition-all">지금 등록하기</button>
+</div>
+</div>
+</header>
+<div class="flex max-w-container-max mx-auto px-gutter relative">
+<!-- Sidebar Filter Navigation -->
+<aside class="hidden lg:flex flex-col w-72 h-[calc(100vh-80px)] sticky top-20 py-lg border-r border-outline-variant/30 bg-surface-container-low dark:bg-primary">
+<div class="px-md mb-lg">
+<span class="font-headline-md text-headline-md text-primary dark:text-secondary-fixed-dim block">KHU 골프 2024</span>
+<span class="text-on-surface-variant dark:text-surface-variant font-body-md">챔피언십 시리즈</span>
+</div>
+<nav class="flex-1 space-y-xs overflow-y-auto">
+<a class="text-on-surface-variant dark:text-surface-variant flex items-center gap-4 px-4 py-3 mx-2 hover:bg-surface-container-high dark:hover:bg-primary-container rounded-lg transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-bold text-label-bold">대회 홈</span>
+</a>
+<a class="bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-lg mx-2 flex items-center gap-4 px-4 py-3 active:scale-98" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+<span class="font-label-bold text-label-bold">실시간 리더보드</span>
+</a>
+<a class="text-on-surface-variant dark:text-surface-variant flex items-center gap-4 px-4 py-3 mx-2 hover:bg-surface-container-high dark:hover:bg-primary-container rounded-lg transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+<span class="font-label-bold text-label-bold">공식 공지사항</span>
+</a>
+<a class="text-on-surface-variant dark:text-surface-variant flex items-center gap-4 px-4 py-3 mx-2 hover:bg-surface-container-high dark:hover:bg-primary-container rounded-lg transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-label-bold text-label-bold">코스 맵</span>
+</a>
+<a class="text-on-surface-variant dark:text-surface-variant flex items-center gap-4 px-4 py-3 mx-2 hover:bg-surface-container-high dark:hover:bg-primary-container rounded-lg transition-all hover:translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-bold text-label-bold">선수 포털</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<div class="bg-primary-container rounded-xl p-md text-white overflow-hidden relative">
+<img alt="실시간 중계" class="absolute inset-0 w-full h-full object-cover opacity-20" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzScCEYC3loGhXGG38kpvDnZUgCGgsd7oMFltQkpOrKIPYC69gEFb_oGPdu1dkJvRT1fQ3LohryvsTbFmasLJJT0TJFaC-35G_JCMQY49pilbblwFlk_cl9uk3lIMDuyf2WoKngwLScqEdb-nX5g4dI3fvVruMvm1PaaH_yNTYyurRsKhCJ3QRaQa18oagVdSJgUCfnNCUFrZkinrVapBDu67DtEnIrU3L62PXXXEsjKQ3BLjWkrstmcldUnEw3FZEMzZxzzCv-ndJ"/>
+<div class="relative z-10">
+<div class="flex items-center gap-xs mb-xs">
+<span class="w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
+<span class="text-xs font-bold uppercase tracking-widest text-secondary">실시간 중계 중</span>
+</div>
+<p class="font-label-bold mb-md">최종 라운드: 18번 홀 커버리지</p>
+<button class="w-full bg-secondary text-on-secondary py-2 rounded-lg font-label-bold hover:bg-secondary-fixed transition-colors">실시간 스코어링</button>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 min-w-0 py-lg lg:pl-lg">
+<!-- Header & Search -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-lg">
+<div>
+<h1 class="font-display-lg text-display-lg text-primary mb-xs">실시간 리더보드</h1>
+<p class="font-body-lg text-on-surface-variant">2024 경희대학교 오픈 • 제4라운드</p>
+</div>
+<div class="flex gap-sm w-full md:w-auto">
+<div class="relative flex-1 md:w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container border border-outline-variant rounded-lg focus:ring-2 focus:ring-secondary focus:border-secondary outline-none transition-all" placeholder="선수 검색..." type="text"/>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 bg-surface-container-high border border-outline-variant rounded-lg font-label-bold hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+                        필터
+                    </button>
+</div>
+</div>
+<!-- Stats Highlights (Bento Grid) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-xl">
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-md shadow-sm">
+<div class="text-on-surface-variant font-label-bold uppercase text-[10px] tracking-widest mb-2">토너먼트 리더</div>
+<div class="flex items-center gap-md">
+<img alt="리더" class="w-16 h-16 rounded-full object-cover border-2 border-secondary-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaZpZqAVDG8z1Jg7SuSUNrGjCp9-DY3_sRsuXyria50Fe8FOuz3IpWoTDUdrQc3yPdZPRJLm6nvVgslDVxILQZvjs9dnMvs55H-cRlzwfs9_a_R5t1U2VpQbyf2_E7Ed6L4U3Tpk6Az0n_1RnapEQTB6KJWjwOaKdJj4jLYINd75z7y-Kh_g6funlKygKe3Z3LfIJL9_Khz2na-tVjdm26IIB1yevuNuo17ZyCeqZ9RxLGuXjisraKgoEmgQFal2NdJc_qSnkCUxyv"/>
+<div>
+<div class="font-headline-md text-primary">-14 (종료)</div>
+<div class="font-body-md font-bold">엘레나 로드리게스</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-md shadow-sm">
+<div class="text-on-surface-variant font-label-bold uppercase text-[10px] tracking-widest mb-2">코스 상황</div>
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-primary-container flex items-center justify-center rounded-lg text-secondary">
+<span class="material-symbols-outlined text-stat-number">thermostat</span>
+</div>
+<div>
+<div class="font-headline-md text-primary">24°C</div>
+<div class="font-body-md">맑음 • 풍속 5km/h</div>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-md shadow-sm">
+<div class="text-on-surface-variant font-label-bold uppercase text-[10px] tracking-widest mb-2">라운드 진행률</div>
+<div class="flex flex-col gap-2">
+<div class="flex justify-between font-label-bold">
+<span>84% 완료</span>
+<span>18번 홀</span>
+</div>
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[84%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Leaderboard Table -->
+<div class="bg-surface-container-lowest rounded-xl shadow-md border border-outline-variant/30 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-primary text-on-primary font-label-bold uppercase text-[12px] tracking-widest">
+<th class="px-md py-4 w-20 text-center">순위</th>
+<th class="px-md py-4">선수명</th>
+<th class="px-md py-4 text-center">파 대비</th>
+<th class="px-md py-4 text-center">홀</th>
+<th class="px-md py-4 text-center">오늘</th>
+<th class="px-md py-4 text-center">1R</th>
+<th class="px-md py-4 text-center">2R</th>
+<th class="px-md py-4 text-center">3R</th>
+<th class="px-md py-4 text-center">합계</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 font-body-md">
+<!-- Top 1 - Gold -->
+<tr class="bg-secondary-fixed/10 hover:bg-secondary-fixed/20 transition-colors group">
+<td class="px-md py-5 text-center">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container font-stat-number flex items-center justify-center mx-auto text-sm border-2 border-secondary shadow-sm">1</div>
+</td>
+<td class="px-md py-5">
+<div class="flex items-center gap-md">
+<img alt="Player" class="w-10 h-10 rounded-full border-2 border-secondary-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLGNZAumPYaBAR9TuCq9WggnYtMljQngHNmPoTXpwj8P1XioyRAgZ7dOnz_OeZUkWyppT7H_-U142wL3Xue3na4dnhK0prclbK2La08Pz3E9oxb6zg65TfE0UNfg9vKwaR3uDVMrzDzl6X48dgflkrx1vfFyme7hDxerdkvSuM4l0dZAL6lZSZBs05NEVHMibDBuQaowqTeRb0TeVPZTLJIjqQ2Oze_pMXDjlcgs-q6odhwV1sXtGx9umGZC-hBh8DXFpBXDTtK5D2"/>
+<div>
+<div class="font-bold text-primary">엘레나 로드리게스</div>
+<div class="text-xs text-on-surface-variant">경희대학교</div>
+</div>
+</div>
+</td>
+<td class="px-md py-5 text-center font-bold text-secondary-container bg-primary-container">-14</td>
+<td class="px-md py-5 text-center font-label-bold text-primary">종료</td>
+<td class="px-md py-5 text-center text-secondary font-bold">-5</td>
+<td class="px-md py-5 text-center text-on-surface-variant">68</td>
+<td class="px-md py-5 text-center text-on-surface-variant">69</td>
+<td class="px-md py-5 text-center text-on-surface-variant">65</td>
+<td class="px-md py-5 text-center font-stat-number text-primary">202</td>
+</tr>
+<!-- Top 2 - Silver -->
+<tr class="bg-surface-container-low/30 hover:bg-surface-container-low transition-colors group">
+<td class="px-md py-5 text-center">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface font-stat-number flex items-center justify-center mx-auto text-sm border-2 border-outline-variant shadow-sm">2</div>
+</td>
+<td class="px-md py-5">
+<div class="flex items-center gap-md">
+<img alt="Player" class="w-10 h-10 rounded-full border-2 border-surface-container-highest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5nYWSv3YogFESFaop6THDkWY-QL_hu94X8NZcYqgln19XBK7sFPwOmsj-COFOtqUlpD7wXLglunhm6XJZifd7PbdDT9uOvTjigs8PemnauZyPufJM5HsW3wTWMMOHMyGtLdpWsCy75ou8_MmpmyJLJt-oKdauPgHO5MWmiNTkodificURldYmMX314xiIEk6zja6XNO2MITg5W1K_5Z-FORbP-FT9flQzBYfKwNbIhT4--UF5tRcHfXo6-LmSqrgzx_gbnVrbt-VR"/>
+<div>
+<div class="font-bold text-primary">제임스 박</div>
+<div class="text-xs text-on-surface-variant">국립 스포츠 아카데미</div>
+</div>
+</div>
+</td>
+<td class="px-md py-5 text-center font-bold text-primary">-12</td>
+<td class="px-md py-5 text-center font-label-bold text-primary">종료</td>
+<td class="px-md py-5 text-center text-primary font-bold">-3</td>
+<td class="px-md py-5 text-center text-on-surface-variant">70</td>
+<td class="px-md py-5 text-center text-on-surface-variant">67</td>
+<td class="px-md py-5 text-center text-on-surface-variant">67</td>
+<td class="px-md py-5 text-center font-stat-number text-primary">204</td>
+</tr>
+<!-- Top 3 - Bronze -->
+<tr class="bg-white hover:bg-surface-container-low transition-colors group">
+<td class="px-md py-5 text-center">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-stat-number flex items-center justify-center mx-auto text-sm border-2 border-on-tertiary-container/30 shadow-sm">3</div>
+</td>
+<td class="px-md py-5">
+<div class="flex items-center gap-md">
+<img alt="Player" class="w-10 h-10 rounded-full border-2 border-tertiary-fixed" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD01fwkclRlslvZQaCHw7BjG1KThWCeOCgAOMEdoSbqMK9WNL3In3a0hNp0CWh-azweAW8wveXf1HoALCvenMMvZ3en2Q4BC_ikuRHHEgt3SpcoCnGcUfryqRwS2BXuZXfxwrSkbEj43A7GJ59IXgqpSJp9rl6NiKMBiE_ZsK9Zvkg4GIgdiunFiBYrwfqpFnO3cDSFLUKOy02brXBtTPZlhBzSdiVVSJI41kSmrRST2Mp1hMvw0W8NoBIqwydTfSHnrqbJ9w0_Qbtn"/>
+<div>
+<div class="font-bold text-primary">클로이 킴</div>
+<div class="text-xs text-on-surface-variant">글로벌 대학교</div>
+</div>
+</div>
+</td>
+<td class="px-md py-5 text-center font-bold text-primary">-11</td>
+<td class="px-md py-5 text-center font-label-bold text-primary">종료</td>
+<td class="px-md py-5 text-center text-primary font-bold">-4</td>
+<td class="px-md py-5 text-center text-on-surface-variant">71</td>
+<td class="px-md py-5 text-center text-on-surface-variant">68</td>
+<td class="px-md py-5 text-center text-on-surface-variant">66</td>
+<td class="px-md py-5 text-center font-stat-number text-primary">205</td>
+</tr>
+<!-- Standard Row -->
+<tr class="bg-surface-container-low/20 hover:bg-surface-container-low transition-colors group">
+<td class="px-md py-4 text-center">
+<div class="w-8 h-8 font-stat-number flex items-center justify-center mx-auto text-sm text-on-surface-variant">공동 4</div>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant font-bold text-xs">SL</div>
+<div>
+<div class="font-bold text-primary">사라 리</div>
+<div class="text-xs text-on-surface-variant">퍼시픽 스포츠 칼리지</div>
+</div>
+</div>
+</td>
+<td class="px-md py-4 text-center font-bold text-primary">-9</td>
+<td class="px-md py-4 text-center font-label-bold text-primary">16</td>
+<td class="px-md py-4 text-center text-primary font-bold">-2</td>
+<td class="px-md py-4 text-center text-on-surface-variant">72</td>
+<td class="px-md py-4 text-center text-on-surface-variant">69</td>
+<td class="px-md py-4 text-center text-on-surface-variant">68</td>
+<td class="px-md py-4 text-center font-stat-number text-primary">209</td>
+</tr>
+<!-- Zebra Row -->
+<tr class="bg-white hover:bg-surface-container-low transition-colors group">
+<td class="px-md py-4 text-center">
+<div class="w-8 h-8 font-stat-number flex items-center justify-center mx-auto text-sm text-on-surface-variant">공동 4</div>
+</td>
+<td class="px-md py-4">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant font-bold text-xs">DC</div>
+<div>
+<div class="font-bold text-primary">데이비드 첸</div>
+<div class="text-xs text-on-surface-variant">중앙 대학교</div>
+</div>
+</div>
+</td>
+<td class="px-md py-4 text-center font-bold text-primary">-9</td>
+<td class="px-md py-4 text-center font-label-bold text-primary">종료</td>
+<td class="px-md py-4 text-center text-primary font-bold">E</td>
+<td class="px-md py-4 text-center text-on-surface-variant">69</td>
+<td class="px-md py-4 text-center text-on-surface-variant">70</td>
+<td class="px-md py-4 text-center text-on-surface-variant">70</td>
+<td class="px-md py-4 text-center font-stat-number text-primary">209</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-md bg-surface-container-low/50 border-t border-outline-variant/30 flex justify-between items-center">
+<span class="text-sm text-on-surface-variant font-body-md">총 144명의 선수 중 1-25명 표시 중</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 rounded-lg flex items-center justify-center bg-white border border-outline-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-lg flex items-center justify-center bg-primary text-on-primary font-label-bold">1</button>
+<button class="w-10 h-10 rounded-lg flex items-center justify-center bg-white border border-outline-variant hover:bg-surface-container-high transition-colors font-label-bold">2</button>
+<button class="w-10 h-10 rounded-lg flex items-center justify-center bg-white border border-outline-variant hover:bg-surface-container-high transition-colors font-label-bold">3</button>
+<button class="w-10 h-10 rounded-lg flex items-center justify-center bg-white border border-outline-variant hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Footer Section -->
+<footer class="bg-primary dark:bg-surface-container-lowest full-width py-lg mt-xl border-t border-primary-container dark:border-outline-variant">
+<div class="w-full flex flex-col md:flex-row justify-between items-center px-gutter max-w-container-max mx-auto gap-md">
+<div class="flex flex-col items-center md:items-start gap-xs">
+<span class="font-label-bold text-label-bold text-secondary-fixed">KHU Sports Golf</span>
+<p class="font-body-md text-primary-fixed-dim dark:text-on-surface-variant text-sm">© 2024 경희대학교 스포츠 골프 토너먼트 사무국. All Rights Reserved.</p>
+</div>
+<nav class="flex gap-md">
+<a class="text-primary-fixed-dim dark:text-on-surface-variant hover:text-white transition-colors hover:underline decoration-secondary decoration-2 underline-offset-4" href="#">개인정보 처리방침</a>
+<a class="text-primary-fixed-dim dark:text-on-surface-variant hover:text-white transition-colors hover:underline decoration-secondary decoration-2 underline-offset-4" href="#">대회 규정</a>
+<a class="text-primary-fixed-dim dark:text-on-surface-variant hover:text-white transition-colors hover:underline decoration-secondary decoration-2 underline-offset-4" href="#">문의하기</a>
+<a class="text-primary-fixed-dim dark:text-on-surface-variant hover:text-white transition-colors hover:underline decoration-secondary decoration-2 underline-offset-4" href="#">후원 안내</a>
+</nav>
+</div>
+</footer>
+</body></html>

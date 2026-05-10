@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>경희대학교 총장배 골프대회 - 홈</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link as="style" crossorigin="" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-container": "#745c00",
+                        "surface": "#f8f9fa",
+                        "surface-dim": "#d9dadb",
+                        "on-secondary-fixed": "#241a00",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f3f4f5",
+                        "outline-variant": "#c1c8c4",
+                        "surface-tint": "#43655c",
+                        "tertiary-fixed-dim": "#e9c176",
+                        "primary-fixed": "#c5eadf",
+                        "tertiary-container": "#483200",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e7e8e9",
+                        "surface-container-highest": "#e1e3e4",
+                        "outline": "#717976",
+                        "on-secondary-fixed-variant": "#574500",
+                        "on-primary-fixed": "#00201a",
+                        "surface-container": "#edeeef",
+                        "surface-variant": "#e1e3e4",
+                        "secondary-fixed-dim": "#e9c349",
+                        "primary-fixed-dim": "#aacec3",
+                        "surface-bright": "#f8f9fa",
+                        "tertiary-fixed": "#ffdea5",
+                        "tertiary": "#2d1e00",
+                        "on-tertiary-container": "#be9953",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#261900",
+                        "on-error-container": "#93000a",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#5d4201",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#aacec3",
+                        "background": "#f8f9fa",
+                        "primary": "#01261f",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "on-primary-container": "#83a69c",
+                        "on-background": "#191c1d",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#f0f1f2",
+                        "secondary-fixed": "#ffe088",
+                        "secondary-container": "#fed65b",
+                        "on-primary-fixed-variant": "#2b4d44",
+                        "primary-container": "#1a3c34",
+                        "secondary": "#735c00",
+                        "on-surface": "#191c1d",
+                        "on-surface-variant": "#414846"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "base": "8px",
+                        "md": "24px",
+                        "xl": "80px",
+                        "xs": "4px",
+                        "lg": "48px",
+                        "sm": "12px",
+                        "margin-mobile": "16px"
+                    },
+                    fontFamily: {
+                        "body-lg": ["Pretendard"],
+                        "label-bold": ["Pretendard"],
+                        "display-lg-mobile": ["Pretendard"],
+                        "headline-md": ["Pretendard"],
+                        "headline-lg": ["Pretendard"],
+                        "body-md": ["Pretendard"],
+                        "display-lg": ["Pretendard"],
+                        "stat-number": ["Pretendard"]
+                    },
+                    fontSize: {
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "label-bold": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "display-lg-mobile": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "800" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "700" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "700" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "800" }],
+                        "stat-number": ["24px", { lineHeight: "24px", fontWeight: "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f8f9fa; /* background */
+            color: #191c1d; /* on-background */
+            font-family: 'Pretendard', sans-serif;
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-primary/90 backdrop-blur-md shadow-sm">
+<div class="flex items-center justify-between px-margin-mobile h-16 w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-on-primary font-bold text-sm">KHU</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-secondary-fixed uppercase tracking-tight">KHU 경희대학교 총장배</h1>
+</div>
+<!-- Desktop Nav -->
+<nav class="hidden md:flex gap-8">
+<a class="text-primary dark:text-secondary-fixed font-bold" href="#">홈</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity" href="#">리더보드</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity" href="#">공지사항</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity" href="#">내 기록</a>
+</nav>
+<button aria-label="알림" class="text-primary dark:text-primary-fixed hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<main class="pt-16 max-w-container-max mx-auto">
+<!-- Hero Section -->
+<section class="relative w-full h-[600px] md:h-[700px] bg-primary flex items-center bg-cover bg-center overflow-hidden" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCnJy_JZ6lVjmj8zcdfKJ8MaYPGYWmtm_8ROeOcVi_e9iyWDVC3ix9foJTbKfjRITfUdrAr3wMS0rMcwKqqiiIfxh949u524oakkI9G90LFJ6R7mJLPfEGydifMsbILYrf5ZFec_KcZcjm6X1-wBM4tMrETYEY9vhap6DfW1YZyri5M7wQsY4g4-GUYWU8ldKgHXM1RU3W9j6ns5bDDkNrPZ8C7lSwkIMdVvrrKXspjnjXGW50tXrzyEhdsOzs1W_QXtvcB29DiVWff');">
+<!-- Overlay to ensure text readability -->
+<div class="absolute inset-0 bg-primary/70"></div>
+<div class="relative z-10 w-full px-margin-mobile md:px-gutter flex flex-col md:flex-row items-center justify-between gap-md">
+<!-- Hero Content -->
+<div class="text-white max-w-2xl">
+<p class="font-label-bold text-label-bold text-secondary-container tracking-widest uppercase mb-4">공식 대회 운영 플랫폼</p>
+<h2 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg font-extrabold mb-6 leading-tight">
+                    경희대학교 총장배 골프대회
+                </h2>
+<p class="font-body-lg text-body-lg text-surface-variant mb-8 max-w-xl">
+                    공지, 참가 안내, 결과 공개, 본인 기록 조회까지 한곳에서 운영하는 공식 대회 홈페이지입니다.
+                </p>
+<div class="flex flex-wrap gap-4">
+<button class="bg-secondary-container text-on-secondary-container font-label-bold text-label-bold px-6 py-3 rounded hover:opacity-90 transition-opacity shadow-sm">
+                        최신 공지 보기
+                    </button>
+<button class="border-[1.5px] border-surface text-surface font-label-bold text-label-bold px-6 py-3 rounded hover:bg-surface/10 transition-colors">
+                        회원가입
+                    </button>
+</div>
+</div>
+<!-- Next Tournament Card (Bento Style) -->
+<div class="bg-surface/95 backdrop-blur-md rounded-xl p-md shadow-lg w-full md:w-[400px] border border-outline-variant/20">
+<p class="font-label-bold text-label-bold text-primary mb-2 uppercase text-xs tracking-wider">다음 대회 안내</p>
+<h3 class="font-headline-md text-headline-md text-primary mb-1">제27회 경희대학교 총장배</h3>
+<p class="text-on-surface-variant text-sm mb-6">전국 골프대회</p>
+<div class="space-y-4">
+<div class="flex justify-between border-b border-surface-container-high pb-2">
+<span class="text-outline text-sm">장소</span>
+<span class="font-medium text-on-surface">경희대학교 지정 코스</span>
+</div>
+<div class="flex justify-between">
+<span class="text-outline text-sm">접수</span>
+<span class="font-medium text-on-surface">선수 서류 이메일 접수</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Operation Status Section (Bento Grid) -->
+<section class="py-xl px-margin-mobile md:px-gutter bg-surface-container-lowest">
+<div class="mb-lg flex flex-col md:flex-row md:justify-between md:items-end gap-4">
+<div>
+<p class="font-label-bold text-label-bold text-on-tertiary-container uppercase tracking-wider mb-2 text-xs">운영 데스크</p>
+<h2 class="font-headline-lg text-headline-lg text-primary">대회 운영 현황</h2>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-md">
+<!-- Card 1 -->
+<a class="bg-surface rounded-xl p-md border border-surface-container-high hover:shadow-[0_4px_12px_rgba(26,60,52,0.08)] transition-all group block" href="#">
+<div class="w-2 h-2 rounded-full bg-primary mb-4"></div>
+<h3 class="font-headline-md text-headline-md text-primary mb-3 group-hover:text-primary-container transition-colors">대회 공지</h3>
+<p class="text-on-surface-variant text-sm">일정, 장소, 제출 서류, 운영 안내를 확인합니다.</p>
+</a>
+<!-- Card 2 -->
+<a class="bg-surface rounded-xl p-md border border-surface-container-high hover:shadow-[0_4px_12px_rgba(26,60,52,0.08)] transition-all group block" href="#">
+<div class="w-2 h-2 rounded-full bg-primary mb-4"></div>
+<h3 class="font-headline-md text-headline-md text-primary mb-3 group-hover:text-primary-container transition-colors">대회 결과</h3>
+<p class="text-on-surface-variant text-sm">공개 결과는 순위, 이름, 총타수까지만 표시됩니다.</p>
+</a>
+<!-- Card 3 -->
+<a class="bg-surface rounded-xl p-md border border-surface-container-high hover:shadow-[0_4px_12px_rgba(26,60,52,0.08)] transition-all group block" href="#">
+<div class="w-2 h-2 rounded-full bg-primary mb-4"></div>
+<h3 class="font-headline-md text-headline-md text-primary mb-3 group-hover:text-primary-container transition-colors">내 기록</h3>
+<p class="text-on-surface-variant text-sm">선수 승인 후 본인 상세 스코어카드를 조회합니다.</p>
+</a>
+<!-- Card 4 -->
+<a class="bg-surface rounded-xl p-md border border-surface-container-high hover:shadow-[0_4px_12px_rgba(26,60,52,0.08)] transition-all group block" href="#">
+<div class="w-2 h-2 rounded-full bg-primary mb-4"></div>
+<h3 class="font-headline-md text-headline-md text-primary mb-3 group-hover:text-primary-container transition-colors">회원가입</h3>
+<p class="text-on-surface-variant text-sm">아이디 로그인과 약관 동의를 기반으로 일반 회원 계정을 만듭니다.</p>
+</a>
+</div>
+</section>
+<!-- Notice & Leaderboard Side-by-Side -->
+<section class="py-xl px-margin-mobile md:px-gutter bg-surface">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+<!-- Notice Column -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-sm border border-surface-container-high">
+<div class="flex justify-between items-center mb-6">
+<div>
+<p class="font-label-bold text-label-bold text-on-tertiary-container uppercase tracking-wider mb-1 text-xs">공지사항</p>
+<h2 class="font-headline-lg text-headline-lg text-primary">최신 공지</h2>
+</div>
+<a class="text-primary-container font-label-bold text-label-bold text-sm hover:underline" href="#">전체 보기</a>
+</div>
+<div class="space-y-0">
+<div class="flex flex-col sm:flex-row sm:items-center py-4 border-b border-surface-container hover:bg-surface-container-low transition-colors px-2 -mx-2 rounded">
+<span class="text-outline text-xs w-20 shrink-0 mb-1 sm:mb-0">대회 공지</span>
+<span class="font-medium text-on-surface flex-grow truncate">제27회 경희대학교 총장배 전국 골프대회 안내</span>
+<span class="text-outline text-xs shrink-0 sm:ml-4">2026.05.10</span>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-center py-4 border-b border-surface-container hover:bg-surface-container-low transition-colors px-2 -mx-2 rounded">
+<span class="text-outline text-xs w-20 shrink-0 mb-1 sm:mb-0">서류</span>
+<span class="font-medium text-on-surface flex-grow truncate">참가자 안전 서약서 및 개인정보 동의서 제출 안내</span>
+<span class="text-outline text-xs shrink-0 sm:ml-4">2026.05.10</span>
+</div>
+<div class="flex flex-col sm:flex-row sm:items-center py-4 hover:bg-surface-container-low transition-colors px-2 -mx-2 rounded">
+<span class="text-outline text-xs w-20 shrink-0 mb-1 sm:mb-0">운영</span>
+<span class="font-medium text-on-surface flex-grow truncate">선수 등록은 이메일 접수 후 관리자 승인으로 진행됩...</span>
+<span class="text-outline text-xs shrink-0 sm:ml-4">2026.05.10</span>
+</div>
+</div>
+</div>
+<!-- Leaderboard Column -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-sm border border-surface-container-high">
+<div class="flex justify-between items-center mb-6">
+<div>
+<p class="font-label-bold text-label-bold text-on-tertiary-container uppercase tracking-wider mb-1 text-xs">리더보드</p>
+<h2 class="font-headline-lg text-headline-lg text-primary">최근 대회 결과</h2>
+</div>
+<a class="text-primary-container font-label-bold text-label-bold text-sm hover:underline" href="#">결과 보기</a>
+</div>
+<div class="space-y-2">
+<!-- Header Row (Hidden on mobile) -->
+<div class="hidden sm:flex py-2 px-4 text-xs font-label-bold text-outline uppercase tracking-wider">
+<div class="w-12 text-center">순위</div>
+<div class="flex-grow">선수</div>
+<div class="w-16 text-center">파 대비</div>
+<div class="w-16 text-right">총 타수</div>
+</div>
+<!-- Rows -->
+<div class="flex items-center p-4 bg-surface-container-low rounded-lg">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shrink-0">1</div>
+<div class="ml-4 flex-grow font-medium text-on-surface">김서준</div>
+<div class="w-16 text-center text-sm font-medium text-on-surface-variant">-2</div>
+<div class="w-16 text-right font-stat-number text-stat-number text-primary">70</div>
+</div>
+<div class="flex items-center p-4 rounded-lg">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shrink-0">2</div>
+<div class="ml-4 flex-grow font-medium text-on-surface">박도윤</div>
+<div class="w-16 text-center text-sm font-medium text-on-surface-variant">E</div>
+<div class="w-16 text-right font-stat-number text-stat-number text-primary">72</div>
+</div>
+<div class="flex items-center p-4 bg-surface-container-low rounded-lg">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shrink-0">3</div>
+<div class="ml-4 flex-grow font-medium text-on-surface">이하린</div>
+<div class="w-16 text-center text-sm font-medium text-on-surface-variant">+1</div>
+<div class="w-16 text-right font-stat-number text-stat-number text-primary">73</div>
+</div>
+<div class="flex items-center p-4 rounded-lg">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shrink-0">4</div>
+<div class="ml-4 flex-grow font-medium text-on-surface">정민재</div>
+<div class="w-16 text-center text-sm font-medium text-on-surface-variant">+2</div>
+<div class="w-16 text-right font-stat-number text-stat-number text-primary">74</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl bg-surface/90 dark:bg-primary/95 backdrop-blur-lg shadow-[0_-4px_12px_rgba(26,60,52,0.08)] border-t border-outline-variant/20">
+<div class="flex justify-around items-center pt-2 pb-safe px-4">
+<!-- Home (Active) -->
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-full px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home" data-weight="fill">home</span>
+<span class="font-label-bold text-[10px] leading-tight">홈</span>
+</a>
+<!-- Leaderboard -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-secondary-fixed active:scale-90 transition-all duration-200 px-2 py-1" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="leaderboard">leaderboard</span>
+<span class="font-label-bold text-[10px] leading-tight">리더보드</span>
+</a>
+<!-- Notice -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-secondary-fixed active:scale-90 transition-all duration-200 px-2 py-1" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="campaign">campaign</span>
+<span class="font-label-bold text-[10px] leading-tight">공지사항</span>
+</a>
+<!-- My Record -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-secondary-fixed active:scale-90 transition-all duration-200 px-2 py-1" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="history_edu">history_edu</span>
+<span class="font-label-bold text-[10px] leading-tight">내 기록</span>
+</a>
+</div>
+</nav>
+</body></html>
