@@ -15,13 +15,11 @@ const mobileNavItems = [
   { label: "공지사항", icon: "campaign", href: "/notices" }
 ];
 
-const tournamentInfo = [
-  { icon: "calendar_today", label: "일정", value: "2026.10.14 (수) ~ 10.16 (금)" },
-  { icon: "location_on", label: "장소", value: "경희대학교 지정 코스" },
-  { icon: "sports_golf", label: "경기방식", value: "54홀 스트로크플레이" },
-  { icon: "flag", label: "기준파", value: "72 (전장 6,400yds)" },
-  { icon: "groups", label: "참가대상", value: "재학생 · 졸업생 · 교직원 · 초청" },
-  { icon: "mail", label: "접수", value: "khusports2026@gmail.com" }
+const tournaments = [
+  { name: "제27회 경희대학교 총장배", date: "2026.10.14 ~ 10.16", venue: "경희대 지정 코스", format: "54홀 스트로크플레이", status: "진행 중", statusType: "live" as const },
+  { name: "OK금융그룹 한국대학 골프대회", date: "2026.03.10 ~ 03.13", venue: "군산CC", format: "72홀 스트로크플레이", status: "예정", statusType: "upcoming" as const },
+  { name: "도미노피자배 우수대학생 골프대회", date: "2026.03.27 ~ 03.29", venue: "군산CC", format: "54홀 스트로크플레이", status: "예정", statusType: "upcoming" as const },
+  { name: "그랑디 KGA 회장배 전국대학", date: "2026.05.06 ~ 05.09", venue: "군산CC", format: "72홀 스트로크플레이", status: "예정", statusType: "upcoming" as const },
 ];
 
 const recentNotices = [
@@ -60,16 +58,22 @@ export default function HomePage() {
             </div>
             <Link className="home-view-all" href="/schedule">전체 보기</Link>
           </div>
-          <div className="home-tourney-info">
-            <h3>제27회 경희대학교 총장배 전국 골프대회</h3>
-            {tournamentInfo.map((item) => (
-              <div className="home-tourney-row" key={item.label}>
-                <div className="home-tourney-label">
-                  <span className="material-symbols-outlined">{item.icon}</span>
-                  <span>{item.label}</span>
+          <div className="home-tourney-list">
+            {tournaments.map((t) => (
+              <Link className={`home-tourney-item ${t.statusType}`} href="/schedule" key={t.name}>
+                <div className="home-tourney-item-top">
+                  <strong>{t.name}</strong>
+                  <span className={`home-tourney-status ${t.statusType}`}>
+                    {t.statusType === "live" && <i />}
+                    {t.status}
+                  </span>
                 </div>
-                <span className="home-tourney-value">{item.value}</span>
-              </div>
+                <div className="home-tourney-item-meta">
+                  <span><span className="material-symbols-outlined">calendar_today</span>{t.date}</span>
+                  <span><span className="material-symbols-outlined">location_on</span>{t.venue}</span>
+                  <span><span className="material-symbols-outlined">sports_golf</span>{t.format}</span>
+                </div>
+              </Link>
             ))}
           </div>
         </div>

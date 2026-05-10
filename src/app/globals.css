@@ -1289,7 +1289,7 @@ p {
   min-height: 560px;
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .home-hero-overlay {
@@ -1627,52 +1627,92 @@ p {
   color: var(--primary);
 }
 
-/* Home Tournament Info */
-.home-tourney-info {
-  padding: 4px 0;
-}
-
-.home-tourney-info h3 {
-  border-bottom: 1px solid var(--line);
-  color: var(--primary);
-  font-size: 16px;
-  font-weight: 900;
-  margin: 0;
-  padding: 0 0 14px;
-}
-
-.home-tourney-row {
-  align-items: center;
-  border-bottom: 1px solid rgba(216, 223, 219, 0.4);
+/* Home Tournament List */
+.home-tourney-list {
   display: flex;
-  gap: 12px;
-  padding: 13px 0;
+  flex-direction: column;
+  gap: 0;
 }
 
-.home-tourney-row:last-child {
+.home-tourney-item {
+  border-bottom: 1px solid rgba(216, 223, 219, 0.4);
+  display: block;
+  padding: 16px 0;
+  transition: background 120ms ease;
+}
+
+.home-tourney-item:last-child {
   border-bottom: none;
 }
 
-.home-tourney-label {
+.home-tourney-item:hover {
+  background: var(--surface-low);
+  border-radius: 8px;
+  margin: 0 -12px;
+  padding: 16px 12px;
+}
+
+.home-tourney-item-top {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.home-tourney-item-top strong {
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.home-tourney-status {
+  align-items: center;
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 900;
+  gap: 5px;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
+.home-tourney-status.live {
+  background: rgba(254, 214, 91, 0.35);
+  color: #745c00;
+}
+
+.home-tourney-status.live i {
+  animation: pulse-dot 1.5s infinite;
+  background: var(--danger);
+  border-radius: 999px;
+  display: block;
+  height: 6px;
+  width: 6px;
+}
+
+.home-tourney-status.upcoming {
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
+}
+
+.home-tourney-item-meta {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.home-tourney-item-meta > span {
   align-items: center;
   color: var(--muted);
   display: flex;
   font-size: 13px;
-  font-weight: 700;
-  gap: 6px;
-  min-width: 100px;
-  white-space: nowrap;
+  gap: 4px;
 }
 
-.home-tourney-label .material-symbols-outlined {
+.home-tourney-item-meta .material-symbols-outlined {
   color: var(--primary);
-  font-size: 18px;
-}
-
-.home-tourney-value {
-  color: var(--ink);
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 16px;
 }
 
 /* Home Responsive */
