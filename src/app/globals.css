@@ -2190,16 +2190,66 @@ p {
   justify-content: center;
 }
 
+/* Hero Label */
+.about-hero-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+/* Capability Grid */
+.about-capability-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.about-capability-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 28px 24px;
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.about-capability-card:hover {
+  box-shadow: 0 8px 24px rgba(26, 60, 52, 0.1);
+  transform: translateY(-2px);
+}
+
+.about-capability-card .material-symbols-outlined {
+  color: var(--primary);
+  font-size: 28px;
+}
+
+.about-capability-card strong {
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.about-capability-card p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+
 /* About Responsive */
 @media (max-width: 900px) {
   .about-features { grid-template-columns: 1fr; }
-  .about-timeline { grid-template-columns: repeat(2, 1fr); }
   .about-overview-grid { grid-template-columns: repeat(2, 1fr); }
+  .about-capability-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 760px) {
   .about-hero { min-height: 260px; }
-  .about-timeline { grid-template-columns: 1fr; }
+  .about-capability-grid { grid-template-columns: 1fr; }
   .about-cta-section { padding: 32px 20px; }
   .about-cta-actions { flex-direction: column; align-items: center; }
 }

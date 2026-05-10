@@ -16,38 +16,40 @@ const features = [
   {
     icon: "info",
     title: "대회 정보 확인",
-    body: "대회 일정, 코스 정보, 경기 규정 등 토너먼트 진행에 필요한 모든 상세 정보를 확인하실 수 있습니다.",
+    body: "대회 일정, 장소, 코스 정보, 경기 규정 등 경희대학교 총장배 골프대회의 모든 상세 정보를 한눈에 확인하세요.",
     link: { text: "자세히 보기 →", href: "/schedule" },
     highlight: false
   },
   {
     icon: "edit_note",
     title: "참가 신청",
-    body: "이메일 접수를 통해 간편하게 대회 참가 접수를 진행하세요. 선수 등록 서류 제출 후 관리자 승인을 거쳐 PLAYER로 전환됩니다.",
+    body: "온라인으로 간편하게 대회 참가 접수를 진행하세요. 선수 등록 서류를 이메일로 접수하면 관리자 승인 후 PLAYER로 전환됩니다.",
     link: { text: "지금 신청하기", href: "mailto:khusports2026@gmail.com" },
     highlight: true
   },
   {
     icon: "history",
     title: "참가 이력 조회",
-    body: "과거 출전했던 대회 기록과 성적, 핸디캡 변화 등 개인의 모든 골프 대회 이력을 관리합니다.",
+    body: "과거 출전한 대회 기록과 라운드별 스코어, 성적 변화 등 개인의 모든 골프 대회 이력을 관리합니다.",
     link: { text: "내역 확인 →", href: "/mypage" },
     highlight: false
   }
 ];
 
-const timeline = [
-  { step: "01", title: "회원가입", desc: "아이디, 이름, 생년월일, 연락처 등 기본 정보를 입력하고 약관에 동의합니다." },
-  { step: "02", title: "선수 등록 서류 제출", desc: "참가 서약서 및 개인정보 동의서를 이메일(khusports2026@gmail.com)로 접수합니다." },
-  { step: "03", title: "관리자 승인", desc: "운영국에서 서류를 검토한 후 GENERAL → PLAYER로 회원 유형을 전환합니다." },
-  { step: "04", title: "대회 출전", desc: "승인 완료 후 대회에 출전하고, 경기 결과는 본인 마이페이지에서 확인할 수 있습니다." }
+const capabilities = [
+  { icon: "sports_golf", title: "실시간 경기결과", desc: "FULL LEADERBOARD와 SCORECARD로 라운드별·홀별 스코어를 실시간 확인" },
+  { icon: "event_note", title: "대회 정보", desc: "스폰서, 일정, 장소, 전장거리, 경기방식 등 대회별 상세 정보 제공" },
+  { icon: "campaign", title: "공지사항", desc: "대회 관련 규정 변경, 일정 업데이트, 긴급 공지를 카드형 피드로 확인" },
+  { icon: "person", title: "마이페이지", desc: "본인의 상세 스코어카드, 참가 이력, 회원 정보를 한곳에서 관리" },
+  { icon: "admin_panel_settings", title: "어드민 운영", desc: "스코어 입력, 회원 관리, 약관 발행 등 대회 운영 전반을 체계적으로 관리" },
+  { icon: "security", title: "개인정보 보호", desc: "상세 스코어카드는 본인만 조회 가능, 탈퇴 시 개인정보 삭제·스코어 익명화" }
 ];
 
-const faqs = [
-  { q: "참가 자격은 어떻게 되나요?", a: "경희대학교 재학생, 졸업생, 교직원 및 초청 게스트가 참가할 수 있습니다. 상세 자격 요건은 각 대회 요강을 참고하세요." },
-  { q: "대회 결과는 어디서 확인하나요?", a: "경기결과 페이지에서 순위, 이름, 총타수를 확인할 수 있습니다. 상세 스코어카드는 본인만 조회 가능합니다." },
-  { q: "선수 등록 후 승인까지 얼마나 걸리나요?", a: "서류 접수 후 통상 3~5 영업일 내에 승인됩니다. 승인 결과는 등록된 이메일로 안내드립니다." },
-  { q: "회원 탈퇴 시 기록은 어떻게 되나요?", a: "탈퇴 신청 후 30일 유예 기간이 적용되며, 이후 개인정보는 삭제됩니다. 스코어 기록은 익명화되어 보존됩니다." }
+const stats = [
+  { value: "27회", label: "역사와 전통" },
+  { value: "120+", label: "매년 참가 선수" },
+  { value: "54홀", label: "스트로크플레이" },
+  { value: "6,400yds", label: "코스 전장" }
 ];
 
 export default function AboutPage() {
@@ -62,10 +64,11 @@ export default function AboutPage() {
       >
         <div className="about-hero-overlay" />
         <div className="about-hero-content">
-          <h1>경희대학교 총장배 골프대회</h1>
+          <p className="about-hero-label">About KHU Sports</p>
+          <h1>경희대학교 골프대회의<br />모든 것을 한 곳에서</h1>
           <p>
-            경희대학교의 스포츠 정신과 골프의 전통이 만나는 대학 골프 토너먼트.<br />
-            선수 등록부터 경기 결과 조회까지, KHU Sports가 함께합니다.
+            대회 정보 확인부터 참가 신청, 실시간 경기결과 조회, 개인 스코어 관리까지 —<br />
+            KHU Sports는 경희대학교 총장배 골프대회를 위한 통합 플랫폼입니다.
           </p>
         </div>
       </section>
@@ -88,76 +91,44 @@ export default function AboutPage() {
         ))}
       </section>
 
-      {/* 참가 절차 Timeline */}
+      {/* What We Offer */}
       <section className="about-section">
         <div className="about-section-header">
-          <p className="stitch-label">How to Participate</p>
-          <h2>참가 절차</h2>
-          <p>간단한 4단계로 대회에 참가하세요.</p>
+          <p className="stitch-label">What We Offer</p>
+          <h2>KHU Sports에서 할 수 있는 것들</h2>
+          <p>대회 참가자와 운영진 모두를 위한 기능을 제공합니다.</p>
         </div>
-        <div className="about-timeline">
-          {timeline.map((t) => (
-            <div className="about-timeline-step" key={t.step}>
-              <span className="about-step-num">{t.step}</span>
-              <div>
-                <strong>{t.title}</strong>
-                <p>{t.desc}</p>
-              </div>
+        <div className="about-capability-grid">
+          {capabilities.map((c) => (
+            <div className="about-capability-card" key={c.title}>
+              <span className="material-symbols-outlined">{c.icon}</span>
+              <strong>{c.title}</strong>
+              <p>{c.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 대회 개요 */}
+      {/* Stats */}
       <section className="about-section">
         <div className="about-section-header">
-          <p className="stitch-label">Tournament Overview</p>
-          <h2>대회 개요</h2>
+          <p className="stitch-label">Tournament at a Glance</p>
+          <h2>경희대학교 총장배 골프대회</h2>
         </div>
         <div className="about-overview-grid">
-          <div className="about-overview-card">
-            <span className="material-symbols-outlined">emoji_events</span>
-            <strong>27회</strong>
-            <small>역사와 전통</small>
-          </div>
-          <div className="about-overview-card">
-            <span className="material-symbols-outlined">groups</span>
-            <strong>120+명</strong>
-            <small>매년 참가 선수</small>
-          </div>
-          <div className="about-overview-card">
-            <span className="material-symbols-outlined">sports_golf</span>
-            <strong>54홀</strong>
-            <small>스트로크플레이</small>
-          </div>
-          <div className="about-overview-card">
-            <span className="material-symbols-outlined">school</span>
-            <strong>경희대학교</strong>
-            <small>주최 · 총장배</small>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="about-section">
-        <div className="about-section-header">
-          <p className="stitch-label">FAQ</p>
-          <h2>자주 묻는 질문</h2>
-        </div>
-        <div className="about-faq-list">
-          {faqs.map((faq) => (
-            <details className="about-faq-item" key={faq.q}>
-              <summary>{faq.q}</summary>
-              <p>{faq.a}</p>
-            </details>
+          {stats.map((s) => (
+            <div className="about-overview-card" key={s.label}>
+              <strong>{s.value}</strong>
+              <small>{s.label}</small>
+            </div>
           ))}
         </div>
       </section>
 
       {/* CTA */}
       <section className="about-cta-section">
-        <h2>대회 참가를 준비하세요</h2>
-        <p>선수 등록 서류를 이메일로 접수하면, 운영국 확인 후 PLAYER로 전환됩니다.</p>
+        <h2>지금 시작하세요</h2>
+        <p>회원가입 후 선수 등록을 완료하면 대회에 참가할 수 있습니다.</p>
         <div className="about-cta-actions">
           <Link className="home-btn primary" href="/signup">회원가입</Link>
           <a className="home-btn outline" href="mailto:khusports2026@gmail.com">선수 등록 문의</a>
