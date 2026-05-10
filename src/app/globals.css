@@ -1715,6 +1715,28 @@ p {
   font-size: 16px;
 }
 
+.home-tourney-more {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  color: var(--primary);
+  display: flex;
+  font-size: 14px;
+  font-weight: 800;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 4px;
+  padding: 16px 0 4px;
+  transition: color 160ms ease;
+}
+
+.home-tourney-more:hover {
+  color: var(--primary-soft);
+}
+
+.home-tourney-more .material-symbols-outlined {
+  font-size: 18px;
+}
+
 /* Home Responsive */
 @media (max-width: 1080px) {
   .home-content {

@@ -59,7 +59,7 @@ export default function HomePage() {
             <Link className="home-view-all" href="/schedule">전체 보기</Link>
           </div>
           <div className="home-tourney-list">
-            {tournaments.map((t) => (
+            {tournaments.slice(0, 3).map((t) => (
               <Link className={`home-tourney-item ${t.statusType}`} href="/schedule" key={t.name}>
                 <div className="home-tourney-item-top">
                   <strong>{t.name}</strong>
@@ -76,6 +76,10 @@ export default function HomePage() {
               </Link>
             ))}
           </div>
+          <Link className="home-tourney-more" href="/schedule">
+            대회 정보 더보기
+            <span className="material-symbols-outlined">arrow_forward</span>
+          </Link>
         </div>
 
         <div className="home-sidebar">
