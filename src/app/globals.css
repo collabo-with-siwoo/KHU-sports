@@ -1873,6 +1873,337 @@ p {
   font-size: 18px;
 }
 
+/* ===== ABOUT PAGE ===== */
+.about-hero {
+  background-color: var(--primary);
+  background-position: center;
+  background-size: cover;
+  margin-top: 64px;
+  min-height: 340px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.about-hero-overlay {
+  background: linear-gradient(to top, rgba(26, 60, 52, 0.85), rgba(26, 60, 52, 0.2));
+  inset: 0;
+  position: absolute;
+}
+
+.about-hero-content {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 48px clamp(16px, 3vw, 40px);
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
+
+.about-hero-content h1 {
+  color: white;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 900;
+  margin: 0 0 12px;
+}
+
+.about-hero-content p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 560px;
+}
+
+/* Feature Cards */
+.about-features {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0 auto;
+  max-width: var(--container);
+  padding: 48px clamp(16px, 3vw, 40px);
+}
+
+.about-feature-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(26, 60, 52, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 32px 28px;
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.about-feature-card:hover {
+  box-shadow: 0 8px 24px rgba(26, 60, 52, 0.1);
+  transform: translateY(-2px);
+}
+
+.about-feature-card.highlight {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.about-feature-card.highlight h2 { color: white; }
+.about-feature-card.highlight p { color: rgba(255, 255, 255, 0.8); }
+
+.about-feature-icon {
+  align-items: center;
+  background: var(--surface-low);
+  border-radius: 999px;
+  display: flex;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
+.about-feature-icon .material-symbols-outlined {
+  color: var(--primary);
+  font-size: 24px;
+}
+
+.about-feature-icon.gold {
+  background: rgba(198, 168, 84, 0.25);
+}
+
+.about-feature-icon.gold .material-symbols-outlined {
+  color: var(--gold);
+}
+
+.about-feature-card h2 {
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 900;
+  margin: 0;
+}
+
+.about-feature-card p {
+  color: var(--muted);
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.about-feature-link {
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 800;
+  margin-top: auto;
+}
+
+.about-cta-btn {
+  background: var(--gold);
+  border-radius: 10px;
+  color: white;
+  display: block;
+  font-size: 15px;
+  font-weight: 900;
+  margin-top: auto;
+  padding: 14px;
+  text-align: center;
+  transition: background 160ms ease;
+}
+
+.about-cta-btn:hover {
+  background: var(--gold-soft);
+}
+
+/* About Sections */
+.about-section {
+  margin: 0 auto;
+  max-width: var(--container);
+  padding: 48px clamp(16px, 3vw, 40px);
+}
+
+.about-section-header {
+  margin-bottom: 32px;
+}
+
+.about-section-header h2 {
+  color: var(--primary);
+  font-size: clamp(22px, 2.5vw, 28px);
+  font-weight: 900;
+  margin: 4px 0 8px;
+}
+
+.about-section-header > p:last-child {
+  color: var(--muted);
+  font-size: 15px;
+  margin: 0;
+}
+
+/* Timeline */
+.about-timeline {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.about-timeline-step {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.about-step-num {
+  align-items: center;
+  background: var(--primary);
+  border-radius: 999px;
+  color: white;
+  display: flex;
+  font-size: 14px;
+  font-weight: 900;
+  height: 36px;
+  justify-content: center;
+  width: 36px;
+}
+
+.about-timeline-step strong {
+  color: var(--ink);
+  font-size: 16px;
+}
+
+.about-timeline-step p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Overview Grid */
+.about-overview-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.about-overview-card {
+  align-items: center;
+  background: var(--surface-low);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 32px 16px;
+  text-align: center;
+}
+
+.about-overview-card .material-symbols-outlined {
+  color: var(--primary);
+  font-size: 32px;
+}
+
+.about-overview-card strong {
+  color: var(--ink);
+  font-size: 24px;
+}
+
+.about-overview-card small {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* FAQ */
+.about-faq-list {
+  display: grid;
+  gap: 12px;
+}
+
+.about-faq-item {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.about-faq-item summary {
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 800;
+  list-style: none;
+  padding: 20px 24px;
+  transition: background 160ms ease;
+}
+
+.about-faq-item summary::-webkit-details-marker { display: none; }
+
+.about-faq-item summary::before {
+  content: "+";
+  color: var(--primary);
+  font-size: 20px;
+  font-weight: 900;
+  margin-right: 12px;
+}
+
+.about-faq-item[open] summary::before {
+  content: "−";
+}
+
+.about-faq-item[open] summary {
+  background: var(--surface-low);
+}
+
+.about-faq-item p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+  margin: 0;
+  padding: 0 24px 20px;
+}
+
+/* CTA Section */
+.about-cta-section {
+  background: var(--surface-low);
+  border-radius: 16px;
+  margin: 20px auto 48px;
+  max-width: var(--container);
+  padding: 48px;
+  text-align: center;
+}
+
+.about-cta-section h2 {
+  color: var(--primary);
+  font-size: 24px;
+  font-weight: 900;
+  margin: 0 0 12px;
+}
+
+.about-cta-section > p {
+  color: var(--muted);
+  font-size: 15px;
+  margin: 0 0 24px;
+}
+
+.about-cta-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+/* About Responsive */
+@media (max-width: 900px) {
+  .about-features { grid-template-columns: 1fr; }
+  .about-timeline { grid-template-columns: repeat(2, 1fr); }
+  .about-overview-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 760px) {
+  .about-hero { min-height: 260px; }
+  .about-timeline { grid-template-columns: 1fr; }
+  .about-cta-section { padding: 32px 20px; }
+  .about-cta-actions { flex-direction: column; align-items: center; }
+}
+
 /* ===== NOTICES GRID CARDS ===== */
 .notices-header {
   display: flex;
