@@ -1394,12 +1394,13 @@ p {
 
 /* Content Grid */
 .home-content {
+  align-items: start;
   display: grid;
   gap: 24px;
   grid-template-columns: minmax(0, 1.6fr) minmax(300px, 0.8fr);
   margin: 0 auto;
   max-width: var(--container);
-  padding: 48px clamp(16px, 3vw, 40px) 80px;
+  padding: 40px clamp(16px, 3vw, 40px) 60px;
 }
 
 /* Leaderboard Card */
