@@ -37,3 +37,16 @@
 - GitHub Pages can host the current site only as a static preview. Real Supabase-backed login/signup persistence needs a server runtime later.
 - To make the Pages export work, M1 forms now use client-side zod validation instead of Server Actions.
 - `khu-sports.com` is represented in `public/CNAME`; Cloudflare DNS must point the apex records to GitHub Pages IPs and `www` to the GitHub Pages default domain.
+
+## 2026-05-10 22:07 KST - Stitch design integration
+
+- The Stitch commit added static HTML and design references, but the GitHub Pages workflow deploys the Next.js `out/` directory, so the design must be ported into `src/app`.
+- Use Stitch's Majestic Green direction, bento-style sections, sticky desktop navigation, and mobile bottom navigation as the visual source.
+- Keep MVP copy aligned with the PRD: no real-time scoring claims, no payment flow, public result summaries only, and player registration via email/admin approval.
+
+## 2026-05-10 22:45 KST - Stitch baseline redesign correction
+
+- The first integration preserved too much of the earlier homepage composition.
+- The corrected direction should treat the Stitch HTML files as the baseline screen architecture: fixed TopAppBar, app-like mobile bottom navigation, surface-container cards, leaderboard table/list, and notice-card feed.
+- Completion: `/`, `/results`, and `/notices` now use the Stitch screen architecture and passed desktop/mobile screenshot checks. Public leaderboard copy remains summary-only until M4 data and update flows exist.
+- Any Stitch copy that implies true real-time scoring should be softened to "공개 리더보드" until M4 data and update flows exist.

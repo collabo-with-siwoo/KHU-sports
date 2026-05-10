@@ -10,8 +10,8 @@ export default function ResetPasswordPage() {
         </Link>
         <div>
           <p className="eyebrow">Password Reset</p>
-          <h1>가입 이메일로 재설정 링크를 보냅니다</h1>
-          <p>Resend 또는 Supabase 메일 설정이 연결되면 30분 만료 링크를 발송합니다.</p>
+          <h1>가입 이메일로 재설정 링크를 받습니다</h1>
+          <p>가입한 이메일 주소로 계정 복구 절차를 진행합니다.</p>
         </div>
       </section>
       <section className="auth-panel">

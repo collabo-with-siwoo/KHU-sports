@@ -88,3 +88,32 @@
 - Branch: `fix/hero-title-wrapping`.
 - Change: Added dedicated `home-title` and `admin-title` classes with desktop `white-space: nowrap` and adjusted responsive font sizes.
 - Status: Verifying with typecheck, lint, Prisma validation, and static export build.
+
+## 2026-05-10 22:07 KST - Stitch design integration
+
+- Request: Replace the current app UI with the Stitch design direction, keep it aligned with the PRD, and avoid implementing unnecessary future features.
+- Milestone: M1 visual integration / M6 design foundation.
+- Branch: `feat/stitch-next-ui`.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Status: Integrating the Stitch visual language into the Next.js App Router pages and correcting corrupted Korean copy/JSX from the static Stitch import.
+- Result:
+  - Ported the Stitch design direction into public, auth, terms, mypage, results, and admin pages.
+  - Corrected Korean UI copy and auth validation messages.
+  - Updated `docs/context.md`, `docs/specs.md`, and `docs/spec-changelog.md`.
+  - Verification passed: typecheck, lint, Prisma validation, production build, static GitHub Pages export build, local content checks for `/`, `/admin`, and `/results`, and Playwright screenshot checks for desktop/mobile home and desktop admin.
+  - Restarted the local dev server after production/export builds so `http://127.0.0.1:3000` serves clean dev output.
+- Conclusion: Stitch is now integrated into the actual Next.js app path. Future Supabase/R2-backed behavior remains intentionally unimplemented until the related milestones.
+
+## 2026-05-10 22:45 KST - Stitch baseline redesign correction
+
+- Request: The previous pass still felt like the old design with small improvements; replace the baseline with the Stitch mobile/desktop designs.
+- Milestone: M1 visual integration / M6 design foundation.
+- Branch: `feat/stitch-next-ui`.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Status: Reworking the public home, results, and notices pages around the Stitch screen structure rather than the previous site-shell structure.
+- Result:
+  - Replaced `/`, `/results`, and `/notices` with Stitch-style top app bars, mobile bottom navigation, compact headers, dense cards/lists, and PRD-aligned placeholder content.
+  - Moved external font loading into global CSS to avoid Next.js custom font lint warnings.
+  - Restarted the local dev server after build/export verification.
+  - Verification passed: typecheck, lint, Prisma validation, production build, static GitHub Pages export build, and Playwright screenshots for desktop/mobile `/`, `/results`, and `/notices`.
+- Conclusion: The public baseline now follows the Stitch design structure rather than the earlier KPGA-inspired shell. Further pages can be brought over incrementally as M1-M7 functionality is wired.

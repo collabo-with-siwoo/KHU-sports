@@ -10,10 +10,10 @@ export default function SignupPage() {
         </Link>
         <div>
           <p className="eyebrow">Create Account</p>
-          <h1>일반 회원으로 가입 후 선수 등록을 신청합니다</h1>
+          <h1>일반 회원으로 가입하고 선수 등록을 신청하세요</h1>
           <p>
-            가입 직후 회원 유형은 GENERAL이며, 이메일 서류 접수와 관리자 승인
-            후 PLAYER로 전환됩니다.
+            가입 직후 회원 유형은 GENERAL입니다. 선수 등록 서류 접수 후
+            관리자 승인으로 PLAYER 전환이 진행됩니다.
           </p>
         </div>
       </section>

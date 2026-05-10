@@ -1,36 +1,100 @@
 import Link from "next/link";
 
-const results = [
-  { rank: 1, name: "김서준", total: 70 },
-  { rank: 2, name: "박도윤", total: 72 },
-  { rank: 3, name: "이하린", total: 73 }
+const navItems = [
+  { label: "홈", icon: "home", href: "/" },
+  { label: "리더보드", icon: "leaderboard", href: "/results" },
+  { label: "공지사항", icon: "campaign", href: "/notices" },
+  { label: "내 기록", icon: "history_edu", href: "/mypage" }
+];
+
+const rows = [
+  { rank: 1, name: "김서준", team: "경희대학교", diff: "-2", total: 70, initials: "KS" },
+  { rank: 2, name: "박도윤", team: "동문회", diff: "E", total: 72, initials: "PD" },
+  { rank: 3, name: "이하린", team: "경희대학교", diff: "+1", total: 73, initials: "LH" },
+  { rank: 4, name: "정민재", team: "게스트", diff: "+2", total: 74, initials: "JM" },
+  { rank: 5, name: "최지우", team: "경희대학교", diff: "+3", total: 75, initials: "CJ" }
 ];
 
 export default function ResultsPage() {
   return (
-    <main className="sub-shell">
-      <header className="sub-header">
-        <Link href="/">KHU Sports Golf</Link>
-        <Link href="/admin">관리자</Link>
+    <main className="stitch-app">
+      <header className="stitch-topbar">
+        <Link className="stitch-brand compact" href="/">
+          <span className="material-symbols-outlined">sports_golf</span>
+          <strong>KHU PRESIDENT&apos;S CUP</strong>
+        </Link>
+        <nav className="stitch-desktop-nav" aria-label="주요 메뉴">
+          {navItems.map((item) => (
+            <Link className={item.href === "/results" ? "active" : ""} href={item.href} key={item.href}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <Link aria-label="로그인" className="stitch-icon-button" href="/login">
+          <span className="material-symbols-outlined">notifications</span>
+        </Link>
       </header>
-      <section className="sub-hero">
-        <div>
-          <p className="eyebrow">Results</p>
-          <h1>대회 결과</h1>
-          <p className="lead">
-            공개 결과는 순위, 이름, 총타수까지만 노출합니다.
-          </p>
+
+      <section className="stitch-page-canvas leaderboard-page">
+        <div className="stitch-page-title">
+          <div>
+            <span className="live-chip">
+              <i />
+              공개
+            </span>
+            <span className="round-label">라운드 1 · 경희대학교 지정 코스</span>
+          </div>
+          <h1>리더보드</h1>
+        </div>
+
+        <div className="stitch-filterbar">
+          <label>
+            <span className="material-symbols-outlined">search</span>
+            <input placeholder="선수명 검색" />
+          </label>
+          <button type="button">
+            <span className="material-symbols-outlined">tune</span>
+            필터
+          </button>
+        </div>
+
+        <div className="stitch-score-table">
+          <div className="score-head">
+            <span>순위</span>
+            <span>선수명</span>
+            <span>대비</span>
+            <span>총타</span>
+          </div>
+          {rows.map((row) => (
+            <article className={row.rank === 1 ? "score-row leader" : "score-row"} key={row.rank}>
+              <div>
+                <span>{row.rank}</span>
+              </div>
+              <div className="player-cell">
+                <i>{row.initials}</i>
+                <span>
+                  <strong>{row.name}</strong>
+                  <small>{row.team}</small>
+                </span>
+              </div>
+              <b>{row.diff}</b>
+              <em>{row.total}</em>
+            </article>
+          ))}
+          <footer>
+            <button type="button">선수 더 보기</button>
+          </footer>
         </div>
       </section>
-      <section className="result-board">
-        {results.map((result) => (
-          <article className="result-item" key={result.rank}>
-            <span>{result.rank}</span>
-            <strong>{result.name}</strong>
-            <p>{result.total}타</p>
-          </article>
+
+      <nav className="stitch-bottom-nav" aria-label="모바일 메뉴">
+        {navItems.map((item) => (
+          <Link className={item.href === "/results" ? "active" : ""} href={item.href} key={item.href}>
+            <span className="material-symbols-outlined">{item.icon}</span>
+            <small>{item.label}</small>
+          </Link>
         ))}
-      </section>
+      </nav>
     </main>
   );
 }

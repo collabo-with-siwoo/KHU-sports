@@ -5,7 +5,7 @@
 - Date: 2026-05-10
 - Active milestone: M1 authentication and agreements.
 - M0 progress: local project foundation complete; external account setup remains.
-- Latest action: Added GitHub Pages static export deployment for `khu-sports.com` and adjusted M1 forms for static preview compatibility.
+- Latest action: Replaced the public home, leaderboard, and notices baselines with the Stitch app-style screen structure.
 - Required docs note: `docs/specs.md` now exists and should be kept synchronized with code changes.
 
 ## Recent Changes
@@ -27,6 +27,12 @@
 - Deployment instructions added in `docs/deployment.md`.
 - DNS check on 2026-05-10 returned no A records for `khu-sports.com`; Cloudflare DNS still needs GitHub Pages records.
 - Adjusted hero heading styles so desktop Korean titles remain on one line.
+- New branch: `feat/stitch-next-ui`.
+- Integrated the Stitch "Majestic Green" visual direction into the actual Next.js pages instead of relying on the root static `index.html`.
+- Reworked the homepage with a sticky desktop nav, mobile bottom nav, hero image, bento-style quick links, latest notices, and recent results.
+- Reworked `/notices`, `/results`, `/mypage`, `/terms`, M1 auth pages, and `/admin` with corrected Korean text and PRD-aligned placeholder content.
+- Kept future functionality visual-only where external Supabase/R2 work is not ready.
+- Corrected the Stitch baseline pass so `/`, `/results`, and `/notices` now use the Stitch-style fixed top app bar, mobile bottom navigation, dense content cards, leaderboard rows, and notices feed instead of the previous site-shell layout.
 
 ## Remaining M0 External Tasks
 
@@ -51,3 +57,8 @@
 - `http://localhost:3000/reset-password`: 200
 - `GITHUB_PAGES=true npm run build:pages`: passed, generated `out/` with `CNAME`
 - `Resolve-DnsName khu-sports.com -Type A`: no A records returned yet
+- 2026-05-10 Stitch integration verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm run build`, and `GITHUB_PAGES=true npm run build:pages` passed.
+- Local checks returned expected Korean content for `/`, `/admin`, and `/results`.
+- Playwright screenshot checks passed for desktop/mobile home and desktop admin after title wrapping adjustments.
+- 2026-05-10 Stitch baseline correction verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm run build`, and `GITHUB_PAGES=true npm run build:pages` passed.
+- Playwright screenshot checks passed for desktop/mobile `/`, `/results`, and `/notices`.

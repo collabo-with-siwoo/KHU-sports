@@ -5,8 +5,7 @@ export type ClientValidationResult = {
   message: string;
 };
 
-const successMessage =
-  "입력값 검증은 통과했습니다. Supabase 프로젝트 연결 후 실제 처리됩니다.";
+const successMessage = "입력값 검증을 통과했습니다.";
 
 export function validateLoginForm(formData: FormData): ClientValidationResult {
   const parsed = loginSchema.safeParse({

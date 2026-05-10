@@ -30,7 +30,7 @@ export const activeAgreementSeeds: AgreementSeed[] = [
     version: "1.0",
     effectiveAt: "2026-05-10",
     content:
-      "회원가입, 선수 등록, 대회 기록 관리에 필요한 개인정보 수집 및 이용 기준입니다. 주민등록번호는 수집하지 않으며 생년월일만 사용합니다."
+      "회원가입, 선수 등록, 대회 기록 관리에 필요한 개인정보 수집 및 이용 기준입니다. 주민등록번호는 수집하지 않고 생년월일을 사용합니다."
   },
   {
     slug: "marketing",
@@ -41,7 +41,7 @@ export const activeAgreementSeeds: AgreementSeed[] = [
     version: "1.0",
     effectiveAt: "2026-05-10",
     content:
-      "대회 소식, 행사 안내 등 선택적 알림 수신에 관한 동의입니다. 동의하지 않아도 회원가입은 가능합니다."
+      "대회 소식, 행사 안내 등 선택 알림 수신에 관한 동의입니다. 동의하지 않아도 회원가입은 가능합니다."
   }
 ].sort((a, b) => a.displayOrder - b.displayOrder);
 
