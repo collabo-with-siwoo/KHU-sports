@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { activeAgreementSeeds } from "@/lib/agreements";
 
 const mobileNavItems = [
@@ -36,6 +37,8 @@ export default function TermsPage() {
           ))}
         </div>
       </section>
+
+      <Footer />
 
       <nav className="stitch-bottom-nav" aria-label="모바일 메뉴">
         {mobileNavItems.map((item) => (

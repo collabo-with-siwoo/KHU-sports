@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
@@ -56,6 +57,8 @@ export default function MyPage() {
           </div>
         </section>
       </section>
+
+      <Footer />
 
       <nav className="stitch-bottom-nav" aria-label="모바일 메뉴">
         {mobileNavItems.map((item) => (
