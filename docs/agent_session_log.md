@@ -81,3 +81,10 @@
   - Converted M1 forms to client-side validation for static export compatibility.
   - Verified `GITHUB_PAGES=true npm run build:pages`; `out/CNAME` contains `khu-sports.com`.
 - Conclusion: Repository is ready for GitHub Pages static deployment after GitHub Pages is set to GitHub Actions and Cloudflare DNS records are configured.
+
+## 2026-05-10 20:20 KST - Hero title wrapping fix
+
+- Request: Prevent long Korean hero titles from wrapping into two lines on desktop.
+- Branch: `fix/hero-title-wrapping`.
+- Change: Added dedicated `home-title` and `admin-title` classes with desktop `white-space: nowrap` and adjusted responsive font sizes.
+- Status: Verifying with typecheck, lint, Prisma validation, and static export build.

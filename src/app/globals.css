@@ -158,6 +158,19 @@ h1 {
   margin-bottom: 20px;
 }
 
+.home-title,
+.admin-title {
+  white-space: nowrap;
+}
+
+.home-title {
+  font-size: clamp(38px, 5.2vw, 64px);
+}
+
+.admin-title {
+  font-size: clamp(38px, 4.8vw, 60px);
+}
+
 h2 {
   font-size: clamp(28px, 3.2vw, 44px);
   line-height: 1.08;
@@ -999,6 +1012,11 @@ h2 {
 
   .home-hero {
     padding-top: 190px;
+  }
+
+  .home-title,
+  .admin-title {
+    white-space: normal;
   }
 
   .notice-row,

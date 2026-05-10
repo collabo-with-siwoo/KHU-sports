@@ -9,7 +9,7 @@ export default function AdminPage() {
         </Link>
         <div className="admin-copy">
           <p className="eyebrow">Admin Console</p>
-          <h1>대회 운영을 위한 관리자 로그인</h1>
+          <h1 className="admin-title">대회 운영을 위한 관리자 로그인</h1>
           <p>
             공지 등록, 회원 승인, 대회 결과 입력까지 한 화면에서 관리할 수
             있도록 설계 중입니다.

@@ -26,6 +26,7 @@
 - Custom domain file added at `public/CNAME` with `khu-sports.com`.
 - Deployment instructions added in `docs/deployment.md`.
 - DNS check on 2026-05-10 returned no A records for `khu-sports.com`; Cloudflare DNS still needs GitHub Pages records.
+- Adjusted hero heading styles so desktop Korean titles remain on one line.
 
 ## Remaining M0 External Tasks
 

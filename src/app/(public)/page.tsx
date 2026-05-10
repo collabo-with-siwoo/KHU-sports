@@ -84,7 +84,7 @@ export default function HomePage() {
 
         <div className="home-hero-content">
           <p className="eyebrow">Official Tournament Platform</p>
-          <h1>경희대학교 총장배 골프대회</h1>
+          <h1 className="home-title">경희대학교 총장배 골프대회</h1>
           <p className="lead">
             공지, 참가 안내, 결과 공개, 본인 기록 조회까지 한곳에서 운영하는
             공식 대회 홈페이지입니다.

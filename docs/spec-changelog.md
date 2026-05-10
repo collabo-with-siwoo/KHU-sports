@@ -34,3 +34,8 @@
 - Added conditional Next.js export mode via `GITHUB_PAGES=true`.
 - Reworked M1 forms from Server Action usage to client validation so the static GitHub Pages export succeeds.
 - Verified `GITHUB_PAGES=true npm run build:pages` exports to `out/` and includes `out/CNAME`.
+
+## 2026-05-10 - Hero Title Wrapping
+
+- Adjusted public and admin hero title sizing so desktop Korean headings stay on one line.
+- Preserved normal wrapping on small mobile screens.
