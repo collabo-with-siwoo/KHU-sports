@@ -23,8 +23,8 @@ const features = [
   {
     icon: "edit_note",
     title: "참가 신청",
-    body: "온라인으로 간편하게 대회 참가 접수를 진행하세요. 선수 등록 서류를 이메일로 접수하면 관리자 승인 후 PLAYER로 전환됩니다.",
-    link: { text: "지금 신청하기", href: "mailto:khusports2026@gmail.com" },
+    body: "로그인 후 참가할 대회를 선택하고 신청서를 작성하면 관리자 승인 후 대회에 참가할 수 있습니다.",
+    link: { text: "지금 신청하기", href: "/login" },
     highlight: true
   },
   {
@@ -128,10 +128,10 @@ export default function AboutPage() {
       {/* CTA */}
       <section className="about-cta-section">
         <h2>지금 시작하세요</h2>
-        <p>회원가입 후 선수 등록을 완료하면 대회에 참가할 수 있습니다.</p>
+        <p>회원가입 후 로그인하여 참가 신청을 완료하면 대회에 참가할 수 있습니다.</p>
         <div className="about-cta-actions">
           <Link className="home-btn primary" href="/signup">회원가입</Link>
-          <a className="home-btn outline" href="mailto:khusports2026@gmail.com">선수 등록 문의</a>
+          <Link className="home-btn outline" href="/login">참가 신청하기</Link>
         </div>
       </section>
 
