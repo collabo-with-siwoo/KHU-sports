@@ -1,26 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { validateLoginForm, type ClientValidationResult } from "@/lib/auth/client-validation";
+import { useActionState } from "react";
+import { signInAction, type AuthActionState } from "../actions";
 import { SubmitButton } from "../submit-button";
 
-const initialState: ClientValidationResult = {
+const initialState: AuthActionState = {
   status: "idle",
   message: ""
 };
 
 export function LoginForm() {
-  const [state, setState] = useState(initialState);
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setState(validateLoginForm(new FormData(event.currentTarget)));
-  }
+  const [state, formAction] = useActionState(signInAction, initialState);
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form action={formAction}>
         <label>
           아이디
           <input autoComplete="username" name="username" placeholder="khugolf2026" />

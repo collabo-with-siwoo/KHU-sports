@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { listPublishedNotices } from "@/lib/notices";
 
 const heroBackgroundUrl =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuC1AWWs8FEyFx31sSOG-AP7Y_Vu-PfrUdJPPeHErDTXqEM_f2gpYQQsC7swnWFOkLxghN5vvwJ7km__bMzwWjtca5E0AdTwRPlVT1ordq-RqDRdA8g8hI1lw-t-idqokTQbbaydUynXbbk2zXCqLPPlA_BlAfcRyGMpoI6CJ7h-vHO9o2WrAizCPMQnN9Tv2GIujQB5KObneFQynkx_HUfs_HBDCI6d2Fknzf1VA63ZQL99EVkxBLTNmcPAVO94W_7GkRrf4PsFn0P4";
@@ -22,13 +23,11 @@ const tournaments = [
   { name: "그랑디 KGA 회장배 전국대학", date: "2026.05.06 ~ 05.09", venue: "군산CC", format: "72홀 스트로크플레이", status: "예정", statusType: "upcoming" as const },
 ];
 
-const recentNotices = [
-  { date: "2026년 10월 14일", title: "제27회 총장배 대회 참가 신청 서류 제출 안내" },
-  { date: "2026년 10월 12일", title: "선수 등록 절차 변경 및 관리자 승인 안내" },
-  { date: "2026년 10월 10일", title: "대회 당일 주차 및 셔틀 버스 이용 안내" }
-];
+export const revalidate = 60;
 
-export default function HomePage() {
+export default async function HomePage() {
+  const recentNotices = (await listPublishedNotices()).slice(0, 3);
+
   return (
     <main className="home-app">
       <Header currentPath="/" />
@@ -108,10 +107,10 @@ export default function HomePage() {
               </div>
             </div>
             {recentNotices.map((notice) => (
-              <div className="home-notice-row" key={notice.title}>
-                <time>{notice.date}</time>
+              <Link className="home-notice-row" href={`/notices/${notice.id}`} key={notice.id}>
+                <time dateTime={notice.publishedAt}>{notice.publishedLabel}</time>
                 <strong>{notice.title}</strong>
-              </div>
+              </Link>
             ))}
             <Link className="home-notices-more" href="/notices">
               모든 공지 보기

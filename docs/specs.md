@@ -4,11 +4,12 @@
 
 ## Milestone Status
 
-- Current milestone: M1, authentication and agreements.
+- Current milestone: M2, notice system.
 - M0 scope in this repository: Next.js App Router scaffold, TypeScript strict mode, Prisma schema validation, environment variable template, and documentation baseline.
-- External M0 tasks still require human/account work: Vercel project, Supabase project, Cloudflare R2 buckets, Resend domain, production domain DNS.
+- External M0 tasks still require human/account work: Cloudflare R2 buckets, Resend domain, production domain DNS verification.
 - Visual foundation: public user view follows the Stitch "Majestic Green" direction with a hero image, sticky desktop navigation, mobile bottom navigation, bento-style quick links, notice modules, and result summary modules. `/admin` presents a polished login-like shell until real authentication is implemented.
-- M1 local foundation: login, signup, reset-password, and terms pages exist with zod-backed client validation for GitHub Pages static preview compatibility. Actual Supabase Auth/Prisma persistence will be wired after external Supabase project setup.
+- M1 runtime foundation: login, signup, reset-password, and terms pages exist with Supabase Auth and Prisma-backed profile/agreement persistence. Static GitHub Pages remains preview-only and cannot run these Server Actions.
+- M2 notice foundation: public notice reads use Supabase `Notice` rows when available and fall back to PRD-aligned seed notices for empty or not-yet-migrated environments. Homepage latest notices, `/notices`, and `/notices/[id]` share the same read model.
 - Static preview deployment: GitHub Pages custom workflow exports the Next.js app to static files and publishes `khu-sports.com` via `public/CNAME`.
 
 ## Technology Decisions
@@ -16,6 +17,7 @@
 - Frontend/backend: Next.js App Router, TypeScript.
 - ORM: Prisma.
 - Database: Supabase PostgreSQL.
+- Deployment build: `postinstall` runs `prisma generate` so Vercel can build server-rendered Prisma pages reliably.
 - Auth: Supabase Auth with app-level `User.username` mapped to `User.email` for login.
 - File storage: Cloudflare R2 via presigned URLs.
 - Forms: zod validation.
@@ -77,15 +79,32 @@ INITIAL_SUPER_ADMIN_EMAIL
 - Login must accept username/password, look up the email server-side, then authenticate with Supabase Auth.
 - Error messages should not reveal whether a username exists.
 
-## M1 Implemented Local Contracts
+## M1 Implemented Runtime Contracts
 
-- `/login`: accepts `username` and `password`, validates with `loginSchema`, and returns a generic success/error state in the browser for static preview.
-- `/signup`: accepts username, password, confirmation, Korean name, birth date, gender, phone, email, address, active agreement version IDs, and age confirmation.
-- `/reset-password`: accepts email and validates reset request shape.
-- `/terms`: renders active agreement seed data in display order.
-- `src/lib/agreements.ts`: temporary seed source until agreement templates are persisted in Supabase/PostgreSQL.
-- `src/lib/auth/schemas.ts`: zod schemas for M1 inputs.
-- `src/lib/auth/client-validation.ts`: static-preview validation layer used until Supabase Auth and Prisma persistence are available.
+- `/login`: accepts `username` and `password`, validates with `loginSchema`, looks up the local `User.email`, signs in through Supabase Auth, sets Supabase session cookies, updates `lastLoginAt`, and redirects to `/mypage`.
+- `/signup`: accepts username, password, confirmation, Korean name, birth date, gender, phone, email, address, active agreement version IDs, and age confirmation. It creates a Supabase Auth user, persists the local `User` profile with `id = auth.users.id`, and records `UserAgreement` rows.
+- `/reset-password`: accepts email and calls Supabase Auth password reset. The response stays generic so account existence is not disclosed.
+- `/terms`: renders active agreement versions from Prisma when available, falling back to UUID seed agreements.
+- `/mypage`: reads the Supabase session and displays the linked local `User` profile when logged in.
+- `src/lib/agreements.ts`: UUID seed source for first-run agreement fallback.
+- `src/lib/agreement-service.ts`: Prisma-backed active agreement loader and default agreement seeder.
+- `src/lib/auth/schemas.ts`: zod schemas for M1 inputs; signup schema can be created with dynamic required agreement version IDs.
+- `src/app/(auth)/actions.ts`: Server Actions for signup, login, and reset-password.
+- `src/lib/supabase/server.ts`: Supabase SSR client and service-role admin client helpers.
+- `npm run db:push`: applies the Prisma schema to the configured Supabase PostgreSQL database.
+- `npm run db:seed`: creates the `GOLF` sport row and initial active agreement templates/versions.
+
+## M2 Notice System Contracts
+
+- `src/lib/prisma.ts`: shared Prisma client singleton for server-side data access.
+- `src/lib/notices.ts`: notice read model and seed fallback. It exposes published notice list/detail reads, admin list reads, category labels, and static params for seed detail pages.
+- `/`: latest notice module reads the first three published notices from the shared notice source.
+- `/notices`: public notice list shows category tabs, search/filter controls, and published notice cards.
+- `/notices/[id]`: public detail route renders sanitized notice HTML and public attachment links when available.
+- `/admin/notices`: admin management list reads all notice rows when available and otherwise shows seed notices for layout validation.
+- `/admin/notices/new`: create screen is intentionally disabled until M3 admin authentication/RBAC protects write actions.
+- Notice content stored as HTML must be sanitized before persistence. The current detail route assumes persisted admin-authored HTML has already passed that sanitization boundary.
+- R2 upload integration is not active yet. `NoticeAttachment` public URLs are derived from `R2_PUBLIC_BASE_URL` only for public attachments.
 
 ## GitHub Pages Static Preview
 
@@ -105,7 +124,8 @@ INITIAL_SUPER_ADMIN_EMAIL
 - Homepage quick-link cards, notice rows, result rows, subpage cards, and admin preview modules provide hover feedback.
 - Public result views must avoid detailed scorecards and expose only rank, player name, and total score.
 - Player registration copy points users toward email submission and admin approval instead of implementing a direct public player-registration workflow.
-- `/admin` login shell is visual-only in M1; submit behavior and Supabase-backed RBAC belong to M3.
+- `/admin` login shell is visual-only until M3; submit behavior and Supabase-backed RBAC belong to M3.
+- Admin notice write controls remain disabled until M3 protects mutations with admin authentication and menu permissions.
 
 ## Verification Commands
 

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { prisma } from "@/lib/prisma";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
@@ -9,7 +11,36 @@ const mobileNavItems = [
   { label: "공지사항", icon: "campaign", href: "/notices" }
 ];
 
-export default function MyPage() {
+export const dynamic = "force-dynamic";
+
+async function getCurrentMember() {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data } = await supabase.auth.getUser();
+
+    if (!data.user) {
+      return null;
+    }
+
+    return prisma.user.findUnique({
+      where: { id: data.user.id },
+      select: {
+        username: true,
+        email: true,
+        name: true,
+        userType: true,
+        status: true,
+        lastLoginAt: true
+      }
+    });
+  } catch {
+    return null;
+  }
+}
+
+export default async function MyPage() {
+  const member = await getCurrentMember();
+
   return (
     <main className="home-app">
       <Header currentPath="/mypage" />
@@ -28,7 +59,11 @@ export default function MyPage() {
           <article className="stitch-bento-card">
             <i />
             <strong>회원 정보</strong>
-            <p>가입 직후에는 GENERAL 회원으로 시작합니다. 관리자가 확인 후 PLAYER로 전환합니다.</p>
+            <p>
+              {member
+                ? `${member.name}님은 현재 ${member.userType} 회원입니다.`
+                : "가입 직후에는 GENERAL 회원으로 시작합니다. 관리자가 확인 후 PLAYER로 전환합니다."}
+            </p>
           </article>
           <article className="stitch-bento-card">
             <i />
@@ -39,19 +74,24 @@ export default function MyPage() {
 
         <section className="profile-preview" style={{ marginTop: "48px" }}>
           <div>
-            <span>GENERAL</span>
-            <strong>선수 등록 승인이 필요합니다</strong>
+            <span>{member?.userType ?? "GENERAL"}</span>
+            <strong>
+              {member ? `${member.name}님의 회원 상태: ${member.status}` : "선수 등록 승인이 필요합니다"}
+            </strong>
             <p>
-              가입 직후에는 일반 회원으로 시작합니다. 로그인 후 참가 신청을
-              진행하면 관리자가 확인 후 PLAYER로 전환합니다.
+              {member
+                ? `아이디 ${member.username} / 이메일 ${member.email}`
+                : "가입 직후에는 일반 회원으로 시작합니다. 로그인 후 참가 신청을 진행하면 관리자가 확인 후 PLAYER로 전환합니다."}
             </p>
           </div>
           <div className="profile-actions">
-            <Link className="button primary" href="/login">
-              로그인
-            </Link>
+            {member ? null : (
+              <Link className="button primary" href="/login">
+                로그인
+              </Link>
+            )}
             <Link className="button ghost" href="/signup">
-              회원가입
+              {member ? "회원 정보 수정 예정" : "회원가입"}
             </Link>
           </div>
         </section>

@@ -1,7 +1,12 @@
 import Link from "next/link";
+import { getActiveAgreements } from "@/lib/agreement-service";
 import { SignupForm } from "./signup-form";
 
-export default function SignupPage() {
+export const revalidate = 60;
+
+export default async function SignupPage() {
+  const agreements = await getActiveAgreements();
+
   return (
     <main className="auth-shell signup-shell">
       <section className="auth-side">
@@ -21,7 +26,7 @@ export default function SignupPage() {
         <div className="auth-card signup-card">
           <p className="eyebrow">Join</p>
           <h2>회원가입</h2>
-          <SignupForm />
+          <SignupForm agreements={agreements} />
         </div>
       </section>
     </main>

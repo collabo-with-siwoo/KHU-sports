@@ -50,3 +50,26 @@
 - The corrected direction should treat the Stitch HTML files as the baseline screen architecture: fixed TopAppBar, app-like mobile bottom navigation, surface-container cards, leaderboard table/list, and notice-card feed.
 - Completion: `/`, `/results`, and `/notices` now use the Stitch screen architecture and passed desktop/mobile screenshot checks. Public leaderboard copy remains summary-only until M4 data and update flows exist.
 - Any Stitch copy that implies true real-time scoring should be softened to "공개 리더보드" until M4 data and update flows exist.
+
+## 2026-05-11 00:17 KST - M2 notice system foundation
+
+- Vercel/Supabase setup is now available, but the repository has no Prisma migration files yet; the application should tolerate an empty or not-yet-migrated database while the schema rollout is prepared.
+- M2 public reads can safely connect to Supabase first and fall back to PRD-aligned seed notices when no rows exist or the database is unavailable.
+- Admin notice write actions should not be exposed publicly before real admin authentication and RBAC are wired. The M2 admin screens therefore establish layout and data contracts while keeping submit controls disabled until M3.
+- Tiptap/R2 integration remains the next notice-system slice: sanitized rich text should populate `Notice.content`, while uploaded assets should create `NoticeAttachment` records backed by Cloudflare R2 keys.
+
+## 2026-05-11 00:35 KST - M1 Supabase auth persistence
+
+- Username login should remain an app-level feature: the app looks up `User.username` in Prisma, then signs into Supabase Auth with the mapped email.
+- `User.id` is stored as the Supabase Auth user UUID so local profile rows and auth users remain 1:1 without an extra mapping table.
+- Signup needs two writes: Supabase Auth user creation and Prisma profile/agreement persistence. If Prisma persistence fails after auth creation, the service-role client deletes the new auth user to avoid orphans.
+- Agreement seed IDs were converted to UUIDs because `UserAgreement.agreementVersionId` references `AgreementVersion.id`.
+- `db:push` and `db:seed` are explicit operator steps. Vercel `postinstall` generates Prisma Client, but it must not silently mutate the production database during deploy.
+- Local `.env` currently points `DATABASE_URL` at `localhost`, so production Supabase schema push was not executed in this session.
+
+## 2026-05-11 00:50 KST - Supabase schema application
+
+- The updated `.env` points to the Supabase pooler and the runtime connection succeeds.
+- Prisma `db push` reported an empty schema engine error, even though the runtime connection could query successfully. To avoid blocking setup, Prisma's generated SQL diff from an empty database was executed directly through the Prisma connection.
+- The schema was verified by checking the expected core tables and the seeded `Sport`/`AgreementVersion` counts.
+- Future schema changes should ideally move to tracked Prisma migrations before production data exists in volume. For this first empty-database setup, direct execution of the generated SQL is acceptable and recorded here.

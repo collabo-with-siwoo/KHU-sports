@@ -46,3 +46,31 @@ $env:GITHUB_PAGES='true'
 npm run build:pages
 Remove-Item Env:\GITHUB_PAGES
 ```
+
+## Vercel + Supabase Runtime
+
+Use Vercel as the runtime deployment once signup/login persistence is enabled.
+
+### Required Vercel Environment Variables
+
+```text
+DATABASE_URL
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+NEXT_PUBLIC_SITE_URL
+INITIAL_SUPER_ADMIN_EMAIL
+```
+
+R2 and Resend variables are still required before the upload and email milestones are fully active.
+
+### Supabase Schema Setup
+
+After `DATABASE_URL` points to the Supabase pooled connection string, apply the Prisma schema and seed the base records:
+
+```powershell
+npm run db:push
+npm run db:seed
+```
+
+`db:seed` creates the `GOLF` sport row and the initial active agreement versions used by signup. Vercel builds run `prisma generate` through `postinstall`, but schema changes are not automatically pushed to Supabase during deploy.

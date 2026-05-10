@@ -1,29 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import {
-  validateResetPasswordForm,
-  type ClientValidationResult
-} from "@/lib/auth/client-validation";
+import { useActionState } from "react";
+import { resetPasswordAction, type AuthActionState } from "../actions";
 import { SubmitButton } from "../submit-button";
 
-const initialState: ClientValidationResult = {
+const initialState: AuthActionState = {
   status: "idle",
   message: ""
 };
 
 export function ResetPasswordForm() {
-  const [state, setState] = useState(initialState);
-
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setState(validateResetPasswordForm(new FormData(event.currentTarget)));
-  }
+  const [state, formAction] = useActionState(resetPasswordAction, initialState);
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form action={formAction}>
         <label>
           이메일
           <input name="email" placeholder="player@example.com" type="email" />

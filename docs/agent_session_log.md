@@ -117,3 +117,51 @@
   - Restarted the local dev server after build/export verification.
   - Verification passed: typecheck, lint, Prisma validation, production build, static GitHub Pages export build, and Playwright screenshots for desktop/mobile `/`, `/results`, and `/notices`.
 - Conclusion: The public baseline now follows the Stitch design structure rather than the earlier KPGA-inspired shell. Further pages can be brought over incrementally as M1-M7 functionality is wired.
+
+## 2026-05-11 00:17 KST - M2 notice system foundation
+
+- Request: Vercel and Supabase setup is complete; create a branch under `develop` and proceed with M2.
+- Milestone: M2 notice system.
+- Branch: `feature/m2-notices-system`.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Status: Building the Supabase-backed notice read layer, public notice list/detail routes, and the admin notice management entry point.
+- Result:
+  - Added shared Prisma client helper and notice query module.
+  - Connected homepage latest notices and `/notices` to the same published notice source.
+  - Added `/notices/[id]` detail route with attachment display support.
+  - Added `/admin/notices` and `/admin/notices/new` management screens; write actions remain disabled until M3 admin auth/RBAC is wired.
+  - Corrected shared header/footer Korean copy and refreshed `/admin` module links.
+  - Added `postinstall: prisma generate` so Vercel creates Prisma Client during dependency installation.
+  - Verification passed: typecheck, lint, Prisma validation, production build, and local 200 checks for `/`, `/notices`, `/notices/2026-application-guide`, and `/admin/notices`.
+- Conclusion: M2 read-side foundation is in place. Remaining M2 work is database migration/seed execution, Tiptap/R2 write flow, and authenticated admin write actions after M3 guardrails are available.
+
+## 2026-05-11 00:35 KST - M1 Supabase auth persistence
+
+- Request: Connect M1 signup DB persistence and login to Supabase.
+- Milestone: M1 authentication and agreements, continued on `feature/m2-notices-system` because M2 changes are still uncommitted.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Status: Replacing static-preview auth validation with Server Actions backed by Supabase Auth and Prisma.
+- Result:
+  - Added Supabase server/admin client helpers.
+  - Added login, signup, and reset-password Server Actions.
+  - Login maps username to `User.email`, signs in through Supabase Auth, stores session cookies, and updates `lastLoginAt`.
+  - Signup creates a Supabase Auth user, persists `User`, stores `UserAgreement` rows, and cleans up the auth user if profile persistence fails.
+  - Active agreements now load from Prisma when available, with UUID seed fallback.
+  - Added `db:push` and `db:seed` scripts plus `prisma/seed.js` for Supabase schema setup.
+  - `/mypage` now reads the Supabase session and displays the logged-in user's local profile.
+  - Verification passed: typecheck, lint, Prisma validation, production build, and local 200 checks for `/login`, `/signup`, `/reset-password`, `/mypage`, and `/terms`.
+- Conclusion: M1 runtime auth flow is wired in code. The Supabase database still needs `npm run db:push` and `npm run db:seed` against the real Supabase `DATABASE_URL` before production signup can persist rows.
+
+## 2026-05-11 00:50 KST - Supabase schema application
+
+- Request: `.env` was updated; verify and apply the database setup.
+- Milestone: M0/M1 runtime setup.
+- Status: Checked `.env` without printing secrets, then applied the Prisma schema and base seed data to Supabase.
+- Result:
+  - Verified Supabase runtime connection with `select 1`.
+  - `prisma db push` reported an empty schema engine error against the Supabase pooler/direct connection, so the Prisma-generated SQL diff was executed directly through the Prisma connection.
+  - Executed 52 generated schema statements.
+  - Ran `npm run db:seed`.
+  - Confirmed core tables exist, `Sport` has 1 row, and `AgreementVersion` has 3 rows.
+  - Verification passed: typecheck, lint, and Prisma validation.
+- Conclusion: Supabase now has the application schema and default seed data required for signup/login persistence.

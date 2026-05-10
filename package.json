@@ -6,8 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "build:pages": "next build",
+    "db:push": "prisma db push",
+    "db:seed": "node --env-file=.env prisma/seed.js",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "prisma generate",
     "typecheck": "tsc --noEmit",
     "prisma:validate": "prisma validate"
   },

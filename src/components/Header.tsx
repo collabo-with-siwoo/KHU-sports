@@ -31,7 +31,7 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
           ))}
         </nav>
         <div className="home-header-actions">
-          <button aria-label="검색" className="home-icon-btn">
+          <button aria-label="검색" className="home-icon-btn" type="button">
             <span className="material-symbols-outlined">search</span>
           </button>
           <Link className="home-cta-btn" href="/signup">
