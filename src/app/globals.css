@@ -1671,6 +1671,290 @@ p {
   }
 }
 
+/* ===== RESULTS PAGE ===== */
+.results-page { padding-bottom: 40px; }
+
+.results-title h1 {
+  color: var(--primary);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 900;
+  margin: 0 0 24px;
+}
+
+/* Tournament Selector */
+.results-tournament-select {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+}
+
+.results-tournament-select button {
+  background: white;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 260px;
+  padding: 16px 20px;
+  text-align: left;
+  transition: all 160ms ease;
+}
+
+.results-tournament-select button strong {
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.results-tournament-select button small {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.results-tournament-select button.active {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.results-tournament-select button.active strong,
+.results-tournament-select button.active small {
+  color: white;
+}
+
+.results-tournament-select button:not(.active):hover {
+  border-color: var(--primary);
+}
+
+/* Controls Row */
+.results-controls {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.results-round-tabs {
+  display: flex;
+  gap: 0;
+}
+
+.results-round-tabs button {
+  background: white;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 10px 24px;
+  transition: all 160ms ease;
+}
+
+.results-round-tabs button:first-child { border-radius: 8px 0 0 8px; }
+.results-round-tabs button:last-child { border-radius: 0 8px 8px 0; }
+.results-round-tabs button:not(:first-child) { border-left: 0; }
+
+.results-round-tabs button.active {
+  background: #38e8b0;
+  border-color: #38e8b0;
+  color: var(--ink);
+}
+
+/* View Toggle */
+.results-view-toggle {
+  display: flex;
+  gap: 0;
+}
+
+.results-view-toggle button {
+  background: white;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 10px 20px;
+  transition: all 160ms ease;
+  white-space: nowrap;
+}
+
+.results-view-toggle button:first-child { border-radius: 8px 0 0 8px; }
+.results-view-toggle button:last-child { border-radius: 0 8px 8px 0; border-left: 0; }
+
+.results-view-toggle button.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.results-note {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 4px 0 16px;
+  text-align: right;
+}
+
+/* Table Wrapper */
+.lb-table-wrap {
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+/* ── FULL LEADERBOARD TABLE ── */
+.lb-table {
+  border-collapse: collapse;
+  min-width: 860px;
+  width: 100%;
+}
+
+.lb-table thead {
+  background: var(--surface-low);
+}
+
+.lb-table th {
+  border-bottom: 2px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 12px 10px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.lb-table th.num,
+.lb-table td.num { text-align: center; }
+
+.lb-table th.total,
+.lb-table td.total { background: rgba(56, 232, 176, 0.06); font-weight: 900; }
+
+.lb-table td {
+  border-bottom: 1px solid rgba(216, 223, 219, 0.5);
+  color: var(--ink);
+  font-size: 14px;
+  padding: 14px 10px;
+  white-space: nowrap;
+}
+
+.lb-table tr.leader-row td {
+  background: rgba(56, 232, 176, 0.06);
+}
+
+.lb-table .fav-star {
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.lb-table .rank-cell { font-weight: 900; text-align: center; }
+.lb-table .name-cell { font-weight: 800; }
+.lb-table .aff-cell { color: var(--muted); font-size: 13px; }
+
+.lb-table .move-cell { font-size: 13px; font-weight: 800; text-align: center; }
+.lb-table .move-cell.up { color: #16a34a; }
+.lb-table .move-cell.down { color: var(--danger); }
+
+.lb-table .topar { color: var(--primary); font-weight: 900; }
+.lb-table .today { color: var(--primary); font-weight: 800; }
+
+/* ── SCORECARD TABLE ── */
+.sc-table {
+  border-collapse: collapse;
+  min-width: 1200px;
+  width: 100%;
+}
+
+.sc-table thead { background: var(--surface-low); }
+
+.sc-table th {
+  border-bottom: 2px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 10px 4px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sc-table td {
+  border-bottom: 1px solid rgba(216, 223, 219, 0.5);
+  color: var(--ink);
+  font-size: 13px;
+  padding: 12px 4px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sc-table th.num, .sc-table td.num { text-align: center; }
+.sc-table th.total, .sc-table td.total { background: rgba(56, 232, 176, 0.06); font-weight: 900; }
+
+.sc-table .fav-star { color: var(--muted); cursor: pointer; font-size: 18px; }
+.sc-table .rank-cell { font-weight: 900; }
+.sc-table .name-cell { font-weight: 800; text-align: left; }
+.sc-table .topar { color: var(--primary); font-weight: 900; }
+.sc-table .today { color: var(--primary); font-weight: 800; }
+
+.sc-table tr.leader-row td { background: rgba(56, 232, 176, 0.06); }
+
+/* Par Row */
+.sc-table .par-row td {
+  background: var(--surface-low);
+  border-bottom: 2px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* Hole Scores */
+.sc-table .hole-num { min-width: 30px; }
+
+.sc-table .hole-out {
+  background: rgba(0, 0, 0, 0.03);
+  font-weight: 900;
+}
+
+.hole-score.birdie {
+  background: rgba(56, 232, 176, 0.15);
+  border-radius: 999px;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.hole-score.bogey {
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: 4px;
+  color: var(--danger);
+  font-weight: 700;
+}
+
+/* Results Responsive */
+@media (max-width: 760px) {
+  .results-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .results-view-toggle {
+    width: 100%;
+  }
+
+  .results-view-toggle button {
+    flex: 1;
+  }
+
+  .results-tournament-select {
+    flex-direction: column;
+  }
+
+  .results-tournament-select button {
+    min-width: unset;
+  }
+}
+
 /* ===== TOURNAMENT INFO PAGE ===== */
 .tourney-page-header {
   display: flex;
