@@ -58,8 +58,6 @@ export default function ResultsPage() {
   const [selectedRound, setSelectedRound] = useState<string>("FR");
   const [viewMode, setViewMode] = useState<ViewMode>("leaderboard");
 
-  const tournament = tournaments.find(t => t.id === selectedTournament)!;
-
   return (
     <main className="home-app">
       <Header currentPath="/results" />

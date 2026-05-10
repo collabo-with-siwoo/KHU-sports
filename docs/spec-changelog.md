@@ -55,3 +55,35 @@
 - Added fixed top app bars, mobile bottom navigation, compact headers, dense cards/lists, leaderboard rows, notice tabs, and desktop notice sidebar behavior.
 - Kept PRD privacy constraints in the leaderboard: public screens show result summaries only, not detailed scorecards.
 - Verified with typecheck, lint, Prisma validation, production build, static GitHub Pages export build, and Playwright desktop/mobile screenshots for the three public screens.
+
+## 2026-05-11 - M2 Notice System Foundation
+
+- Created `feature/m2-notices-system` from `develop`.
+- Added a shared Prisma client helper for server-side data access.
+- Added `src/lib/notices.ts` as the M2 notice read model with Supabase-first reads and PRD-aligned seed fallback.
+- Connected homepage latest notices and `/notices` to the shared published-notice source.
+- Added `/notices/[id]` detail pages with sanitized HTML rendering and public attachment display support.
+- Added `/admin/notices` and `/admin/notices/new` screens for the admin notice workflow.
+- Documented that admin notice write actions stay disabled until M3 authentication/RBAC is wired.
+- Updated shared header/footer Korean copy and refreshed `/admin` module navigation.
+- Added `postinstall: prisma generate` for Vercel/Prisma build reliability.
+- Removed a stale unused variable in `src/app/results/page.tsx` so lint passes cleanly.
+
+## 2026-05-11 - M1 Supabase Auth Persistence
+
+- Added Supabase SSR server client and service-role admin client helpers.
+- Replaced static-preview login/signup/reset-password form handlers with Server Actions.
+- Implemented username-to-email login through local Prisma `User` lookup followed by Supabase Auth sign-in.
+- Implemented signup persistence: Supabase Auth user creation, local `User` row creation, and `UserAgreement` evidence rows.
+- Added cleanup for partially failed signups by deleting the Supabase Auth user when Prisma persistence fails.
+- Converted agreement seed version IDs to UUIDs so they can be referenced by `UserAgreement`.
+- Added Prisma-backed active agreement loading with seed fallback.
+- Added `db:push` and `db:seed` scripts plus `prisma/seed.js` for Supabase schema setup and initial agreement/sport records.
+- Updated `/mypage` to read the Supabase session and display the linked local profile.
+- Updated deployment documentation with Vercel/Supabase runtime variables and DB setup commands.
+
+## 2026-05-11 - Supabase Schema Applied
+
+- Applied the Prisma schema to Supabase by executing the Prisma-generated SQL diff directly after `prisma db push` returned an empty schema engine error.
+- Seeded the `GOLF` sport row and the initial agreement templates/versions.
+- Verified the runtime database connection, expected core tables, and seed row counts.

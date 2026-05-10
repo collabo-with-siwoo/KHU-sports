@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { activeAgreementSeeds } from "@/lib/agreements";
+import { getActiveAgreements } from "@/lib/agreement-service";
 
 const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
@@ -10,7 +10,11 @@ const mobileNavItems = [
   { label: "공지사항", icon: "campaign", href: "/notices" }
 ];
 
-export default function TermsPage() {
+export const revalidate = 60;
+
+export default async function TermsPage() {
+  const agreements = await getActiveAgreements();
+
   return (
     <main className="home-app">
       <Header currentPath="/terms" />
@@ -25,7 +29,7 @@ export default function TermsPage() {
         </div>
 
         <div className="stitch-notice-feed">
-          {activeAgreementSeeds.map((agreement) => (
+          {agreements.map((agreement) => (
             <article key={agreement.versionId}>
               <div>
                 <span>{agreement.required ? "필수" : "선택"}</span>

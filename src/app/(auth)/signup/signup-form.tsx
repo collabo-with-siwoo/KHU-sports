@@ -1,27 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { activeAgreementSeeds } from "@/lib/agreements";
-import { validateSignupForm, type ClientValidationResult } from "@/lib/auth/client-validation";
+import { useActionState } from "react";
+import type { AgreementView } from "@/lib/agreement-service";
+import { signUpAction, type AuthActionState } from "../actions";
 import { SubmitButton } from "../submit-button";
 
-const initialState: ClientValidationResult = {
+const initialState: AuthActionState = {
   status: "idle",
   message: ""
 };
 
-export function SignupForm() {
-  const [state, setState] = useState(initialState);
+type SignupFormProps = {
+  agreements: AgreementView[];
+};
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setState(validateSignupForm(new FormData(event.currentTarget)));
-  }
+export function SignupForm({ agreements }: SignupFormProps) {
+  const [state, formAction] = useActionState(signUpAction, initialState);
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form action={formAction}>
         <div className="form-grid">
           <label>
             아이디
@@ -71,7 +70,7 @@ export function SignupForm() {
             <strong>약관 동의</strong>
             <span>활성 약관 자동 노출</span>
           </div>
-          {activeAgreementSeeds.map((agreement) => (
+          {agreements.map((agreement) => (
             <label className="agreement-item" key={agreement.versionId}>
               <input
                 name="agreementVersionIds"

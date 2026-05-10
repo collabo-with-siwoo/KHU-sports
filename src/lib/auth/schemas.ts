@@ -19,8 +19,9 @@ export const resetPasswordSchema = z.object({
   email: z.string().trim().email("이메일 형식을 확인해주세요.")
 });
 
-export const signupSchema = z
-  .object({
+export function createSignupSchema(requiredAgreementVersionIds = getRequiredAgreementVersionIds()) {
+  return z
+    .object({
     username: z
       .string()
       .trim()
@@ -67,8 +68,8 @@ export const signupSchema = z
     ageConfirmed: z.literal("on", {
       message: "만 14세 이상 확인에 동의해주세요."
     })
-  })
-  .superRefine((value, context) => {
+    })
+    .superRefine((value, context) => {
     if (value.password !== value.confirmPassword) {
       context.addIssue({
         code: "custom",
@@ -77,7 +78,7 @@ export const signupSchema = z
       });
     }
 
-    for (const requiredVersionId of getRequiredAgreementVersionIds()) {
+    for (const requiredVersionId of requiredAgreementVersionIds) {
       if (!value.agreementVersionIds.includes(requiredVersionId)) {
         context.addIssue({
           code: "custom",
@@ -88,6 +89,9 @@ export const signupSchema = z
       }
     }
   });
+}
+
+export const signupSchema = createSignupSchema();
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type SignupInput = z.infer<typeof signupSchema>;

@@ -1,4 +1,5 @@
 export type AgreementSeed = {
+  templateId: string;
   slug: string;
   title: string;
   required: boolean;
@@ -11,33 +12,36 @@ export type AgreementSeed = {
 
 export const activeAgreementSeeds: AgreementSeed[] = [
   {
+    templateId: "11111111-1111-4111-8111-111111111001",
     slug: "terms",
     title: "이용약관",
     required: true,
     displayOrder: 1,
-    versionId: "seed-terms-1-0",
+    versionId: "11111111-1111-4111-8111-111111111101",
     version: "1.0",
     effectiveAt: "2026-05-10",
     content:
       "경희대학교 골프대회 홈페이지 이용 목적, 계정 이용, 서비스 제공 범위에 관한 기본 약관입니다. 최종 문구는 관리자 약관 관리에서 직접 작성합니다."
   },
   {
+    templateId: "11111111-1111-4111-8111-111111111002",
     slug: "privacy",
     title: "개인정보 처리방침",
     required: true,
     displayOrder: 2,
-    versionId: "seed-privacy-1-0",
+    versionId: "11111111-1111-4111-8111-111111111102",
     version: "1.0",
     effectiveAt: "2026-05-10",
     content:
       "회원가입, 선수 등록, 대회 기록 관리에 필요한 개인정보 수집 및 이용 기준입니다. 주민등록번호는 수집하지 않고 생년월일을 사용합니다."
   },
   {
+    templateId: "11111111-1111-4111-8111-111111111003",
     slug: "marketing",
     title: "마케팅 수신 동의",
     required: false,
     displayOrder: 3,
-    versionId: "seed-marketing-1-0",
+    versionId: "11111111-1111-4111-8111-111111111103",
     version: "1.0",
     effectiveAt: "2026-05-10",
     content:
