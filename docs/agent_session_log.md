@@ -50,3 +50,34 @@
   - Added hover interactions across navigation, feature cards, notices, rankings, and admin modules.
   - Reworked `/admin` into a polished login-like visual shell.
   - Verification passed: typecheck, lint, Prisma validate, build, and local 200 checks for `/` and `/admin`.
+
+## 2026-05-10 19:50 KST - M1 auth and agreements
+
+- Request: Commit the previous visual layout work, create a new branch, and proceed with M1.
+- Milestone: M1 authentication and agreements.
+- Branch: `feat/m1-auth-agreements`.
+- Pre-task checks: Re-read PRD, CLAUDE rules, `docs/context.md`, and `docs/specs.md`.
+- Status: Building local, verifiable authentication and agreement foundations before external Supabase project setup.
+- Scope note: Supabase project/DB is not configured yet, so this pass focuses on validated forms, dynamic active-agreement rendering, and server-action boundaries for the eventual Supabase/Prisma integration.
+- Result:
+  - Added `/login`, `/signup`, `/reset-password`, and `/terms`.
+  - Added zod auth schemas, active agreement seeds, and server action validation.
+  - Connected homepage/mypage navigation to M1 routes.
+  - Verification passed: typecheck, lint, Prisma validate, build, and local 200 checks for M1 routes.
+- Conclusion: M1 local foundation is ready. Next M1 step is wiring Supabase Auth, username-to-email lookup, and UserAgreement persistence after Supabase project credentials are available.
+
+## 2026-05-10 20:05 KST - GitHub Pages and Cloudflare domain
+
+- Request: Before Supabase work, connect the Cloudflare-registered domain `khu-sports.com` using GitHub Pages.
+- Milestone: M0 deployment setup / M1 static preview compatibility.
+- Branch: `feat/m1-auth-agreements`.
+- Reference checks: Consulted GitHub Pages custom domain and custom workflow docs, and Cloudflare DNS record docs.
+- Status: Adding static export settings, GitHub Pages workflow, CNAME, and deployment documentation.
+- Result:
+  - Added `.github/workflows/deploy-github-pages.yml`.
+  - Added `public/CNAME` with `khu-sports.com` and `public/.nojekyll`.
+  - Added conditional Next.js static export mode through `GITHUB_PAGES=true`.
+  - Added `docs/deployment.md` with Cloudflare DNS records.
+  - Converted M1 forms to client-side validation for static export compatibility.
+  - Verified `GITHUB_PAGES=true npm run build:pages`; `out/CNAME` contains `khu-sports.com`.
+- Conclusion: Repository is ready for GitHub Pages static deployment after GitHub Pages is set to GitHub Actions and Cloudflare DNS records are configured.

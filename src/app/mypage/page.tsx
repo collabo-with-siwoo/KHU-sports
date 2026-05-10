@@ -22,7 +22,10 @@ export default function MyPage() {
           <strong>선수 등록이 필요합니다</strong>
           <p>PLAYER 승인 후 참가 대회와 상세 스코어카드를 확인할 수 있습니다.</p>
         </div>
-        <Link className="button primary" href="/mypage">
+        <Link className="button primary" href="/login">
+          로그인하기
+        </Link>
+        <Link className="button ghost" href="/signup">
           선수 등록 안내
         </Link>
       </section>

@@ -42,6 +42,11 @@ const quickLinks = [
     title: "내 기록",
     body: "PLAYER 승인 후 본인 상세 스코어카드를 조회합니다.",
     href: "/mypage"
+  },
+  {
+    title: "회원가입",
+    body: "아이디 로그인과 약관 동의를 기반으로 일반 회원 계정을 만듭니다.",
+    href: "/signup"
   }
 ];
 
@@ -56,7 +61,9 @@ export default function HomePage() {
         <nav aria-label="Primary navigation" className="nav">
           <Link href="/notices">공지</Link>
           <Link href="/results">대회 결과</Link>
+          <Link href="/terms">약관</Link>
           <Link href="/mypage">마이페이지</Link>
+          <Link href="/login">로그인</Link>
           <Link className="admin-link" href="/admin">
             관리자
           </Link>
@@ -86,8 +93,8 @@ export default function HomePage() {
             <Link className="button primary" href="/notices">
               최신 공지 보기
             </Link>
-            <Link className="button secondary" href="/results">
-              결과 확인
+            <Link className="button secondary" href="/signup">
+              회원가입
             </Link>
           </div>
         </div>

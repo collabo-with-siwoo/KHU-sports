@@ -4,10 +4,12 @@
 
 ## Milestone Status
 
-- Current milestone: M0, project foundation.
+- Current milestone: M1, authentication and agreements.
 - M0 scope in this repository: Next.js App Router scaffold, TypeScript strict mode, Prisma schema validation, environment variable template, and documentation baseline.
 - External M0 tasks still require human/account work: Vercel project, Supabase project, Cloudflare R2 buckets, Resend domain, production domain DNS.
 - Visual foundation: public user view has a sports-site style homepage with hero, notice, result, and quick-link modules. `/admin` currently presents a polished login-like shell until real authentication is implemented.
+- M1 local foundation: login, signup, reset-password, and terms pages exist with zod-backed client validation for GitHub Pages static preview compatibility. Actual Supabase Auth/Prisma persistence will be wired after external Supabase project setup.
+- Static preview deployment: GitHub Pages custom workflow exports the Next.js app to static files and publishes `khu-sports.com` via `public/CNAME`.
 
 ## Technology Decisions
 
@@ -74,6 +76,24 @@ INITIAL_SUPER_ADMIN_EMAIL
 - Sign-up must dynamically load active agreement templates and latest effective versions.
 - Login must accept username/password, look up the email server-side, then authenticate with Supabase Auth.
 - Error messages should not reveal whether a username exists.
+
+## M1 Implemented Local Contracts
+
+- `/login`: accepts `username` and `password`, validates with `loginSchema`, and returns a generic success/error state in the browser for static preview.
+- `/signup`: accepts username, password, confirmation, Korean name, birth date, gender, phone, email, address, active agreement version IDs, and age confirmation.
+- `/reset-password`: accepts email and validates reset request shape.
+- `/terms`: renders active agreement seed data in display order.
+- `src/lib/agreements.ts`: temporary seed source until agreement templates are persisted in Supabase/PostgreSQL.
+- `src/lib/auth/schemas.ts`: zod schemas for M1 inputs.
+- `src/lib/auth/client-validation.ts`: static-preview validation layer used until Supabase Auth and Prisma persistence are available.
+
+## GitHub Pages Static Preview
+
+- Domain: `khu-sports.com`.
+- Workflow: `.github/workflows/deploy-github-pages.yml`.
+- Build mode: `GITHUB_PAGES=true npm run build:pages`, which enables Next.js static export.
+- Custom domain: configure `khu-sports.com` in GitHub repository Pages settings. `public/CNAME` is kept as an exported marker but is not a substitute for the GitHub Pages custom-domain setting when using a custom workflow.
+- GitHub Pages is static only; real signup/login persistence requires the future Supabase-backed runtime deployment.
 
 ## Visual Interaction Notes
 
