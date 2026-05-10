@@ -15,17 +15,19 @@ const mobileNavItems = [
   { label: "공지사항", icon: "campaign", href: "/notices" }
 ];
 
-const leaderboard = [
-  { rank: 1, name: "김서연", holes: 15, score: "-4", total: 208, avatar: "KS" },
-  { rank: 2, name: "박지훈", holes: 14, score: "-2", total: 210, avatar: "PJ" },
-  { rank: 3, name: "이민재", holes: 18, score: "E", total: 212, avatar: "LM" },
-  { rank: 4, name: "최다니엘", holes: 12, score: "+1", total: 213, avatar: "CD" }
+const tournamentInfo = [
+  { icon: "calendar_today", label: "일정", value: "2026.10.14 (수) ~ 10.16 (금)" },
+  { icon: "location_on", label: "장소", value: "경희대학교 지정 코스" },
+  { icon: "sports_golf", label: "경기방식", value: "54홀 스트로크플레이" },
+  { icon: "flag", label: "기준파", value: "72 (전장 6,400yds)" },
+  { icon: "groups", label: "참가대상", value: "재학생 · 졸업생 · 교직원 · 초청" },
+  { icon: "mail", label: "접수", value: "khusports2026@gmail.com" }
 ];
 
 const recentNotices = [
-  { date: "2026년 10월 14일", title: "토요일 파이널 라운드 티타임 변경 안내" },
-  { date: "2026년 10월 12일", title: "선수 필수 브리핑: 14번 홀 로컬 룰 안내" },
-  { date: "2026년 10월 10일", title: "동문 주말 주차 및 셔틀 버스 이용 안내" }
+  { date: "2026년 10월 14일", title: "제27회 총장배 대회 참가 신청 서류 제출 안내" },
+  { date: "2026년 10월 12일", title: "선수 등록 절차 변경 및 관리자 승인 안내" },
+  { date: "2026년 10월 10일", title: "대회 당일 주차 및 셔틀 버스 이용 안내" }
 ];
 
 export default function HomePage() {
@@ -40,23 +42,11 @@ export default function HomePage() {
       >
         <div className="home-hero-overlay" />
         <div className="home-hero-content">
-          <span className="home-live-badge">
-            <i />
-            실시간 대회 중
-          </span>
-          <h1>2026 KHU 챔피언십 시리즈</h1>
+          <h1>경희대학교 총장배<br />전국 골프대회</h1>
           <p>
-            최고의 대학 골프 대회를 경험해 보세요. 명문 하이랜드 그린스에서 올해의
-            챔피언을 가리는 영광의 순간에 함께하십시오.
+            27년 전통의 경희대학교 총장배 골프대회.<br />
+            대회 정보 확인, 경기 결과 조회, 참가 신청까지 KHU Sports에서 함께하세요.
           </p>
-          <div className="home-hero-actions">
-            <Link className="home-btn primary" href="/results">
-              라이브 스코어
-            </Link>
-            <Link className="home-btn outline" href="/schedule">
-              일정 보기
-            </Link>
-          </div>
         </div>
       </section>
 
@@ -65,30 +55,23 @@ export default function HomePage() {
         <div className="home-leaderboard-card">
           <div className="home-card-header">
             <div className="home-card-title">
-              <span className="material-symbols-outlined">leaderboard</span>
-              <h2>실시간 리더보드</h2>
+              <span className="material-symbols-outlined">emoji_events</span>
+              <h2>대회 정보</h2>
             </div>
-            <Link className="home-view-all" href="/results">전체 보기</Link>
+            <Link className="home-view-all" href="/schedule">전체 보기</Link>
           </div>
-          <div className="home-lb-head">
-            <span>순위</span>
-            <span>선수</span>
-            <span>진행</span>
-            <span>스코어</span>
-            <span>합계</span>
-          </div>
-          {leaderboard.map((player) => (
-            <div className={`home-lb-row${player.rank === 1 ? " leader" : ""}`} key={player.rank}>
-              <span className="home-lb-rank">{player.rank}</span>
-              <div className="home-lb-player">
-                <i>{player.avatar}</i>
-                <strong>{player.name}</strong>
+          <div className="home-tourney-info">
+            <h3>제27회 경희대학교 총장배 전국 골프대회</h3>
+            {tournamentInfo.map((item) => (
+              <div className="home-tourney-row" key={item.label}>
+                <div className="home-tourney-label">
+                  <span className="material-symbols-outlined">{item.icon}</span>
+                  <span>{item.label}</span>
+                </div>
+                <span className="home-tourney-value">{item.value}</span>
               </div>
-              <span>{player.holes}</span>
-              <span className={Number(player.score) < 0 ? "score-under" : ""}>{player.score}</span>
-              <b>{player.total}</b>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <div className="home-sidebar">
@@ -98,7 +81,7 @@ export default function HomePage() {
           >
             <div className="home-weather-overlay" />
             <div className="home-weather-content">
-              <p>실시간 코스 날씨</p>
+              <p>코스 날씨</p>
               <div className="home-weather-temp">
                 <strong>24°C</strong>
                 <div>

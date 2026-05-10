@@ -1627,6 +1627,54 @@ p {
   color: var(--primary);
 }
 
+/* Home Tournament Info */
+.home-tourney-info {
+  padding: 4px 0;
+}
+
+.home-tourney-info h3 {
+  border-bottom: 1px solid var(--line);
+  color: var(--primary);
+  font-size: 16px;
+  font-weight: 900;
+  margin: 0;
+  padding: 0 0 14px;
+}
+
+.home-tourney-row {
+  align-items: center;
+  border-bottom: 1px solid rgba(216, 223, 219, 0.4);
+  display: flex;
+  gap: 12px;
+  padding: 13px 0;
+}
+
+.home-tourney-row:last-child {
+  border-bottom: none;
+}
+
+.home-tourney-label {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 6px;
+  min-width: 100px;
+  white-space: nowrap;
+}
+
+.home-tourney-label .material-symbols-outlined {
+  color: var(--primary);
+  font-size: 18px;
+}
+
+.home-tourney-value {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
 /* Home Responsive */
 @media (max-width: 1080px) {
   .home-content {
@@ -1650,24 +1698,6 @@ p {
 
   .home-hero h1 {
     font-size: clamp(28px, 8vw, 38px);
-  }
-
-  .home-lb-head,
-  .home-lb-row {
-    grid-template-columns: 40px minmax(0, 1fr) 52px 52px 52px;
-    gap: 8px;
-  }
-
-  .home-lb-player i {
-    display: none;
-  }
-
-  .home-lb-head {
-    font-size: 12px;
-  }
-
-  .home-lb-row b {
-    font-size: 16px;
   }
 }
 
