@@ -12,8 +12,8 @@ export default function LoginPage() {
           <p className="eyebrow">Member Login</p>
           <h1>아이디로 로그인하고 내 기록을 확인하세요</h1>
           <p>
-            내부 인증은 Supabase Auth와 연결되며, 사용자는 PRD 정책에 따라
-            아이디와 비밀번호로 로그인합니다.
+            아이디와 비밀번호로 로그인합니다. 선수 승인 후에는 본인 상세
+            스코어카드를 확인할 수 있습니다.
           </p>
         </div>
       </section>

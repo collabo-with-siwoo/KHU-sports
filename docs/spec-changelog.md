@@ -39,3 +39,19 @@
 
 - Adjusted public and admin hero title sizing so desktop Korean headings stay on one line.
 - Preserved normal wrapping on small mobile screens.
+
+## 2026-05-10 - Stitch Next.js UI Integration
+
+- Created `feat/stitch-next-ui` branch.
+- Ported the Stitch "Majestic Green" design direction into the Next.js App Router pages.
+- Replaced corrupted Korean UI copy across public, auth, terms, mypage, results, and admin pages.
+- Kept non-MVP functionality visual-only: no live scoring claims, no payment flow, no direct public player approval, and no public detailed scorecard.
+- Updated visual interaction specs for quick-link cards, notice rows, result rows, subpage cards, and admin modules.
+- Verified with typecheck, lint, Prisma validation, production build, static GitHub Pages export build, and local content checks.
+
+## 2026-05-10 - Stitch Baseline Correction
+
+- Replaced the previous public page shell on `/`, `/results`, and `/notices` with the Stitch app-style baseline.
+- Added fixed top app bars, mobile bottom navigation, compact headers, dense cards/lists, leaderboard rows, notice tabs, and desktop notice sidebar behavior.
+- Kept PRD privacy constraints in the leaderboard: public screens show result summaries only, not detailed scorecards.
+- Verified with typecheck, lint, Prisma validation, production build, static GitHub Pages export build, and Playwright desktop/mobile screenshots for the three public screens.

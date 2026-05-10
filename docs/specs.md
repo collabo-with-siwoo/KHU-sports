@@ -7,7 +7,7 @@
 - Current milestone: M1, authentication and agreements.
 - M0 scope in this repository: Next.js App Router scaffold, TypeScript strict mode, Prisma schema validation, environment variable template, and documentation baseline.
 - External M0 tasks still require human/account work: Vercel project, Supabase project, Cloudflare R2 buckets, Resend domain, production domain DNS.
-- Visual foundation: public user view has a sports-site style homepage with hero, notice, result, and quick-link modules. `/admin` currently presents a polished login-like shell until real authentication is implemented.
+- Visual foundation: public user view follows the Stitch "Majestic Green" direction with a hero image, sticky desktop navigation, mobile bottom navigation, bento-style quick links, notice modules, and result summary modules. `/admin` presents a polished login-like shell until real authentication is implemented.
 - M1 local foundation: login, signup, reset-password, and terms pages exist with zod-backed client validation for GitHub Pages static preview compatibility. Actual Supabase Auth/Prisma persistence will be wired after external Supabase project setup.
 - Static preview deployment: GitHub Pages custom workflow exports the Next.js app to static files and publishes `khu-sports.com` via `public/CNAME`.
 
@@ -97,9 +97,15 @@ INITIAL_SUPER_ADMIN_EMAIL
 
 ## Visual Interaction Notes
 
+- Stitch baseline screens use an app-style top bar, mobile bottom navigation, compact page headers, dense cards/lists, and light gray canvas backgrounds for `/`, `/results`, and `/notices`.
+- The homepage uses a tournament hero with a golf course image, a next-tournament summary card, bento quick links, a notice panel, and a public mini leaderboard.
+- The public leaderboard page presents only public-safe fields: rank, player name, affiliation, relative score, and total score. Detailed scorecard access remains excluded from public result screens.
+- The notices page uses category tabs and a feed layout; desktop screens add a left sidebar while mobile screens rely on the bottom navigation.
 - Public navigation uses hover lift/color transitions.
-- Homepage feature cards, notice rows, and ranking rows provide hover feedback for a more finished client preview.
-- `/admin` login shell is visual-only in M0; submit behavior and Supabase-backed RBAC belong to M3.
+- Homepage quick-link cards, notice rows, result rows, subpage cards, and admin preview modules provide hover feedback.
+- Public result views must avoid detailed scorecards and expose only rank, player name, and total score.
+- Player registration copy points users toward email submission and admin approval instead of implementing a direct public player-registration workflow.
+- `/admin` login shell is visual-only in M1; submit behavior and Supabase-backed RBAC belong to M3.
 
 ## Verification Commands
 
