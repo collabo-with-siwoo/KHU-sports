@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
   { label: "경기결과", icon: "leaderboard", href: "/results" },
-  { label: "대회일정", icon: "event", href: "/schedule" },
+  { label: "대회정보", icon: "event", href: "/schedule" },
   { label: "공지사항", icon: "campaign", href: "/notices" }
 ];
 
