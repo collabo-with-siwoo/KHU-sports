@@ -49,6 +49,7 @@
 - `/mypage` now reads the Supabase session and displays the logged-in local profile when present.
 - Supabase DB schema has been applied from the Prisma-generated SQL diff after `prisma db push` reported an empty schema engine error.
 - `npm run db:seed` was applied; Supabase now has the `GOLF` sport row and 3 default agreement versions.
+- Successful signup now redirects to `/login?signup=success`; the obsolete static-preview client validation helper was removed.
 
 ## Remaining M0 External Tasks
 

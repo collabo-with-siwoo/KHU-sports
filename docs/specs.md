@@ -82,7 +82,7 @@ INITIAL_SUPER_ADMIN_EMAIL
 ## M1 Implemented Runtime Contracts
 
 - `/login`: accepts `username` and `password`, validates with `loginSchema`, looks up the local `User.email`, signs in through Supabase Auth, sets Supabase session cookies, updates `lastLoginAt`, and redirects to `/mypage`.
-- `/signup`: accepts username, password, confirmation, Korean name, birth date, gender, phone, email, address, active agreement version IDs, and age confirmation. It creates a Supabase Auth user, persists the local `User` profile with `id = auth.users.id`, and records `UserAgreement` rows.
+- `/signup`: accepts username, password, confirmation, Korean name, birth date, gender, phone, email, address, active agreement version IDs, and age confirmation. It creates a Supabase Auth user, persists the local `User` profile with `id = auth.users.id`, records `UserAgreement` rows, and redirects to `/login?signup=success`.
 - `/reset-password`: accepts email and calls Supabase Auth password reset. The response stays generic so account existence is not disclosed.
 - `/terms`: renders active agreement versions from Prisma when available, falling back to UUID seed agreements.
 - `/mypage`: reads the Supabase session and displays the linked local `User` profile when logged in.

@@ -165,3 +165,17 @@
   - Confirmed core tables exist, `Sport` has 1 row, and `AgreementVersion` has 3 rows.
   - Verification passed: typecheck, lint, and Prisma validation.
 - Conclusion: Supabase now has the application schema and default seed data required for signup/login persistence.
+
+## 2026-05-11 01:04 KST - Signup completion redirect check
+
+- Request: Signup still shows the old input-validation success message and does not navigate; verify whether Supabase setup is correct.
+- Milestone: M1 authentication and agreements.
+- Status: Compared local `main`, Supabase counts, and the deployed signup page.
+- Findings:
+  - Local `main` contains the Supabase Server Action signup path.
+  - Supabase has the expected base tables and seed rows, but `User` is still empty because the reported signup did not hit the persistence action.
+  - The deployed signup JavaScript contains `signUpAction`, not the old `validateSignupForm` client path.
+- Result:
+  - Changed successful signup to redirect to `/login?signup=success`.
+  - Added a login-page success message for completed signup.
+  - Removed the obsolete `src/lib/auth/client-validation.ts` helper to eliminate the old success message path.

@@ -195,10 +195,7 @@ export async function signUpAction(
     };
   }
 
-  return {
-    status: "success",
-    message: "회원가입이 완료되었습니다. 이메일 인증이 켜져 있다면 인증 후 로그인해주세요."
-  };
+  redirect("/login?signup=success");
 }
 
 export async function resetPasswordAction(

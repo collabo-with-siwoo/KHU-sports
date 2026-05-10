@@ -87,3 +87,9 @@
 - Applied the Prisma schema to Supabase by executing the Prisma-generated SQL diff directly after `prisma db push` returned an empty schema engine error.
 - Seeded the `GOLF` sport row and the initial agreement templates/versions.
 - Verified the runtime database connection, expected core tables, and seed row counts.
+
+## 2026-05-11 - Signup Completion Redirect
+
+- Changed successful signup to redirect to `/login?signup=success` after Supabase Auth, local `User`, and `UserAgreement` persistence completes.
+- Added a login-page success message for completed signup.
+- Removed the obsolete static-preview client validation helper so the old "입력값 검증" success path cannot be bundled again.
