@@ -3,7 +3,7 @@ import Link from "next/link";
 const gnbItems = [
   { label: "홈", href: "/" },
   { label: "경기결과", href: "/results" },
-  { label: "대회일정", href: "/schedule" },
+  { label: "대회정보", href: "/schedule" },
   { label: "공지사항", href: "/notices" }
 ];
 
