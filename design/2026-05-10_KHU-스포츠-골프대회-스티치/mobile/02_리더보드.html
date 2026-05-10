@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>실시간 리더보드</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Pretendard Font Replacement -->
+<link as="style" crossorigin="" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-container": "#745c00",
+                      "surface": "#f8f9fa",
+                      "surface-dim": "#d9dadb",
+                      "on-secondary-fixed": "#241a00",
+                      "error": "#ba1a1a",
+                      "surface-container-low": "#f3f4f5",
+                      "outline-variant": "#c1c8c4",
+                      "surface-tint": "#43655c",
+                      "tertiary-fixed-dim": "#e9c176",
+                      "primary-fixed": "#c5eadf",
+                      "tertiary-container": "#483200",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#e7e8e9",
+                      "surface-container-highest": "#e1e3e4",
+                      "outline": "#717976",
+                      "on-secondary-fixed-variant": "#574500",
+                      "on-primary-fixed": "#00201a",
+                      "surface-container": "#edeeef",
+                      "surface-variant": "#e1e3e4",
+                      "secondary-fixed-dim": "#e9c349",
+                      "primary-fixed-dim": "#aacec3",
+                      "surface-bright": "#f8f9fa",
+                      "tertiary-fixed": "#ffdea5",
+                      "tertiary": "#2d1e00",
+                      "on-tertiary-container": "#be9953",
+                      "error-container": "#ffdad6",
+                      "on-tertiary-fixed": "#261900",
+                      "on-error-container": "#93000a",
+                      "on-error": "#ffffff",
+                      "on-tertiary-fixed-variant": "#5d4201",
+                      "on-secondary": "#ffffff",
+                      "inverse-primary": "#aacec3",
+                      "background": "#f8f9fa",
+                      "primary": "#01261f",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-surface": "#2e3132",
+                      "on-primary-container": "#83a69c",
+                      "on-background": "#191c1d",
+                      "on-primary": "#ffffff",
+                      "inverse-on-surface": "#f0f1f2",
+                      "secondary-fixed": "#ffe088",
+                      "secondary-container": "#fed65b",
+                      "on-primary-fixed-variant": "#2b4d44",
+                      "primary-container": "#1a3c34",
+                      "secondary": "#735c00",
+                      "on-surface": "#191c1d",
+                      "on-surface-variant": "#414846"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-max": "1280px",
+                      "gutter": "24px",
+                      "base": "8px",
+                      "md": "24px",
+                      "xl": "80px",
+                      "xs": "4px",
+                      "lg": "48px",
+                      "sm": "12px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Pretendard", "Inter", "sans-serif"],
+                      "label-bold": ["Pretendard", "Lexend", "sans-serif"],
+                      "display-lg-mobile": ["Pretendard", "Hanken Grotesk", "sans-serif"],
+                      "headline-md": ["Pretendard", "Hanken Grotesk", "sans-serif"],
+                      "headline-lg": ["Pretendard", "Hanken Grotesk", "sans-serif"],
+                      "body-md": ["Pretendard", "Inter", "sans-serif"],
+                      "display-lg": ["Pretendard", "Hanken Grotesk", "sans-serif"],
+                      "stat-number": ["Pretendard", "Lexend", "sans-serif"]
+              },
+              "fontSize": {
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-bold": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "800"
+                              }
+                      ],
+                      "stat-number": [
+                              "24px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+      font-family: 'Pretendard', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased pt-16 pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="bg-surface/80 dark:bg-primary/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant/30 shadow-sm transition-all duration-300">
+<div class="flex items-center justify-between px-margin-mobile h-16 w-full max-w-container-max mx-auto">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed" style="font-variation-settings: 'FILL' 1;">sports_golf</span>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-secondary-fixed uppercase">KHU PRESIDENT'S CUP</h1>
+</div>
+<div class="hidden md:flex gap-gutter items-center">
+<a class="text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity font-label-bold text-label-bold" href="#">홈</a>
+<a class="text-primary dark:text-secondary-fixed font-bold hover:opacity-80 transition-opacity font-label-bold text-label-bold" href="#">리더보드</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity font-label-bold text-label-bold" href="#">공지사항</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:opacity-80 transition-opacity font-label-bold text-label-bold" href="#">나의 기록</a>
+</div>
+<button class="active:scale-95 transition-transform p-xs text-primary dark:text-primary-fixed">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-gutter mt-lg">
+<!-- Header Section -->
+<div class="mb-lg">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-md">
+<div>
+<div class="flex items-center gap-sm mb-xs">
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full font-label-bold text-xs inline-flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-error animate-pulse"></span>
+                            실시간
+                        </span>
+<span class="text-on-surface-variant font-label-bold text-sm">라운드 2 • 하이원 CC</span>
+</div>
+<h2 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-primary">실시간 리더보드</h2>
+</div>
+<div class="flex items-center bg-surface-container rounded-lg p-xs">
+<button class="px-md py-sm rounded-md bg-surface text-primary shadow-sm font-label-bold text-label-bold transition-all">남성부</button>
+<button class="px-md py-sm rounded-md text-on-surface-variant hover:text-primary font-label-bold text-label-bold transition-all">여성부</button>
+</div>
+</div>
+<!-- Search and Filter Bar -->
+<div class="flex flex-col md:flex-row gap-sm items-center bg-surface-container-lowest p-sm rounded-lg border border-outline-variant/30 shadow-[0_4px_12px_rgba(26,60,52,0.04)]">
+<div class="relative w-full md:w-96 flex-grow">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full bg-transparent border border-outline-variant rounded-md py-sm pl-xl pr-sm text-on-surface focus:border-secondary-container focus:ring-1 focus:ring-secondary-container outline-none transition-all placeholder:text-outline-variant font-body-md" placeholder="선수명 검색..." type="text"/>
+</div>
+<button class="flex items-center gap-xs px-md py-sm border border-outline-variant rounded-md text-on-surface-variant hover:bg-surface-container transition-colors w-full md:w-auto justify-center">
+<span class="material-symbols-outlined text-sm">tune</span>
+<span class="font-label-bold text-label-bold">필터</span>
+</button>
+</div>
+</div>
+<!-- Leaderboard Table/List -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0_4px_24px_rgba(26,60,52,0.06)] border border-outline-variant/20 overflow-hidden">
+<!-- Table Header -->
+<div class="grid grid-cols-[60px_1fr_80px_80px] md:grid-cols-[80px_1fr_120px_120px] gap-sm px-md py-sm bg-surface-container-low border-b border-outline-variant/30 text-on-surface-variant font-label-bold text-label-bold uppercase text-xs tracking-wider">
+<div class="text-center">순위</div>
+<div>선수명</div>
+<div class="text-right">전체</div>
+<div class="text-right">타수</div>
+</div>
+<!-- Table Body -->
+<div class="flex flex-col">
+<!-- Row 1 (1st Place) -->
+<div class="grid grid-cols-[60px_1fr_80px_80px] md:grid-cols-[80px_1fr_120px_120px] gap-sm px-md py-md items-center border-b border-outline-variant/10 hover:bg-surface-container-low transition-colors bg-surface-bright">
+<div class="flex justify-center">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-stat-number text-stat-number text-sm shadow-sm">1</div>
+</div>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container hidden md:flex items-center justify-center font-bold text-lg">KS</div>
+<div>
+<div class="font-bold text-primary text-lg">김서준</div>
+<div class="text-sm text-on-surface-variant hidden md:block">경희대학교</div>
+</div>
+</div>
+<div class="text-right font-stat-number text-stat-number text-primary font-bold">-5</div>
+<div class="text-right font-stat-number text-stat-number text-outline">67</div>
+</div>
+<!-- Row 2 (2nd Place) -->
+<div class="grid grid-cols-[60px_1fr_80px_80px] md:grid-cols-[80px_1fr_120px_120px] gap-sm px-md py-md items-center border-b border-outline-variant/10 hover:bg-surface-container-low transition-colors bg-[#F1F3F2]">
+<div class="flex justify-center">
+<div class="w-8 h-8 rounded-full bg-surface-dim text-on-surface flex items-center justify-center font-stat-number text-stat-number text-sm shadow-sm">2</div>
+</div>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant hidden md:flex items-center justify-center font-bold text-lg">PD</div>
+<div>
+<div class="font-bold text-primary text-lg">박도윤</div>
+<div class="text-sm text-on-surface-variant hidden md:block">동문회</div>
+</div>
+</div>
+<div class="text-right font-stat-number text-stat-number text-primary font-bold">-2</div>
+<div class="text-right font-stat-number text-stat-number text-outline">70</div>
+</div>
+<!-- Row 3 (3rd Place) -->
+<div class="grid grid-cols-[60px_1fr_80px_80px] md:grid-cols-[80px_1fr_120px_120px] gap-sm px-md py-md items-center border-b border-outline-variant/10 hover:bg-surface-container-low transition-colors bg-surface-bright">
+<div class="flex justify-center">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed-dim text-on-tertiary-fixed flex items-center justify-center font-stat-number text-stat-number text-sm shadow-sm">3</div>
+</div>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant hidden md:flex items-center justify-center font-bold text-lg">LH</div>
+<div>
+<div class="font-bold text-primary text-lg">이하린</div>
+<div class="text-sm text-on-surface-variant hidden md:block">경희대학교</div>
+</div>
+</div>
+<div class="text-right font-stat-number text-stat-number text-on-surface font-semibold">E</div>
+<div class="text-right font-stat-number text-stat-number text-outline">72</div>
+</div>
+<!-- Row 4 -->
+<div class="grid grid-cols-[60px_1fr_80px_80px] md:grid-cols-[80px_1fr_120px_120px] gap-sm px-md py-md items-center border-b border-outline-variant/10 hover:bg-surface-container-low transition-colors bg-[#F1F3F2]">
+<div class="flex justify-center">
+<div class="w-8 h-8 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center font-stat-number text-stat-number text-sm">4</div>
+</div>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant hidden md:flex items-center justify-center font-bold text-lg">JM</div>
+<div>
+<div class="font-bold text-on-surface text-lg">정민재</div>
+<div class="text-sm text-on-surface-variant hidden md:block">게스트</div>
+</div>
+</div>
+<div class="text-right font-stat-number text-stat-number text-error font-semibold">+1</div>
+<div class="text-right font-stat-number text-stat-number text-outline">73</div>
+</div>
+<!-- Row 5 -->
+<div class="grid grid-cols-[60px_1fr_80px_80px] md:grid-cols-[80px_1fr_120px_120px] gap-sm px-md py-md items-center border-b border-outline-variant/10 hover:bg-surface-container-low transition-colors bg-surface-bright">
+<div class="flex justify-center">
+<div class="w-8 h-8 rounded-full bg-surface-container text-on-surface-variant flex items-center justify-center font-stat-number text-stat-number text-sm">5</div>
+</div>
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-surface-variant text-on-surface-variant hidden md:flex items-center justify-center font-bold text-lg">CJ</div>
+<div>
+<div class="font-bold text-on-surface text-lg">최지훈</div>
+<div class="text-sm text-on-surface-variant hidden md:block">경희대학교</div>
+</div>
+</div>
+<div class="text-right font-stat-number text-stat-number text-error font-semibold">+3</div>
+<div class="text-right font-stat-number text-stat-number text-outline">75</div>
+</div>
+</div>
+<div class="p-md text-center bg-surface-container-low">
+<button class="text-primary font-label-bold text-label-bold hover:underline transition-all">선수 더 보기</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden bg-surface/90 dark:bg-primary/95 backdrop-blur-lg fixed bottom-0 w-full z-50 rounded-t-xl border-t border-outline-variant/20 shadow-[0_-4px_12px_rgba(26,60,52,0.08)]">
+<div class="fixed bottom-0 left-0 w-full flex justify-around items-center pt-2 pb-safe px-4 h-20">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-secondary-fixed active:scale-90 transition-all duration-200 w-16" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-bold text-label-bold text-[10px]">홈</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-full px-4 py-1 active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">leaderboard</span>
+<span class="font-label-bold text-label-bold text-[10px]">리더보드</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-secondary-fixed active:scale-90 transition-all duration-200 w-16" href="#">
+<span class="material-symbols-outlined mb-1">campaign</span>
+<span class="font-label-bold text-label-bold text-[10px]">공지사항</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-secondary-fixed active:scale-90 transition-all duration-200 w-16" href="#">
+<span class="material-symbols-outlined mb-1">history_edu</span>
+<span class="font-label-bold text-label-bold text-[10px]">나의 기록</span>
+</a>
+</div>
+</nav>
+</body></html>

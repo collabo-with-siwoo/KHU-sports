@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>공지사항 목록</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link as="style" crossorigin="" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "on-secondary-container": "#745c00",
+                            "surface": "#f8f9fa",
+                            "surface-dim": "#d9dadb",
+                            "on-secondary-fixed": "#241a00",
+                            "error": "#ba1a1a",
+                            "surface-container-low": "#f3f4f5",
+                            "outline-variant": "#c1c8c4",
+                            "surface-tint": "#43655c",
+                            "tertiary-fixed-dim": "#e9c176",
+                            "primary-fixed": "#c5eadf",
+                            "tertiary-container": "#483200",
+                            "on-tertiary": "#ffffff",
+                            "surface-container-high": "#e7e8e9",
+                            "surface-container-highest": "#e1e3e4",
+                            "outline": "#717976",
+                            "on-secondary-fixed-variant": "#574500",
+                            "on-primary-fixed": "#00201a",
+                            "surface-container": "#edeeef",
+                            "surface-variant": "#e1e3e4",
+                            "secondary-fixed-dim": "#e9c349",
+                            "primary-fixed-dim": "#aacec3",
+                            "surface-bright": "#f8f9fa",
+                            "tertiary-fixed": "#ffdea5",
+                            "tertiary": "#2d1e00",
+                            "on-tertiary-container": "#be9953",
+                            "error-container": "#ffdad6",
+                            "on-tertiary-fixed": "#261900",
+                            "on-error-container": "#93000a",
+                            "on-error": "#ffffff",
+                            "on-tertiary-fixed-variant": "#5d4201",
+                            "on-secondary": "#ffffff",
+                            "inverse-primary": "#aacec3",
+                            "background": "#f8f9fa",
+                            "primary": "#01261f",
+                            "surface-container-lowest": "#ffffff",
+                            "inverse-surface": "#2e3132",
+                            "on-primary-container": "#83a69c",
+                            "on-background": "#191c1d",
+                            "on-primary": "#ffffff",
+                            "inverse-on-surface": "#f0f1f2",
+                            "secondary-fixed": "#ffe088",
+                            "secondary-container": "#fed65b",
+                            "on-primary-fixed-variant": "#2b4d44",
+                            "primary-container": "#1a3c34",
+                            "secondary": "#735c00",
+                            "on-surface": "#191c1d",
+                            "on-surface-variant": "#414846"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "container-max": "1280px",
+                            "gutter": "24px",
+                            "base": "8px",
+                            "md": "24px",
+                            "xl": "80px",
+                            "xs": "4px",
+                            "lg": "48px",
+                            "sm": "12px",
+                            "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                            "body-lg": ["Pretendard", "Inter", "sans-serif"],
+                            "label-bold": ["Pretendard", "Lexend", "sans-serif"],
+                            "display-lg-mobile": ["Pretendard", "Hanken Grotesk", "sans-serif"],
+                            "headline-md": ["Pretendard", "Hanken Grotesk", "sans-serif"],
+                            "headline-lg": ["Pretendard", "Hanken Grotesk", "sans-serif"],
+                            "body-md": ["Pretendard", "Inter", "sans-serif"],
+                            "display-lg": ["Pretendard", "Hanken Grotesk", "sans-serif"],
+                            "stat-number": ["Pretendard", "Lexend", "sans-serif"]
+                    },
+                    "fontSize": {
+                            "body-lg": [
+                                    "18px",
+                                    {
+                                            "lineHeight": "28px",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "label-bold": [
+                                    "14px",
+                                    {
+                                            "lineHeight": "20px",
+                                            "letterSpacing": "0.05em",
+                                            "fontWeight": "600"
+                                    }
+                            ],
+                            "display-lg-mobile": [
+                                    "32px",
+                                    {
+                                            "lineHeight": "40px",
+                                            "letterSpacing": "-0.01em",
+                                            "fontWeight": "800"
+                                    }
+                            ],
+                            "headline-md": [
+                                    "24px",
+                                    {
+                                            "lineHeight": "32px",
+                                            "fontWeight": "700"
+                                    }
+                            ],
+                            "headline-lg": [
+                                    "32px",
+                                    {
+                                            "lineHeight": "40px",
+                                            "fontWeight": "700"
+                                    }
+                            ],
+                            "body-md": [
+                                    "16px",
+                                    {
+                                            "lineHeight": "24px",
+                                            "fontWeight": "400"
+                                    }
+                            ],
+                            "display-lg": [
+                                    "48px",
+                                    {
+                                            "lineHeight": "56px",
+                                            "letterSpacing": "-0.02em",
+                                            "fontWeight": "800"
+                                    }
+                            ],
+                            "stat-number": [
+                                    "24px",
+                                    {
+                                            "lineHeight": "24px",
+                                            "fontWeight": "700"
+                                    }
+                            ]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+            font-family: "Pretendard", sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-lg antialiased min-h-screen flex flex-col pt-16 pb-20 md:pb-0">
+<!-- TopAppBar -->
+<header class="bg-surface/80 dark:bg-primary/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant/30 shadow-sm flex items-center justify-between px-margin-mobile h-16 max-w-container-max mx-auto left-0 right-0">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold overflow-hidden">
+<img alt="KHU Sports Logo placeholder" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFhxBsKP9m8D0TGjdjFfrV7TXW8pqiiUQ7qSCg8QVo8UtSkvDcRmDDmJvbj6xGOHQx-L_lhNBVYhL7AwHxPU40ZqdHEQ0tizYoxztoI7B2Krn0P_cvo1eQhtpdgrsqp6qB0c8R7b-kRD7L7DU5coyGdYrdEMhqGZsyMeElbz7Og2PCzusZHYhGkmbKTyr_JmIXZtWqqxPh8E6eYOvR_HtOj-4Vk6fjCR3D2vWqoy273ahlbHrEgKFo3iM0lbYRgJrTPaxUIOiWjwmj"/>
+</div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-secondary-fixed uppercase">KHU 총장배</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors hover:opacity-80 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed text-[24px]" data-icon="notifications">notifications</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-gutter py-md">
+<!-- Header Section -->
+<div class="mb-lg">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-xs">공지사항</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">최신 소식과 대회 정보를 확인하세요.</p>
+</div>
+<!-- Filter/Tabs -->
+<div class="flex gap-2 overflow-x-auto pb-4 mb-md hide-scrollbar">
+<button class="px-4 py-2 rounded-full bg-primary text-on-primary font-label-bold text-label-bold whitespace-nowrap shadow-sm">전체</button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-bold text-label-bold whitespace-nowrap hover:bg-surface-variant transition-colors border border-outline-variant/30">대회</button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-bold text-label-bold whitespace-nowrap hover:bg-surface-variant transition-colors border border-outline-variant/30">관리자</button>
+<button class="px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-bold text-label-bold whitespace-nowrap hover:bg-surface-variant transition-colors border border-outline-variant/30">일반</button>
+</div>
+<!-- Notice List -->
+<div class="space-y-4">
+<!-- Notice Card 1 -->
+<article class="bg-surface-container-lowest rounded-xl p-md shadow-[0_4px_12px_rgba(26,60,52,0.08)] border border-outline-variant/20 hover:shadow-[0_8px_24px_rgba(26,60,52,0.12)] transition-shadow cursor-pointer group">
+<div class="flex items-start justify-between mb-sm gap-4">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-md bg-secondary-container/20 text-on-secondary-container font-label-bold text-[12px] uppercase tracking-wider">대회</span>
+<span class="text-on-surface-variant font-body-md text-[14px]">2026.05.10</span>
+</div>
+<h3 class="font-headline-md text-[20px] leading-[28px] text-on-surface group-hover:text-primary transition-colors">제27회 경희대학교 총장배 전국 골프대회 안내</h3>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">제27회 경희대학교 총장배 전국 골프대회가 개최됩니다. 자세한 일정 및 참가 신청 안내를 확인해 주세요.</p>
+</article>
+<!-- Notice Card 2 -->
+<article class="bg-surface-container-lowest rounded-xl p-md shadow-[0_4px_12px_rgba(26,60,52,0.08)] border border-outline-variant/20 hover:shadow-[0_8px_24px_rgba(26,60,52,0.12)] transition-shadow cursor-pointer group">
+<div class="flex items-start justify-between mb-sm gap-4">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-md bg-primary-container/10 text-primary font-label-bold text-[12px] uppercase tracking-wider">관리자</span>
+<span class="text-on-surface-variant font-body-md text-[14px]">2026.05.08</span>
+</div>
+<h3 class="font-headline-md text-[20px] leading-[28px] text-on-surface group-hover:text-primary transition-colors">참가자 안전 서약서 및 개인정보 동의서 제출 안내</h3>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">모든 참가자는 대회 시작 전 안전 서약서와 개인정보 동의서를 제출해야 합니다. 미제출 시 참가가 제한될 수 있습니다.</p>
+</article>
+<!-- Notice Card 3 -->
+<article class="bg-surface-container-lowest rounded-xl p-md shadow-[0_4px_12px_rgba(26,60,52,0.08)] border border-outline-variant/20 hover:shadow-[0_8px_24px_rgba(26,60,52,0.12)] transition-shadow cursor-pointer group">
+<div class="flex items-start justify-between mb-sm gap-4">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-md bg-surface-container-high text-on-surface font-label-bold text-[12px] uppercase tracking-wider">일반</span>
+<span class="text-on-surface-variant font-body-md text-[14px]">2026.05.05</span>
+</div>
+<h3 class="font-headline-md text-[20px] leading-[28px] text-on-surface group-hover:text-primary transition-colors">선수 등록은 이메일 접수 후 관리자 승인으로 진행됩니다</h3>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">선수 등록은 이메일 접수 후 관리자의 최종 승인을 거쳐 완료됩니다. 제출 서류를 다시 한번 확인해 주시기 바랍니다.</p>
+</article>
+<!-- Notice Card 4 -->
+<article class="bg-surface-container-lowest rounded-xl p-md shadow-[0_4px_12px_rgba(26,60,52,0.08)] border border-outline-variant/20 hover:shadow-[0_8px_24px_rgba(26,60,52,0.12)] transition-shadow cursor-pointer group">
+<div class="flex items-start justify-between mb-sm gap-4">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-1 rounded-md bg-secondary-container/20 text-on-secondary-container font-label-bold text-[12px] uppercase tracking-wider">대회</span>
+<span class="text-on-surface-variant font-body-md text-[14px]">2026.04.28</span>
+</div>
+<h3 class="font-headline-md text-[20px] leading-[28px] text-on-surface group-hover:text-primary transition-colors">대회 코스 야디지북 배포 안내</h3>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">공식 대회 코스 야디지북 다운로드가 가능합니다. 인쇄본은 첫 연습 라운드 당일에 현장 배부될 예정입니다.</p>
+</article>
+</div>
+<!-- Pagination/Load More -->
+<div class="mt-lg flex justify-center pb-xl md:pb-0">
+<button class="px-6 py-3 rounded-full bg-surface-container-high text-primary font-label-bold text-label-bold hover:bg-surface-variant transition-colors border border-outline-variant/30 flex items-center gap-2 shadow-sm">
+                공지사항 더보기
+                <span class="material-symbols-outlined text-[18px]" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface/90 dark:bg-primary/95 backdrop-blur-lg fixed bottom-0 w-full z-50 rounded-t-xl border-t border-outline-variant/20 shadow-[0_-4px_12px_rgba(26,60,52,0.08)]">
+<div class="flex justify-around items-center pt-2 pb-safe px-4 min-h-[64px]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-secondary-fixed active:scale-90 transition-all duration-200 gap-1 w-16" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="home">home</span>
+<span class="font-label-bold text-[10px] leading-[12px] truncate w-full text-center">홈</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-secondary-fixed active:scale-90 transition-all duration-200 gap-1 w-16" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="leaderboard">leaderboard</span>
+<span class="font-label-bold text-[10px] leading-[12px] truncate w-full text-center">리더보드</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-secondary text-on-secondary-container dark:text-on-secondary rounded-full px-4 py-1 active:scale-90 transition-all duration-200 gap-1 w-20" href="#">
+<span class="material-symbols-outlined text-[24px] fill" data-icon="campaign" data-weight="fill">campaign</span>
+<span class="font-label-bold text-[10px] leading-[12px] truncate w-full text-center">공지사항</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-secondary-fixed active:scale-90 transition-all duration-200 gap-1 w-16" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="history_edu">history_edu</span>
+<span class="font-label-bold text-[10px] leading-[12px] truncate w-full text-center">기록</span>
+</a>
+</div>
+</nav>
+<!-- Desktop Sidebar Navigation (Hidden on Mobile) -->
+<aside class="hidden md:flex flex-col fixed left-0 top-16 bottom-0 w-[240px] bg-surface border-r border-outline-variant/20 py-md px-4 z-40">
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-bold text-[14px]">홈</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+<span class="font-label-bold text-[14px]">리더보드</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-secondary-container/30 text-primary font-bold transition-colors border-l-4 border-primary" href="#">
+<span class="material-symbols-outlined fill" data-icon="campaign" data-weight="fill">campaign</span>
+<span class="font-label-bold text-[14px]">공지사항</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-variant/50 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span class="font-label-bold text-[14px]">나의 기록</span>
+</a>
+</nav>
+</aside>
+<style>
+        /* Hide scrollbar for horizontal scroll area but keep functionality */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        @media (min-width: 768px) {
+            main {
+                padding-left: calc(240px + 24px); /* Sidebar width + gutter */
+            }
+        }
+    </style>
+</body></html>

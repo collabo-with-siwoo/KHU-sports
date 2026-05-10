@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KHU Sports Golf - 공식 토너먼트 홈</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;family=Lexend:wght@600;700&amp;family=Hanken+Grotesk:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-container-high": "#e7e8e9",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#aacec3",
+                        "surface-variant": "#e1e3e4",
+                        "secondary-fixed-dim": "#e9c349",
+                        "surface-bright": "#f8f9fa",
+                        "on-secondary-fixed-variant": "#574500",
+                        "outline": "#717976",
+                        "surface-container": "#edeeef",
+                        "on-primary-fixed": "#00201a",
+                        "on-secondary-fixed": "#241a00",
+                        "surface-container-low": "#f3f4f5",
+                        "outline-variant": "#c1c8c4",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#d9dadb",
+                        "surface": "#f8f9fa",
+                        "on-secondary-container": "#745c00",
+                        "tertiary-container": "#483200",
+                        "primary-fixed": "#c5eadf",
+                        "surface-tint": "#43655c",
+                        "tertiary-fixed-dim": "#e9c176",
+                        "secondary-container": "#fed65b",
+                        "on-primary-fixed-variant": "#2b4d44",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#ffe088",
+                        "inverse-on-surface": "#f0f1f2",
+                        "on-surface": "#191c1d",
+                        "secondary": "#735c00",
+                        "on-surface-variant": "#414846",
+                        "primary-container": "#1a3c34",
+                        "on-tertiary-fixed": "#261900",
+                        "on-tertiary-container": "#be9953",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#ffdea5",
+                        "tertiary": "#2d1e00",
+                        "on-primary-container": "#83a69c",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "on-background": "#191c1d",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#aacec3",
+                        "background": "#f8f9fa",
+                        "on-tertiary-fixed-variant": "#5d4201",
+                        "on-error": "#ffffff",
+                        "primary": "#01261f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "xl": "80px",
+                        "md": "24px",
+                        "gutter": "24px",
+                        "base": "8px",
+                        "xs": "4px",
+                        "margin-mobile": "16px",
+                        "sm": "12px",
+                        "lg": "48px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Pretendard", "Inter", "sans-serif"],
+                        "stat-number": ["Lexend", "Pretendard", "sans-serif"],
+                        "display-lg": ["Pretendard", "Hanken Grotesk", "sans-serif"],
+                        "headline-lg": ["Pretendard", "Hanken Grotesk", "sans-serif"],
+                        "label-bold": ["Pretendard", "Lexend", "sans-serif"],
+                        "headline-md": ["Pretendard", "Hanken Grotesk", "sans-serif"],
+                        "display-lg-mobile": ["Pretendard", "Hanken Grotesk", "sans-serif"],
+                        "body-lg": ["Pretendard", "Inter", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "stat-number": ["24px", {"lineHeight": "24px", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}],
+                        "label-bold": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .shadow-premium {
+            box-shadow: 0 4px 12px rgba(26, 60, 52, 0.08);
+        }
+        .zebra-row:nth-child(even) {
+            background-color: #f1f3f2;
+        }
+        body {
+            background-color: #f8f9fa;
+            color: #191c1d;
+            font-family: "Pretendard", sans-serif;
+        }
+    </style>
+</head>
+<body class="font-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="bg-surface/80 backdrop-blur-md sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm">
+<div class="flex justify-between items-center h-20 px-gutter max-w-container-max mx-auto w-full">
+<div class="flex items-center gap-md">
+<span class="font-display-lg text-display-lg-mobile lg:text-headline-md font-extrabold text-primary">KHU Sports Golf</span>
+</div>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="text-primary border-b-2 border-secondary font-label-bold pb-1" href="#">홈</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">리더보드</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">대회일정</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">공지사항</a>
+<a class="text-on-surface-variant font-body-md hover:text-primary transition-colors" href="#">갤러리</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="hidden lg:flex items-center gap-xs text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-bold active:scale-95 duration-150">
+                지금 등록하기
+            </button>
+<span class="material-symbols-outlined text-primary cursor-pointer text-3xl">account_circle</span>
+</div>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative w-full h-[640px] flex items-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<img alt="Tournament Fairway" class="w-full h-full object-cover" data-alt="A sweeping wide-angle shot of a pristine, verdant golf course fairway at dawn. The lush grass is meticulously manicured, and a soft morning mist clings to the distant line of tall deciduous trees. Warm, golden sunlight filters through the foliage, creating long shadows and a serene, prestigious atmosphere. This high-resolution photograph embodies a premium sporting environment with a deep forest green and gold light palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1AWWs8FEyFx31sSOG-AP7Y_Vu-PfrUdJPPeHErDTXqEM_f2gpYQQsC7swnWFOkLxghN5vvwJ7km__bMzwWjtca5E0AdTwRPlVT1ordq-RqDRdA8g8hI1lw-t-idqokTQbbaydUynXbbk2zXCqLPPlA_BlAfcRyGMpoI6CJ7h-vHO9o2WrAizCPMQnN9Tv2GIujQB5KObneFQynkx_HUfs_HBDCI6d2Fknzf1VA63ZQL99EVkxBLTNmcPAVO94W_7GkRrf4PsFn0P4"/>
+<div class="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/40 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-container-max mx-auto px-gutter w-full text-white">
+<div class="max-w-2xl">
+<div class="inline-flex items-center gap-2 bg-secondary/90 backdrop-blur px-3 py-1 rounded-full mb-md animate-pulse">
+<span class="w-2 h-2 bg-white rounded-full"></span>
+<span class="font-label-bold text-white text-[12px] tracking-widest">실시간 대회 중</span>
+</div>
+<h1 class="font-display-lg text-white mb-md leading-tight">2024 KHU 챔피언십 시리즈</h1>
+<p class="font-body-lg text-primary-fixed mb-lg max-w-lg">최고의 대학 골프 대회를 경험해 보세요. 명문 하이랜드 그린스에서 올해의 챔피언을 가리는 영광의 순간에 함께하십시오.</p>
+<div class="flex gap-md">
+<button class="bg-secondary text-on-secondary px-8 py-4 rounded-lg font-label-bold text-lg hover:bg-secondary/90 transition-all active:scale-98">
+                        라이브 스코어
+                    </button>
+<button class="border-2 border-white/30 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-label-bold text-lg hover:bg-white/10 transition-all">
+                        일정 보기
+                    </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Grid & Live Content -->
+<section class="py-xl px-gutter max-w-container-max mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Live Leaderboard Bento (Large) -->
+<div class="lg:col-span-8 bg-surface-container-lowest border border-outline-variant/30 rounded-xl shadow-premium p-lg">
+<div class="flex justify-between items-center mb-lg">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-3xl">leaderboard</span>
+<h2 class="font-headline-md text-primary">실시간 리더보드</h2>
+</div>
+<a class="text-secondary font-label-bold hover:underline" href="#">전체 보기</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="border-b border-outline-variant">
+<tr>
+<th class="py-md px-sm font-label-bold text-on-surface-variant">순위</th>
+<th class="py-md px-sm font-label-bold text-on-surface-variant">선수</th>
+<th class="py-md px-sm font-label-bold text-on-surface-variant">진행</th>
+<th class="py-md px-sm font-label-bold text-on-surface-variant">스코어</th>
+<th class="py-md px-sm font-label-bold text-on-surface-variant">합계</th>
+</tr>
+</thead>
+<tbody>
+<tr class="zebra-row group hover:bg-secondary-container/10 transition-colors">
+<td class="py-md px-sm font-stat-number text-secondary">1</td>
+<td class="py-md px-sm font-body-md flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant">
+<img alt="Player" data-alt="Close-up headshot of a professional female athlete in modern sportswear, looking focused and determined." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0lp0KNbEEBBg5jXdR7HcIoo9t3DRVrQZJ4BKqbg0Slpn9WkdrkTHPjupE7M3M69HJQ3x8wOburCtFfmXX-09QHeWKSwylPegsLlM7jCf9HHAfLHN7fH-IHuB2fX_gmQzZg8Wv7uQJLw_gKruywAgUe-koohoyPqoZE8oc9eFaFxwV56abIUtoR-csV6xhxjn03JVbHnHHeJsM3_w82Hku28TRk6Vqjjfa0ti44RrPum5PyAYjjQS6w8BRPkCjZynCZVd4KBjmfQXb"/>
+</div>
+<span>김서연</span>
+</td>
+<td class="py-md px-sm font-body-md">15</td>
+<td class="py-md px-sm font-label-bold text-error">-4</td>
+<td class="py-md px-sm font-stat-number">208</td>
+</tr>
+<tr class="zebra-row group hover:bg-secondary-container/10 transition-colors">
+<td class="py-md px-sm font-stat-number text-secondary">2</td>
+<td class="py-md px-sm font-body-md flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant">
+<img alt="Player" data-alt="A high-fidelity portrait of a professional male golf player smiling confidently." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4lSyRHaVrbIFadMqjMtsDTlLFQRGWK7rXGxr2jaERVx7SMKtk8fkZK2bkVipMikbDmx4qG6gW5STMnEAhKmSUZuITdJlp8A9AmD7cuN5qb0pQLjuG4oeq9lRzlIhMDDyZDtI7JvbA5btA8jWd6t5eljyu1cZBKRosokjczp9SAkVfOZI0ZyfLvoE9Wp6F1zc_5tSZ8U5P6-DBWxGEllNVJS0W-XdO4F6yyUlTDCmDljDZRBBD-bXtxeWa-U-TOR-pHsE381d9qN9G"/>
+</div>
+<span>박지훈</span>
+</td>
+<td class="py-md px-sm font-body-md">14</td>
+<td class="py-md px-sm font-label-bold text-error">-2</td>
+<td class="py-md px-sm font-stat-number">210</td>
+</tr>
+<tr class="zebra-row group hover:bg-secondary-container/10 transition-colors">
+<td class="py-md px-sm font-stat-number text-secondary">3</td>
+<td class="py-md px-sm font-body-md flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant">
+<img alt="Player" data-alt="Portrait of a young professional athlete with a warm, genuine smile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBKpTrCcMmWYbS57DCyi1rGXcz2oYvLLF00LJb2-pQ-nX2Fzsvzz9TFQqThElAVOcqupMAHMRdv47zE4QunKhIua_EaH5QBkrvNWorX5DoRHXS39YV_WzXt8N21C7mCiJSetPgoJL9wE7-eY1DvBX0qMWlR611orHi2tvwO6gn4sNr7jsw0JcRB7jQ48nrEuO7ZhcqyxhQXuxFyihc8RNtpwLiQCjMXTcBTbN5vBE8zfH2gOyBZ6foDcZQL_-Vy9IJbzFRpuPOsRPAh"/>
+</div>
+<span>이민재</span>
+</td>
+<td class="py-md px-sm font-body-md">18</td>
+<td class="py-md px-sm font-label-bold text-on-surface">E</td>
+<td class="py-md px-sm font-stat-number">212</td>
+</tr>
+<tr class="zebra-row group hover:bg-secondary-container/10 transition-colors">
+<td class="py-md px-sm font-stat-number text-on-surface-variant">4</td>
+<td class="py-md px-sm font-body-md flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden border border-outline-variant">
+<img alt="Player" data-alt="Detailed close-up of a professional sportsman in elite athletic apparel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJ4BTARs_fHtBV2RMxAyXueh3VHknZERZDPHPymZ01HKGZ2LANKgqmiY8hgEW6r8m5KChQGSJQGBWCTB9Nzskp2sMbLgS4JNrYczVz09wdBM9epjWaiwMc8q3kp_dY3ZiwdCwRPads5SN_UJi4Oybp5mLWOWESS3Tlh3HCZUGKhtIJL7HG9m1vVp4GjAlDOO7oU_zDuQ9hJEXVIwxmo5g14Ojgb8VtOtEUqHglif96dWTbL64EUuD-nFHil4FVfJ0d2lvzgilw-nSY"/>
+</div>
+<span>최다니엘</span>
+</td>
+<td class="py-md px-sm font-body-md">12</td>
+<td class="py-md px-sm font-label-bold text-primary">+1</td>
+<td class="py-md px-sm font-stat-number">213</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Notices & Updates (Side Bento) -->
+<div class="lg:col-span-4 flex flex-col gap-lg">
+<!-- Weather Card -->
+<div class="bg-primary text-white rounded-xl p-md shadow-premium relative overflow-hidden h-48 flex flex-col justify-end">
+<img alt="Weather Background" class="absolute inset-0 opacity-40 object-cover w-full h-full" data-alt="A wide, scenic view of a clear blue sky over a rolling green golf course landscape." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4mQgBAkWoDKRY2M6UXPAweArFjvvuis85kI2pnjdj7kpjsE0wJp7ouf66XsBQ-cgo1R5L7AK2oWG8zN-gHeG_Ogwf40WPyFWHq5A_3TRh1OmLjwNTGSmtVbSaFnDD77ppYbKRrMKTZ8WbWDbEwow5V4TYEZFF5vC7hKFA3CSaTImB-nOCjocl3cGxWkMhXxqAFjLY5_Uyptak98EHZzlqEUnAw34ou4-9Ry-yCQTnT0YSS2szEKOPWPxQ1clknoxPcGJ9wiSd0qg6"/>
+<div class="relative z-10">
+<p class="font-label-bold text-primary-fixed uppercase tracking-wider text-xs mb-1">실시간 코스 날씨</p>
+<div class="flex items-center justify-between">
+<h3 class="text-4xl font-stat-number">24°C</h3>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-4xl text-secondary-fixed">wb_sunny</span>
+<div class="text-right">
+<p class="font-label-bold text-sm">맑음</p>
+<p class="font-body-md text-xs text-primary-fixed">풍속: 4 km/h</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Latest Notices -->
+<div class="bg-surface-container-low rounded-xl border border-outline-variant/30 shadow-premium p-md flex-1">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-primary">campaign</span>
+<h2 class="font-headline-md text-primary text-lg">최신 공지사항</h2>
+</div>
+<ul class="space-y-md">
+<li class="group cursor-pointer">
+<p class="text-xs font-label-bold text-secondary mb-1">2024년 10월 14일</p>
+<h4 class="font-label-bold text-primary group-hover:text-secondary transition-colors line-clamp-2">토요일 파이널 라운드 티타임 변경 안내</h4>
+<div class="w-full h-px bg-outline-variant/50 mt-sm"></div>
+</li>
+<li class="group cursor-pointer">
+<p class="text-xs font-label-bold text-secondary mb-1">2024년 10월 12일</p>
+<h4 class="font-label-bold text-primary group-hover:text-secondary transition-colors line-clamp-2">선수 필수 브리핑: 14번 홀 로컬 룰 안내</h4>
+<div class="w-full h-px bg-outline-variant/50 mt-sm"></div>
+</li>
+<li class="group cursor-pointer">
+<p class="text-xs font-label-bold text-secondary mb-1">2024년 10월 10일</p>
+<h4 class="font-label-bold text-primary group-hover:text-secondary transition-colors line-clamp-2">동문 주말 주차 및 셔틀 버스 이용 안내</h4>
+</li>
+</ul>
+<button class="w-full mt-lg py-3 border border-primary text-primary font-label-bold rounded-lg hover:bg-primary hover:text-white transition-all active:scale-98">
+                        모든 공지 보기
+                    </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Course Spotlight Section -->
+<section class="bg-surface-container-highest py-xl">
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-2 gap-xl items-center">
+<div class="relative rounded-xl overflow-hidden shadow-premium aspect-video group">
+<img alt="Signature Hole" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="An editorial-style photograph of a signature golf hole at sunset." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuFw25q4FMGCj_FSURyPmFVb3JxQ-weBC3NW4tGdogCmPSSEhcRZbDLaZv-tv95rwQbFUMMYeb1xjZD6WR-KTB756oZBhOdhwsyAlhk-doN-FPndTNVyd-Pni9lGq81QgoO5dBlg-5ojQLIZeCW5LLAtQMeLYCBPNoTQfTApeqJLxENsarmZXeKNrON5SHe5QsX4oijUQF6LxLHzBDY650o5Uu9rDY_zrBh-lUdSCTz1rXl75XfUv2bM2KNSZuMHhevuvjeB6oZXRk"/>
+<div class="absolute bottom-0 left-0 right-0 p-md bg-gradient-to-t from-black/80 to-transparent text-white">
+<p class="font-label-bold text-secondary-fixed">18번 홀: 더 건틀렛</p>
+<p class="font-body-md text-sm opacity-80">Par 5, 540 Yards - 챔피언십의 최종 관문.</p>
+</div>
+</div>
+<div>
+<h2 class="font-display-lg text-primary mb-md">토너먼트 코스</h2>
+<p class="font-body-lg text-on-surface-variant mb-lg">하이랜드 그린스는 전략적인 정교함과 숨 막히는 경관으로 유명합니다. 모든 페어웨이는 KHU 시리즈를 위해 프로 규격에 맞게 관리되고 있습니다.</p>
+<div class="grid grid-cols-2 gap-md">
+<div class="bg-white p-md rounded-lg border border-outline-variant/30 shadow-sm">
+<span class="material-symbols-outlined text-secondary text-3xl mb-sm">map</span>
+<p class="font-label-bold text-primary">인터랙티브 맵</p>
+<p class="text-xs text-on-surface-variant">코스 레이아웃 둘러보기</p>
+</div>
+<div class="bg-white p-md rounded-lg border border-outline-variant/30 shadow-sm">
+<span class="material-symbols-outlined text-secondary text-3xl mb-sm">verified</span>
+<p class="font-label-bold text-primary">공식 코스 정보</p>
+<p class="text-xs text-on-surface-variant">공인 토너먼트 데이터</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-primary text-on-primary py-lg mt-xl border-t border-primary-container">
+<div class="w-full flex flex-col md:flex-row justify-between items-center px-gutter max-w-container-max mx-auto gap-md">
+<div class="flex flex-col gap-sm">
+<span class="font-label-bold text-secondary-fixed">KHU Sports Golf</span>
+<p class="text-primary-fixed-dim text-body-md max-w-md">© 2024 KHU 스포츠 골프 토너먼트 운영국. All Rights Reserved.</p>
+</div>
+<nav class="flex flex-wrap justify-center gap-lg">
+<a class="text-primary-fixed-dim hover:text-white hover:underline decoration-secondary decoration-2 underline-offset-4 transition-colors font-body-md" href="#">개인정보 처리방침</a>
+<a class="text-primary-fixed-dim hover:text-white hover:underline decoration-secondary decoration-2 underline-offset-4 transition-colors font-body-md" href="#">대회 규정</a>
+<a class="text-primary-fixed-dim hover:text-white hover:underline decoration-secondary decoration-2 underline-offset-4 transition-colors font-body-md" href="#">고객 지원</a>
+<a class="text-primary-fixed-dim hover:text-white hover:underline decoration-secondary decoration-2 underline-offset-4 transition-colors font-body-md" href="#">스폰서십</a>
+</nav>
+<div class="flex gap-md">
+<span class="material-symbols-outlined cursor-pointer hover:text-secondary-fixed transition-colors">social_leaderboard</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-secondary-fixed transition-colors">share</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-secondary-fixed transition-colors">public</span>
+</div>
+</div>
+</footer>
+</body></html>
