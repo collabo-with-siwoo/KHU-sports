@@ -193,3 +193,24 @@
   - Wrapped login/signup/reset DB and Supabase calls with form-level error returns.
   - Signup persistence cleanup now swallows service-role cleanup failures and still returns a visible form error.
   - Verification passed: typecheck, lint, Prisma validation, and production build.
+
+## 2026-05-11 07:49 KST - Prisma direct URL review
+
+- Request: Review Supabase's Prisma connection prompt and confirm whether the password must be set.
+- Milestone: M0/M1 runtime setup.
+- Findings:
+  - `DATABASE_URL` and `DIRECT_URL` are both present in local `.env`, point to the Supabase pooler host, and no longer contain the `[YOUR-PASSWORD]` placeholder.
+  - The password in both URLs must be replaced with the actual Supabase database password. If the password has reserved URL characters, it should be URL encoded.
+  - Supabase's Prisma guidance uses pooled/session/direct connection strings differently; serverless runtime should use the pooled URL, while migrations/schema operations should use `DIRECT_URL`.
+- Result:
+  - Added `directUrl = env("DIRECT_URL")` to `prisma/schema.prisma`.
+  - Updated `.env.example`, `docs/deployment.md`, `docs/specs.md`, `docs/spec-changelog.md`, and `docs/context.md`.
+
+## 2026-05-11 08:26 KST - Signup email verification modal
+
+- Request: After signup, show a popup explaining that signup is complete, a verification email was sent, and login is available after email verification.
+- Milestone: M1 authentication and agreements.
+- Result:
+  - Added `SignupSuccessModal` on `/login?signup=success`.
+  - Replaced the prior inline signup success message with an accessible modal dialog.
+  - Updated docs/specs/context/changelog for the new UX contract.

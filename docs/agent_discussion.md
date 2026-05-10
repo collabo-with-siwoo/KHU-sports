@@ -73,3 +73,8 @@
 - Prisma `db push` reported an empty schema engine error, even though the runtime connection could query successfully. To avoid blocking setup, Prisma's generated SQL diff from an empty database was executed directly through the Prisma connection.
 - The schema was verified by checking the expected core tables and the seeded `Sport`/`AgreementVersion` counts.
 - Future schema changes should ideally move to tracked Prisma migrations before production data exists in volume. For this first empty-database setup, direct execution of the generated SQL is acceptable and recorded here.
+
+## 2026-05-11 08:26 KST - Signup email verification UX
+
+- Successful signup should not leave users on the same page with an ambiguous status message.
+- The app redirects to login and opens a modal that explicitly tells users to verify the email address they entered before attempting normal login.

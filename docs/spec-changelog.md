@@ -98,3 +98,13 @@
 
 - Wrapped M1 auth Server Action database and Supabase calls so production runtime failures return form-level errors instead of uncaught application errors.
 - Made signup cleanup resilient when service-role cleanup cannot run, while still surfacing a clear environment/configuration error to the user.
+
+## 2026-05-11 - Prisma Direct URL Configuration
+
+- Added `directUrl = env("DIRECT_URL")` to the Prisma datasource for Supabase migration/schema operations.
+- Updated environment examples and deployment docs to include both pooled `DATABASE_URL` and migration/session `DIRECT_URL`.
+
+## 2026-05-11 - Signup Email Verification Modal
+
+- Added a signup-completion modal on `/login?signup=success`.
+- The modal tells users that signup is complete, a verification email was sent, and login works after email verification.

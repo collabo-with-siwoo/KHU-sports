@@ -55,6 +55,7 @@ Use Vercel as the runtime deployment once signup/login persistence is enabled.
 
 ```text
 DATABASE_URL
+DIRECT_URL
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
@@ -66,7 +67,7 @@ R2 and Resend variables are still required before the upload and email milestone
 
 ### Supabase Schema Setup
 
-After `DATABASE_URL` points to the Supabase pooled connection string, apply the Prisma schema and seed the base records:
+After `DATABASE_URL` points to the Supabase transaction pooler and `DIRECT_URL` points to the migration/session connection, apply the Prisma schema and seed the base records:
 
 ```powershell
 npm run db:push

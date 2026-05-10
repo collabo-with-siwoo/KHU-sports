@@ -51,6 +51,8 @@
 - `npm run db:seed` was applied; Supabase now has the `GOLF` sport row and 3 default agreement versions.
 - Successful signup now redirects to `/login?signup=success`; the obsolete static-preview client validation helper was removed.
 - Signup/login/reset Server Actions now return form-level errors instead of throwing application errors when production DB or Supabase environment configuration fails.
+- Prisma datasource now includes `DIRECT_URL` for Supabase migration/schema operations; `.env.example` and deployment docs include both pooled and direct/session URLs.
+- `/login?signup=success` now opens an email-verification modal after successful signup.
 
 ## Remaining M0 External Tasks
 
