@@ -19,3 +19,9 @@
 - Created backlog entries for missing specs and final legal review of the dormant-account policy.
 - Chose Prisma as the ORM for the initial schema because it aligns with the repository verification protocol and PRD data model.
 - Chose Next.js 15.5.18 instead of latest Next 16 because the project's required verification still uses `next lint`, which Next 15 supports.
+
+## 2026-05-10 19:35 KST - User view visual layout
+
+- The KPGA site was used as a high-level reference for sports-site information hierarchy, not as a source for copied branding or assets.
+- The public homepage should feel like a tournament hub: hero, notice stream, result/leaderboard, and quick access to key user tasks.
+- The admin entry can look like a login screen now, while remaining non-functional until the M3 Supabase Auth/RBAC work.

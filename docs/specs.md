@@ -7,6 +7,7 @@
 - Current milestone: M0, project foundation.
 - M0 scope in this repository: Next.js App Router scaffold, TypeScript strict mode, Prisma schema validation, environment variable template, and documentation baseline.
 - External M0 tasks still require human/account work: Vercel project, Supabase project, Cloudflare R2 buckets, Resend domain, production domain DNS.
+- Visual foundation: public user view has a sports-site style homepage with hero, notice, result, and quick-link modules. `/admin` currently presents a polished login-like shell until real authentication is implemented.
 
 ## Technology Decisions
 
@@ -73,6 +74,12 @@ INITIAL_SUPER_ADMIN_EMAIL
 - Sign-up must dynamically load active agreement templates and latest effective versions.
 - Login must accept username/password, look up the email server-side, then authenticate with Supabase Auth.
 - Error messages should not reveal whether a username exists.
+
+## Visual Interaction Notes
+
+- Public navigation uses hover lift/color transitions.
+- Homepage feature cards, notice rows, and ranking rows provide hover feedback for a more finished client preview.
+- `/admin` login shell is visual-only in M0; submit behavior and Supabase-backed RBAC belong to M3.
 
 ## Verification Commands
 

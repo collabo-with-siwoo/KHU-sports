@@ -36,3 +36,17 @@
   - Verification passed: typecheck, lint, Prisma validate, and build.
   - Dev server started successfully at `http://127.0.0.1:3000`.
 - Conclusion: M0 local foundation is ready for review. External service setup remains: Vercel, Supabase, R2, Resend, DNS, and final super admin email.
+
+## 2026-05-10 19:35 KST - User view visual layout
+
+- Request: Create a new branch and make the user-facing view look plausible for client review, inspired by `https://www.kpga.co.kr/`, with hover interactions and a polished `/admin` login-like screen.
+- Milestone: M0/M6 visual foundation.
+- Branch: `feat/m0-user-view-layout`.
+- Pre-task checks: Re-read PRD, CLAUDE rules, `docs/context.md`, and `docs/specs.md`.
+- Reference review: KPGA site was checked as a visual/product reference. It appears dynamically rendered from the available text extraction, so the design will borrow high-level patterns only: strong sports-site navigation, large hero, tournament/news/ranking modules, and crisp hover interactions.
+- Status: Updating public homepage, route placeholders, and admin login presentation.
+- Result:
+  - Reworked public homepage into a fuller sports-site layout.
+  - Added hover interactions across navigation, feature cards, notices, rankings, and admin modules.
+  - Reworked `/admin` into a polished login-like visual shell.
+  - Verification passed: typecheck, lint, Prisma validate, build, and local 200 checks for `/` and `/admin`.

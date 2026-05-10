@@ -5,7 +5,7 @@
 - Date: 2026-05-10
 - Active milestone: M0 environment/repository setup.
 - M0 progress: local project foundation complete; external account setup remains.
-- Latest action: Created the initial Next.js App Router foundation, Prisma schema, executable specs, backlog records, and legal-policy correction for dormant accounts.
+- Latest action: Reworked the public user view into a client-review-ready sports-site layout and upgraded `/admin` into a login-like shell.
 - Required docs note: `docs/specs.md` now exists and should be kept synchronized with code changes.
 
 ## Recent Changes
@@ -16,6 +16,9 @@
 - Added M0 app scaffold: Next.js 15.5.18, TypeScript strict mode, Prisma schema, environment template, and basic public/admin route placeholders.
 - Updated dormant-account policy language: automatic 1-year dormant conversion is not implemented as a statutory MVP workflow.
 - Local dev server: running at `http://127.0.0.1:3000`.
+- New branch: `feat/m0-user-view-layout`.
+- Public homepage now includes a large tournament hero, quick-link feature cards, latest notices, and recent result leaderboard.
+- `/admin` now presents a polished login-like view; it is visual-only until real auth/RBAC is implemented.
 
 ## Remaining M0 External Tasks
 
@@ -32,3 +35,5 @@
 - `npm run lint`: passed
 - `npm run prisma:validate`: passed
 - `npm run build`: passed
+- `http://localhost:3000`: 200
+- `http://localhost:3000/admin`: 200
