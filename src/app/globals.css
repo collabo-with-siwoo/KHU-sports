@@ -1770,6 +1770,367 @@ p {
 .schedule-meta .material-symbols-outlined {
   font-size: 18px;
 }
+
+/* ===== NOTICES GRID CARDS ===== */
+.notices-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 28px;
+}
+
+.notices-header h1 {
+  color: var(--primary);
+  font-size: clamp(24px, 3vw, 32px);
+  font-weight: 900;
+  margin: 0 0 8px;
+}
+
+.notices-header > div:first-child p {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 520px;
+}
+
+.notices-search {
+  align-items: center;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+  padding: 0 16px;
+  width: 260px;
+}
+
+.notices-search span {
+  color: var(--muted);
+  font-size: 20px;
+}
+
+.notices-search input {
+  background: transparent;
+  border: 0;
+  font-size: 14px;
+  height: 44px;
+  outline: none;
+  width: 100%;
+}
+
+/* Filters */
+.notices-filters {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 32px;
+  padding-left: 0;
+}
+
+.notices-filters::before {
+  color: var(--muted);
+  content: "필터:";
+  font-size: 14px;
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.notices-filters button {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px 18px;
+  transition: all 160ms ease;
+}
+
+.notices-filters button.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.notices-filters button:not(.active):hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Grid */
+.notices-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.notices-grid .notice-card.featured {
+  grid-row: 1;
+  grid-column: 1 / 3;
+}
+
+.notices-grid .notice-card.side {
+  grid-row: 1;
+  grid-column: 3;
+}
+
+/* 하단 3열 */
+.notices-grid:has(.notice-card:nth-child(5)) {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@supports not selector(:has(*)) {
+  .notices-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Card */
+.notice-card {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(26, 60, 52, 0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: box-shadow 160ms ease, transform 160ms ease;
+}
+
+.notice-card:hover {
+  box-shadow: 0 8px 24px rgba(26, 60, 52, 0.1);
+  transform: translateY(-2px);
+}
+
+.notice-card.highlight {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.notice-card.highlight .notice-card-meta time {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.notice-card.highlight h2 {
+  color: white;
+}
+
+.notice-card.highlight p {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Card Image */
+.notice-card-img {
+  background-color: var(--surface-low);
+  background-position: center;
+  background-size: cover;
+  min-height: 260px;
+  width: 100%;
+}
+
+.notice-card-img.compact {
+  min-height: 180px;
+}
+
+/* Card Body */
+.notice-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px;
+}
+
+.notice-card-meta {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+}
+
+.notice-card-meta time {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* Badge */
+.notice-badge {
+  background: var(--surface-low);
+  border-radius: 4px;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 900;
+  padding: 3px 8px;
+}
+
+.notice-badge.urgent {
+  background: #fdecea;
+  color: var(--danger);
+}
+
+.notice-badge.rule {
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
+}
+
+.notice-card h2 {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.notice-card.featured h2 {
+  font-size: 22px;
+}
+
+.notice-card p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Card Meta Location */
+.notice-card-loc {
+  align-items: center;
+  background: var(--surface-low);
+  border-radius: 8px;
+  display: inline-flex;
+  font-size: 13px;
+  gap: 6px;
+  margin-top: auto;
+  padding: 8px 14px;
+  width: fit-content;
+}
+
+.notice-card-loc .material-symbols-outlined {
+  color: var(--primary);
+  font-size: 18px;
+}
+
+/* Card Link */
+.notice-card-link {
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 800;
+  margin-top: auto;
+  transition: color 160ms ease;
+}
+
+.notice-card-link:hover {
+  color: var(--primary-soft);
+}
+
+.notice-card.highlight .notice-card-link.btn {
+  background: white;
+  border-radius: 8px;
+  color: var(--primary);
+  display: block;
+  font-weight: 900;
+  margin-top: 12px;
+  padding: 12px;
+  text-align: center;
+  transition: background 160ms ease;
+}
+
+.notice-card.highlight .notice-card-link.btn:hover {
+  background: var(--surface-low);
+}
+
+/* Pagination */
+.notices-pagination {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 48px;
+  padding-bottom: 20px;
+}
+
+.notices-pagination button {
+  align-items: center;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 700;
+  height: 40px;
+  justify-content: center;
+  min-width: 40px;
+  padding: 0 4px;
+  transition: all 160ms ease;
+}
+
+.notices-pagination button.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.notices-pagination button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.notices-pagination button:not(.active):not(:disabled):hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.notices-pagination span {
+  color: var(--muted);
+  font-size: 14px;
+  padding: 0 4px;
+}
+
+/* Notices Responsive */
+@media (max-width: 900px) {
+  .notices-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .notices-grid .notice-card.featured {
+    grid-column: 1 / -1;
+  }
+
+  .notices-grid .notice-card.side {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .notices-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .notices-search {
+    width: 100%;
+  }
+
+  .notices-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notices-grid .notice-card.featured {
+    grid-column: 1;
+  }
+
+  .notice-card-img {
+    min-height: 200px;
+  }
+}
+
 /* Stitch baseline */
 .material-symbols-outlined {
   font-family: "Material Symbols Outlined";
