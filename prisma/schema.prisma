@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String          @id @default(uuid()) @db.Uuid
+  username    String          @unique
+  email       String          @unique
+  name        String
+  phone       String
+  birthDate   DateTime        @db.Date
+  gender      Gender
+  address     String?
+  userType    UserType        @default(GENERAL)
+  status      UserStatus      @default(ACTIVE)
+  lastLoginAt DateTime?
+  dormantAt   DateTime?
+  withdrawnAt DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  agreements  UserAgreement[]
+  players     Player[]
+
+  @@index([email])
+  @@index([status])
+  @@index([userType])
+}
+
+model UserAgreement {
+  id                 String           @id @default(uuid()) @db.Uuid
+  userId             String           @db.Uuid
+  user               User             @relation(fields: [userId], references: [id])
+  agreementVersionId String           @db.Uuid
+  agreementVersion   AgreementVersion @relation(fields: [agreementVersionId], references: [id])
+  agreedAt           DateTime         @default(now())
+  ipAddress          String
+
+  @@index([userId])
+  @@index([agreementVersionId])
+}
+
+model AgreementTemplate {
+  id           String             @id @default(uuid()) @db.Uuid
+  slug         String             @unique
+  title        String
+  required     Boolean
+  displayOrder Int                @default(0)
+  active       Boolean            @default(true)
+  versions     AgreementVersion[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([active, displayOrder])
+}
+
+model AgreementVersion {
+  id          String             @id @default(uuid()) @db.Uuid
+  templateId  String             @db.Uuid
+  template    AgreementTemplate  @relation(fields: [templateId], references: [id])
+  version     String
+  content     String
+  effectiveAt DateTime
+  createdBy   String             @db.Uuid
+  createdAt   DateTime           @default(now())
+  agreements  UserAgreement[]
+
+  @@unique([templateId, version])
+  @@index([templateId, effectiveAt])
+}
+
+model AdminUser {
+  id          String      @id @default(uuid()) @db.Uuid
+  email       String      @unique
+  name        String
+  role        AdminRole
+  permissions Json
+  invitedBy   String?     @db.Uuid
+  status      AdminStatus
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([role])
+  @@index([status])
+}
+
+model Sport {
+  id          String       @id @default(uuid()) @db.Uuid
+  code        String       @unique
+  name        String
+  active      Boolean      @default(true)
+  tournaments Tournament[]
+  players     Player[]
+  notices     Notice[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Notice {
+  id           String             @id @default(uuid()) @db.Uuid
+  sportId      String?            @db.Uuid
+  sport        Sport?             @relation(fields: [sportId], references: [id])
+  title        String
+  content      String
+  category     String?
+  thumbnailUrl String?
+  attachments  NoticeAttachment[]
+  authorId     String             @db.Uuid
+  publishedAt  DateTime?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@index([sportId, publishedAt])
+  @@index([publishedAt])
+}
+
+model NoticeAttachment {
+  id       String  @id @default(uuid()) @db.Uuid
+  noticeId String  @db.Uuid
+  notice   Notice  @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  fileName String
+  fileSize Int
+  mimeType String
+  r2Key    String
+  isPublic Boolean
+
+  @@index([noticeId])
+}
+
+model Player {
+  id          String   @id @default(uuid()) @db.Uuid
+  sportId     String   @db.Uuid
+  sport       Sport    @relation(fields: [sportId], references: [id])
+  userId      String?  @db.Uuid
+  user        User?    @relation(fields: [userId], references: [id])
+  name        String
+  birthYear   Int?
+  affiliation String?
+  photoUrl    String?
+  anonymized  Boolean  @default(false)
+  scores      Score[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([sportId, userId])
+  @@index([sportId, name])
+  @@index([userId])
+}
+
+model Tournament {
+  id        String   @id @default(uuid()) @db.Uuid
+  sportId   String   @db.Uuid
+  sport     Sport    @relation(fields: [sportId], references: [id])
+  name      String
+  startDate DateTime @db.Date
+  endDate   DateTime @db.Date
+  venue     String?
+  rounds    Int      @default(1)
+  scores    Score[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sportId, startDate])
+}
+
+model Score {
+  id           String     @id @default(uuid()) @db.Uuid
+  tournamentId String     @db.Uuid
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  playerId     String     @db.Uuid
+  player       Player     @relation(fields: [playerId], references: [id])
+  round        Int
+  scoreData    Json
+  rank         Int?
+  notes        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([tournamentId, playerId, round])
+  @@index([playerId])
+  @@index([tournamentId, rank])
+}
+
+enum UserStatus {
+  ACTIVE
+  DORMANT
+  WITHDRAWN_PENDING
+  WITHDRAWN_DELETED
+}
+
+enum UserType {
+  GENERAL
+  PLAYER
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum AdminRole {
+  SUPER
+  MEMBER
+}
+
+enum AdminStatus {
+  PENDING
+  ACTIVE
+  DISABLED
+}
