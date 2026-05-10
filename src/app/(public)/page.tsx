@@ -1,173 +1,175 @@
 import Link from "next/link";
 
 const heroBackgroundUrl =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuCnJy_JZ6lVjmj8zcdfKJ8MaYPGYWmtm_8ROeOcVi_e9iyWDVC3ix9foJTbKfjRITfUdrAr3wMS0rMcwKqqiiIfxh949u524oakkI9G90LFJ6R7mJLPfEGydifMsbILYrf5ZFec_KcZcjm6X1-wBM4tMrETYEY9vhap6DfW1YZyri5M7wQsY4g4-GUYWU8ldKgHXM1RU3W9j6ns5bDDkNrPZ8C7lSwkIMdVvrrKXspjnjXGW50tXrzyEhdsOzs1W_QXtvcB29DiVWff";
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuC1AWWs8FEyFx31sSOG-AP7Y_Vu-PfrUdJPPeHErDTXqEM_f2gpYQQsC7swnWFOkLxghN5vvwJ7km__bMzwWjtca5E0AdTwRPlVT1ordq-RqDRdA8g8hI1lw-t-idqokTQbbaydUynXbbk2zXCqLPPlA_BlAfcRyGMpoI6CJ7h-vHO9o2WrAizCPMQnN9Tv2GIujQB5KObneFQynkx_HUfs_HBDCI6d2Fknzf1VA63ZQL99EVkxBLTNmcPAVO94W_7GkRrf4PsFn0P4";
 
-const navItems = [
+const weatherImgUrl =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuBuFw25q4FMGCj_FSURyPmFVb3JxQ-weBC3NW4tGdogCmPSSEhcRZbDLaZv-tv95rwQbFUMMYeb1xjZD6WR-KTB756oZBhOdhwsyAlhk-doN-FPndTNVyd-Pni9lGq81QgoO5dBlg-5ojQLIZeCW5LLAtQMeLYCBPNoTQfTApeqJLxENsarmZXeKNrON5SHe5QsX4oijUQF6LxLHzBDY650o5Uu9rDY_zrBh-lUdSCTz1rXl75XfUv2bM2KNSZuMHhevuvjeB6oZXRk";
+
+const gnbItems = [
+  { label: "홈", href: "/" },
+  { label: "경기결과", href: "/results" },
+  { label: "대회일정", href: "/schedule" },
+  { label: "공지사항", href: "/notices" }
+];
+
+const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
-  { label: "리더보드", icon: "leaderboard", href: "/results" },
-  { label: "공지사항", icon: "campaign", href: "/notices" },
-  { label: "내 기록", icon: "history_edu", href: "/mypage" }
-];
-
-const deskItems = [
-  {
-    title: "대회 공지",
-    body: "일정, 장소, 제출 서류, 운영 안내를 확인합니다.",
-    href: "/notices"
-  },
-  {
-    title: "대회 결과",
-    body: "공개 결과는 순위, 이름, 총타수까지만 표시합니다.",
-    href: "/results"
-  },
-  {
-    title: "내 기록",
-    body: "PLAYER 승인 후 본인 상세 스코어카드를 조회합니다.",
-    href: "/mypage"
-  },
-  {
-    title: "회원가입",
-    body: "가입 직후 GENERAL 회원으로 시작합니다.",
-    href: "/signup"
-  }
-];
-
-const notices = [
-  ["대회", "제27회 경희대학교 총장배 전국 골프대회 안내", "2026.05.10"],
-  ["서류", "참가 신청 서약서 및 개인정보 동의서 제출 안내", "2026.05.10"],
-  ["운영", "선수 등록은 이메일 접수 후 관리자 승인으로 진행됩니다", "2026.05.10"]
+  { label: "경기결과", icon: "leaderboard", href: "/results" },
+  { label: "대회일정", icon: "event", href: "/schedule" },
+  { label: "공지사항", icon: "campaign", href: "/notices" }
 ];
 
 const leaderboard = [
-  { rank: 1, name: "김서준", diff: "-2", total: 70 },
-  { rank: 2, name: "박도윤", diff: "E", total: 72 },
-  { rank: 3, name: "이하린", diff: "+1", total: 73 },
-  { rank: 4, name: "정민재", diff: "+2", total: 74 }
+  { rank: 1, name: "김서연", holes: 15, score: "-4", total: 208, avatar: "KS" },
+  { rank: 2, name: "박지훈", holes: 14, score: "-2", total: 210, avatar: "PJ" },
+  { rank: 3, name: "이민재", holes: 18, score: "E", total: 212, avatar: "LM" },
+  { rank: 4, name: "최다니엘", holes: 12, score: "+1", total: 213, avatar: "CD" }
+];
+
+const recentNotices = [
+  { date: "2026년 10월 14일", title: "토요일 파이널 라운드 티타임 변경 안내" },
+  { date: "2026년 10월 12일", title: "선수 필수 브리핑: 14번 홀 로컬 룰 안내" },
+  { date: "2026년 10월 10일", title: "동문 주말 주차 및 셔틀 버스 이용 안내" }
 ];
 
 export default function HomePage() {
   return (
-    <main className="stitch-app">
-      <header className="stitch-topbar">
-        <Link className="stitch-brand" href="/">
-          <span>KHU</span>
-          <strong>KHU 경희대학교 총장배</strong>
-        </Link>
-        <nav className="stitch-desktop-nav" aria-label="주요 메뉴">
-          {navItems.map((item) => (
-            <Link className={item.href === "/" ? "active" : ""} href={item.href} key={item.href}>
-              {item.label}
-            </Link>
-          ))}
-          <Link href="/admin">관리자</Link>
-        </nav>
-        <Link aria-label="로그인" className="stitch-icon-button" href="/login">
-          <span className="material-symbols-outlined">account_circle</span>
-        </Link>
-      </header>
-
-      <div className="stitch-canvas">
-        <section
-          className="stitch-hero"
-          style={{
-            backgroundImage: `linear-gradient(90deg, rgba(1, 38, 31, 0.78), rgba(1, 38, 31, 0.52)), url("${heroBackgroundUrl}")`
-          }}
-        >
-          <div className="stitch-hero-content">
-            <p className="stitch-label">공식 대회 운영 플랫폼</p>
-            <h1>경희대학교 총장배 골프대회</h1>
-            <p>
-              공지, 참가 안내, 결과 공개, 본인 기록 조회까지 한곳에서 확인하는
-              공식 대회 홈페이지입니다.
-            </p>
-            <div className="stitch-actions">
-              <Link className="stitch-button primary" href="/notices">
-                최신 공지 보기
-              </Link>
-              <Link className="stitch-button outline" href="/signup">
-                회원가입
-              </Link>
-            </div>
-          </div>
-
-          <aside className="stitch-next-card" aria-label="다음 대회 안내">
-            <p>다음 대회 안내</p>
-            <h2>제27회 경희대학교 총장배</h2>
-            <span>전국 골프대회</span>
-            <dl>
-              <div>
-                <dt>장소</dt>
-                <dd>경희대학교 지정 코스</dd>
-              </div>
-              <div>
-                <dt>접수</dt>
-                <dd>이메일 서류 접수</dd>
-              </div>
-            </dl>
-          </aside>
-        </section>
-
-        <section className="stitch-section">
-          <div className="stitch-section-heading">
-            <p className="stitch-label">운영 데스크</p>
-            <h2>대회 운영 현황</h2>
-          </div>
-          <div className="stitch-bento-grid">
-            {deskItems.map((item) => (
-              <Link className="stitch-bento-card" href={item.href} key={item.title}>
-                <i />
-                <strong>{item.title}</strong>
-                <p>{item.body}</p>
+    <main className="home-app">
+      {/* ===== HEADER ===== */}
+      <header className="home-header">
+        <div className="home-header-inner">
+          <Link className="home-logo" href="/">
+            KHU Sports Golf
+          </Link>
+          <nav className="home-gnb" aria-label="주요 메뉴">
+            {gnbItems.map((item) => (
+              <Link
+                className={item.href === "/" ? "active" : ""}
+                href={item.href}
+                key={item.href}
+              >
+                {item.label}
               </Link>
             ))}
+          </nav>
+          <div className="home-header-actions">
+            <button aria-label="검색" className="home-icon-btn">
+              <span className="material-symbols-outlined">search</span>
+            </button>
+            <Link className="home-cta-btn" href="/signup">
+              지금 등록하기
+            </Link>
+            <Link aria-label="로그인" className="home-icon-btn" href="/login">
+              <span className="material-symbols-outlined">account_circle</span>
+            </Link>
           </div>
-        </section>
+        </div>
+      </header>
 
-        <section className="stitch-two-column">
-          <article className="stitch-panel">
-            <div className="stitch-panel-heading">
-              <div>
-                <p className="stitch-label">공지사항</p>
-                <h2>최신 공지</h2>
-              </div>
-              <Link href="/notices">전체 보기</Link>
-            </div>
-            <div className="stitch-notice-list">
-              {notices.map(([category, title, date]) => (
-                <Link href="/notices" key={title}>
-                  <span>{category}</span>
-                  <strong>{title}</strong>
-                  <time>{date}</time>
-                </Link>
-              ))}
-            </div>
-          </article>
+      {/* ===== HERO ===== */}
+      <section
+        className="home-hero"
+        style={{ backgroundImage: `url("${heroBackgroundUrl}")` }}
+      >
+        <div className="home-hero-overlay" />
+        <div className="home-hero-content">
+          <span className="home-live-badge">
+            <i />
+            실시간 대회 중
+          </span>
+          <h1>2026 KHU 챔피언십 시리즈</h1>
+          <p>
+            최고의 대학 골프 대회를 경험해 보세요. 명문 하이랜드 그린스에서 올해의
+            챔피언을 가리는 영광의 순간에 함께하십시오.
+          </p>
+          <div className="home-hero-actions">
+            <Link className="home-btn primary" href="/results">
+              라이브 스코어
+            </Link>
+            <Link className="home-btn outline" href="/schedule">
+              일정 보기
+            </Link>
+          </div>
+        </div>
+      </section>
 
-          <article className="stitch-panel">
-            <div className="stitch-panel-heading">
-              <div>
-                <p className="stitch-label">리더보드</p>
-                <h2>최근 대회 결과</h2>
-              </div>
-              <Link href="/results">결과 보기</Link>
+      {/* ===== CONTENT GRID ===== */}
+      <section className="home-content">
+        {/* LEFT: Leaderboard */}
+        <div className="home-leaderboard-card">
+          <div className="home-card-header">
+            <div className="home-card-title">
+              <span className="material-symbols-outlined">leaderboard</span>
+              <h2>실시간 리더보드</h2>
             </div>
-            <div className="stitch-mini-board">
-              {leaderboard.map((player) => (
-                <div key={player.rank}>
-                  <span>{player.rank}</span>
-                  <strong>{player.name}</strong>
-                  <em>{player.diff}</em>
-                  <b>{player.total}</b>
+            <Link className="home-view-all" href="/results">전체 보기</Link>
+          </div>
+          <div className="home-lb-head">
+            <span>순위</span>
+            <span>선수</span>
+            <span>진행</span>
+            <span>스코어</span>
+            <span>합계</span>
+          </div>
+          {leaderboard.map((player) => (
+            <div className={`home-lb-row${player.rank === 1 ? " leader" : ""}`} key={player.rank}>
+              <span className="home-lb-rank">{player.rank}</span>
+              <div className="home-lb-player">
+                <i>{player.avatar}</i>
+                <strong>{player.name}</strong>
+              </div>
+              <span>{player.holes}</span>
+              <span className={Number(player.score) < 0 ? "score-under" : ""}>{player.score}</span>
+              <b>{player.total}</b>
+            </div>
+          ))}
+        </div>
+
+        {/* RIGHT: Weather + Notices */}
+        <div className="home-sidebar">
+          {/* Weather Card */}
+          <div
+            className="home-weather-card"
+            style={{ backgroundImage: `url("${weatherImgUrl}")` }}
+          >
+            <div className="home-weather-overlay" />
+            <div className="home-weather-content">
+              <p>실시간 코스 날씨</p>
+              <div className="home-weather-temp">
+                <strong>24°C</strong>
+                <div>
+                  <span className="material-symbols-outlined">wb_sunny</span>
+                  <small>맑음<br />풍속: 4 km/h</small>
                 </div>
-              ))}
+              </div>
             </div>
-          </article>
-        </section>
-      </div>
+          </div>
 
+          {/* Notices Card */}
+          <div className="home-notices-card">
+            <div className="home-card-header">
+              <div className="home-card-title">
+                <span className="material-symbols-outlined">notifications_active</span>
+                <h2>최신 공지사항</h2>
+              </div>
+            </div>
+            {recentNotices.map((notice) => (
+              <div className="home-notice-row" key={notice.title}>
+                <time>{notice.date}</time>
+                <strong>{notice.title}</strong>
+              </div>
+            ))}
+            <Link className="home-notices-more" href="/notices">
+              모든 공지 보기
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ===== MOBILE BOTTOM NAV ===== */}
       <nav className="stitch-bottom-nav" aria-label="모바일 메뉴">
-        {navItems.map((item) => (
+        {mobileNavItems.map((item) => (
           <Link className={item.href === "/" ? "active" : ""} href={item.href} key={item.href}>
             <span className="material-symbols-outlined">{item.icon}</span>
             <small>{item.label}</small>
