@@ -50,6 +50,7 @@
 - Supabase DB schema has been applied from the Prisma-generated SQL diff after `prisma db push` reported an empty schema engine error.
 - `npm run db:seed` was applied; Supabase now has the `GOLF` sport row and 3 default agreement versions.
 - Successful signup now redirects to `/login?signup=success`; the obsolete static-preview client validation helper was removed.
+- Signup/login/reset Server Actions now return form-level errors instead of throwing application errors when production DB or Supabase environment configuration fails.
 
 ## Remaining M0 External Tasks
 
@@ -86,3 +87,4 @@
 - 2026-05-11 local route checks returned 200 for `/login`, `/signup`, `/reset-password`, `/mypage`, and `/terms` on `http://127.0.0.1:3001`.
 - 2026-05-11 Supabase DB setup verification: runtime `select 1` passed, 52 generated schema statements executed, core table check returned 6/6, `Sport` count is 1, and `AgreementVersion` count is 3.
 - 2026-05-11 post-DB verification: `npm run typecheck`, `npm run lint`, and `npm run prisma:validate` passed.
+- 2026-05-11 signup exception hardening verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, and `npm run build` passed.

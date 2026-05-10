@@ -45,6 +45,10 @@ function getSiteUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
+function authRuntimeErrorMessage() {
+  return "인증 환경 설정을 확인해주세요. Vercel의 Supabase 환경변수가 최신 값인지 점검이 필요합니다.";
+}
+
 export async function signInAction(
   _previousState: AuthActionState,
   formData: FormData
@@ -61,10 +65,19 @@ export async function signInAction(
     };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { username: parsed.data.username },
-    select: { id: true, email: true, status: true }
-  });
+  let user;
+
+  try {
+    user = await prisma.user.findUnique({
+      where: { username: parsed.data.username.toLowerCase() },
+      select: { id: true, email: true, status: true }
+    });
+  } catch {
+    return {
+      status: "error",
+      message: "회원 저장소에 연결할 수 없습니다. 잠시 후 다시 시도해주세요."
+    };
+  }
 
   if (!user || user.status !== "ACTIVE") {
     return {
@@ -73,23 +86,40 @@ export async function signInAction(
     };
   }
 
-  const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.signInWithPassword({
-    email: user.email,
-    password: parsed.data.password
-  });
+  let signInError;
 
-  if (error) {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: parsed.data.password
+    });
+    signInError = error;
+  } catch {
+    return {
+      status: "error",
+      message: authRuntimeErrorMessage()
+    };
+  }
+
+  if (signInError) {
     return {
       status: "error",
       message: "아이디 또는 비밀번호를 확인해주세요."
     };
   }
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { lastLoginAt: new Date() }
-  });
+  try {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() }
+    });
+  } catch {
+    return {
+      status: "error",
+      message: "로그인 상태를 저장하지 못했습니다. 잠시 후 다시 시도해주세요."
+    };
+  }
 
   redirect("/mypage");
 }
@@ -122,12 +152,21 @@ export async function signUpAction(
   const email = parsed.data.email.toLowerCase();
   const username = parsed.data.username.toLowerCase();
 
-  const duplicate = await prisma.user.findFirst({
-    where: {
-      OR: [{ username }, { email }]
-    },
-    select: { id: true }
-  });
+  let duplicate;
+
+  try {
+    duplicate = await prisma.user.findFirst({
+      where: {
+        OR: [{ username }, { email }]
+      },
+      select: { id: true }
+    });
+  } catch {
+    return {
+      status: "error",
+      message: "회원 저장소에 연결할 수 없습니다. Vercel의 DATABASE_URL을 확인해주세요."
+    };
+  }
 
   if (duplicate) {
     return {
@@ -136,28 +175,39 @@ export async function signUpAction(
     };
   }
 
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password: parsed.data.password,
-    options: {
-      data: {
-        username,
-        name: parsed.data.name,
-        userType: "GENERAL"
-      },
-      emailRedirectTo: `${getSiteUrl().replace(/\/$/, "")}/login`
-    }
-  });
+  let authUserId: string | null = null;
+  let signUpError = false;
 
-  if (error || !data.user) {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password: parsed.data.password,
+      options: {
+        data: {
+          username,
+          name: parsed.data.name,
+          userType: "GENERAL"
+        },
+        emailRedirectTo: `${getSiteUrl().replace(/\/$/, "")}/login`
+      }
+    });
+
+    signUpError = Boolean(error || !data.user);
+    authUserId = data.user?.id ?? null;
+  } catch {
+    return {
+      status: "error",
+      message: authRuntimeErrorMessage()
+    };
+  }
+
+  if (signUpError || !authUserId) {
     return {
       status: "error",
       message: "회원가입을 완료할 수 없습니다. 아이디와 이메일을 다시 확인해주세요."
     };
   }
-
-  const authUser = data.user;
 
   try {
     const ipAddress = await getRequestIp();
@@ -165,7 +215,7 @@ export async function signUpAction(
     await prisma.$transaction(async (tx) => {
       await tx.user.create({
         data: {
-          id: authUser.id,
+          id: authUserId,
           username,
           email,
           name: parsed.data.name,
@@ -180,18 +230,22 @@ export async function signUpAction(
 
       await tx.userAgreement.createMany({
         data: parsed.data.agreementVersionIds.map((agreementVersionId) => ({
-          userId: authUser.id,
+          userId: authUserId,
           agreementVersionId,
           ipAddress
         }))
       });
     });
   } catch {
-    await createSupabaseAdminClient().auth.admin.deleteUser(authUser.id);
+    try {
+      await createSupabaseAdminClient().auth.admin.deleteUser(authUserId);
+    } catch {
+      // If cleanup cannot run because the service role key is missing, still return a form error.
+    }
 
     return {
       status: "error",
-      message: "회원 정보를 저장하지 못했습니다. 잠시 후 다시 시도해주세요."
+      message: "회원 정보를 저장하지 못했습니다. Vercel의 DATABASE_URL과 SUPABASE_SERVICE_ROLE_KEY를 확인해주세요."
     };
   }
 
@@ -213,12 +267,22 @@ export async function resetPasswordAction(
     };
   }
 
-  const supabase = await createSupabaseServerClient();
-  const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email.toLowerCase(), {
-    redirectTo: `${getSiteUrl().replace(/\/$/, "")}/reset-password`
-  });
+  let resetError;
 
-  if (error) {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email.toLowerCase(), {
+      redirectTo: `${getSiteUrl().replace(/\/$/, "")}/reset-password`
+    });
+    resetError = error;
+  } catch {
+    return {
+      status: "error",
+      message: authRuntimeErrorMessage()
+    };
+  }
+
+  if (resetError) {
     return {
       status: "error",
       message: "재설정 메일을 발송하지 못했습니다. 잠시 후 다시 시도해주세요."

@@ -179,3 +179,17 @@
   - Changed successful signup to redirect to `/login?signup=success`.
   - Added a login-page success message for completed signup.
   - Removed the obsolete `src/lib/auth/client-validation.ts` helper to eliminate the old success message path.
+
+## 2026-05-11 07:40 KST - Signup server exception hardening
+
+- Request: Production signup shows `Application error` with digest `4023028116`.
+- Milestone: M1 authentication and agreements.
+- Status: Verified the deployed `/signup` page renders the Server Action version and reads agreement seed data, then hardened auth actions against uncaught runtime exceptions.
+- Findings:
+  - Supabase schema/seed rows are present locally against the configured Supabase DB.
+  - The deployed signup page includes `signUpAction`; the old client validation path is no longer bundled.
+  - The likely failure path is an uncaught Server Action runtime exception from production environment/database/auth configuration.
+- Result:
+  - Wrapped login/signup/reset DB and Supabase calls with form-level error returns.
+  - Signup persistence cleanup now swallows service-role cleanup failures and still returns a visible form error.
+  - Verification passed: typecheck, lint, Prisma validation, and production build.

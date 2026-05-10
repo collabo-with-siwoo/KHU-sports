@@ -93,3 +93,8 @@
 - Changed successful signup to redirect to `/login?signup=success` after Supabase Auth, local `User`, and `UserAgreement` persistence completes.
 - Added a login-page success message for completed signup.
 - Removed the obsolete static-preview client validation helper so the old "입력값 검증" success path cannot be bundled again.
+
+## 2026-05-11 - Signup Server Exception Hardening
+
+- Wrapped M1 auth Server Action database and Supabase calls so production runtime failures return form-level errors instead of uncaught application errors.
+- Made signup cleanup resilient when service-role cleanup cannot run, while still surfacing a clear environment/configuration error to the user.
