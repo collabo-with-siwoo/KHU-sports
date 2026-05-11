@@ -3,12 +3,13 @@ import { LoginForm } from "./login-form";
 import { SignupSuccessModal } from "./signup-success-modal";
 
 type LoginPageProps = {
-  searchParams: Promise<{ signup?: string }>;
+  searchParams: Promise<{ next?: string; signup?: string }>;
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
   const signupCompleted = params.signup === "success";
+  const nextPath = params.next && params.next.startsWith("/") ? params.next : "/mypage";
 
   return (
     <main className="auth-shell">
@@ -30,7 +31,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <p className="eyebrow">Sign In</p>
           <h2>로그인</h2>
           {signupCompleted ? <SignupSuccessModal /> : null}
-          <LoginForm />
+          <LoginForm nextPath={nextPath} />
         </div>
       </section>
     </main>

@@ -213,6 +213,8 @@
 - Added Supabase SSR middleware to refresh auth cookies across page navigation.
 - Added `SESSION_MAX_AGE_HOURS` with a 12-hour default for app-level session expiry.
 - Updated the public header to show My Page and logout actions while a member session is active.
+- Switched app-level expiry from relying on Supabase `last_sign_in_at` to an HTTP-only `khu_app_session_started_at` cookie so PLAYER member sessions remain stable across home, My Page, and score-input navigation.
+- Preserved login `next` redirects so score-input deep links return to their original page after member login.
 
 ## 2026-05-11 - Player Score Input Discovery
 

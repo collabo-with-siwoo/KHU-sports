@@ -10,12 +10,17 @@ const initialState: AuthActionState = {
   message: ""
 };
 
-export function LoginForm() {
+type LoginFormProps = {
+  nextPath: string;
+};
+
+export function LoginForm({ nextPath }: LoginFormProps) {
   const [state, formAction] = useActionState(signInAction, initialState);
 
   return (
     <>
       <form action={formAction}>
+        <input name="next" type="hidden" value={nextPath} />
         <label>
           아이디
           <input autoComplete="username" name="username" placeholder="khugolf2026" />

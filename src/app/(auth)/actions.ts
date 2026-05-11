@@ -1,9 +1,10 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ensureDefaultAgreements, getRequiredAgreementVersionIdsFrom } from "@/lib/agreement-service";
 import { createSignupSchema, loginSchema, resetPasswordSchema } from "@/lib/auth/schemas";
+import { APP_SESSION_COOKIE_NAME, getAppSessionCookieOptions } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseAdminClient, createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -49,10 +50,25 @@ function authRuntimeErrorMessage() {
   return "인증 환경 설정을 확인해주세요. Vercel의 Supabase 환경변수가 최신 값인지 점검이 필요합니다.";
 }
 
+function safeNextPath(value: FormDataEntryValue | null) {
+  if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//")) {
+    return "/mypage";
+  }
+
+  return value;
+}
+
+async function startAppSession() {
+  const cookieStore = await cookies();
+
+  cookieStore.set(APP_SESSION_COOKIE_NAME, String(Date.now()), getAppSessionCookieOptions());
+}
+
 export async function signInAction(
   _previousState: AuthActionState,
   formData: FormData
 ): Promise<AuthActionState> {
+  const nextPath = safeNextPath(formData.get("next"));
   const parsed = loginSchema.safeParse({
     username: String(formData.get("username") ?? ""),
     password: String(formData.get("password") ?? "")
@@ -114,6 +130,7 @@ export async function signInAction(
       where: { id: user.id },
       data: { lastLoginAt: new Date() }
     });
+    await startAppSession();
   } catch {
     return {
       status: "error",
@@ -121,7 +138,7 @@ export async function signInAction(
     };
   }
 
-  redirect("/mypage");
+  redirect(nextPath);
 }
 
 export async function signUpAction(
