@@ -298,6 +298,29 @@ export type MyScoreInputContext = {
   statusLabel: string;
   statusMessage: string;
   adminConfirmed: boolean;
+  inputOpen: boolean;
+  inputOpenMessage: string | null;
+  canEdit: boolean;
+};
+
+export type MyOpenScoreInputRound = {
+  round: number;
+  status: MyScoreStatus;
+  statusLabel: string;
+  actionLabel: string | null;
+  href: string;
+  canEdit: boolean;
+};
+
+export type MyOpenScoreInput = {
+  tournamentId: string;
+  tournamentName: string;
+  venue: string;
+  period: string;
+  status: string;
+  primaryHref: string | null;
+  primaryActionLabel: string | null;
+  rounds: MyOpenScoreInputRound[];
 };
 
 const fallbackTournaments: PublicTournamentResult[] = [
@@ -418,14 +441,59 @@ function getRoundTotal(data: Prisma.JsonValue) {
   );
 }
 
-function tournamentStatus(startDate: Date, endDate: Date) {
-  const today = new Date();
+function dateOnly(value: Date) {
+  const normalized = new Date(value);
+  normalized.setHours(0, 0, 0, 0);
+  return normalized;
+}
 
-  if (today < startDate) {
+export function isTournamentScoreInputOpen(startDate: Date, endDate: Date, today = new Date()) {
+  const current = dateOnly(today);
+  return current >= dateOnly(startDate) && current <= dateOnly(endDate);
+}
+
+function getInputOpenMessage(startDate: Date, endDate: Date) {
+  const today = dateOnly(new Date());
+
+  if (today < dateOnly(startDate)) {
+    return "대회 입력 기간 전입니다. 대회 시작일 이후 입력할 수 있습니다.";
+  }
+
+  if (today > dateOnly(endDate)) {
+    return "대회 입력 기간이 종료되었습니다. 관리자에게 문의해 주세요.";
+  }
+
+  return null;
+}
+
+export function isPlayerEditableScoreStatus(status: MyScoreStatus) {
+  return status === "NOT_STARTED" || status === "DRAFT" || status === "ADMIN_REJECTED";
+}
+
+export function getPlayerScoreInputActionLabel(status: MyScoreStatus, round: number) {
+  if (!isPlayerEditableScoreStatus(status)) {
+    return null;
+  }
+
+  if (status === "DRAFT") {
+    return `${round}R 이어쓰기`;
+  }
+
+  if (status === "ADMIN_REJECTED") {
+    return `${round}R 다시 입력`;
+  }
+
+  return `${round}R 스코어 입력`;
+}
+
+function tournamentStatus(startDate: Date, endDate: Date) {
+  const today = dateOnly(new Date());
+
+  if (today < dateOnly(startDate)) {
     return "예정";
   }
 
-  if (today > endDate) {
+  if (today > dateOnly(endDate)) {
     return "종료";
   }
 
@@ -728,6 +796,10 @@ function mergeScoreStatus(statuses: MyScoreStatus[]): MyScoreStatus {
 
   if (statuses.includes("SUBMITTED")) {
     return "SUBMITTED";
+  }
+
+  if (statuses.includes("NOT_STARTED")) {
+    return "NOT_STARTED";
   }
 
   if (statuses.every((status) => status === "ADMIN_CONFIRMED")) {
@@ -1556,6 +1628,79 @@ export async function listMemberScoreArchive(userId: string): Promise<MemberScor
     .sort((a, b) => b.period.localeCompare(a.period));
 }
 
+export async function getMyOpenScoreInputs(userId: string): Promise<MyOpenScoreInput[]> {
+  const player = await prisma.player.findFirst({
+    where: {
+      userId,
+      sport: { code: "GOLF", active: true }
+    },
+    select: {
+      id: true,
+      sportId: true
+    }
+  });
+
+  if (!player) {
+    return [];
+  }
+
+  const today = dateOnly(new Date());
+  const tournaments = await prisma.tournament.findMany({
+    where: {
+      sportId: player.sportId,
+      startDate: { lte: today },
+      endDate: { gte: today }
+    },
+    select: {
+      id: true,
+      name: true,
+      venue: true,
+      startDate: true,
+      endDate: true,
+      rounds: true,
+      scores: {
+        where: { playerId: player.id },
+        select: {
+          round: true,
+          scoreData: true
+        }
+      }
+    },
+    orderBy: [{ startDate: "asc" }, { name: "asc" }]
+  });
+
+  return tournaments.map((tournament) => {
+    const existingByRound = new Map(tournament.scores.map((score) => [score.round, score.scoreData]));
+    const rounds = Array.from({ length: Math.max(tournament.rounds, 1) }, (_, index) => {
+      const round = index + 1;
+      const scoreData = existingByRound.get(round);
+      const status = scoreData ? getScoreSubmissionStatus(scoreData) : "NOT_STARTED";
+      const canEdit = isPlayerEditableScoreStatus(status);
+
+      return {
+        round,
+        status,
+        statusLabel: getScoreStatusLabel(status),
+        actionLabel: getPlayerScoreInputActionLabel(status, round),
+        href: `/mypage/scores/${tournament.id}/input/round/${round}`,
+        canEdit
+      };
+    });
+    const primaryRound = rounds.find((round) => round.canEdit) ?? null;
+
+    return {
+      tournamentId: tournament.id,
+      tournamentName: tournament.name,
+      venue: tournament.venue ?? "-",
+      period: `${toDateLabel(tournament.startDate)} ~ ${toDateLabel(tournament.endDate)}`,
+      status: tournamentStatus(tournament.startDate, tournament.endDate),
+      primaryHref: primaryRound?.href ?? null,
+      primaryActionLabel: primaryRound?.actionLabel ?? null,
+      rounds
+    };
+  });
+}
+
 export async function getMyScoreHistory(userId: string): Promise<MyScoreHistory[]> {
   const players = await prisma.player.findMany({
     where: {
@@ -1575,7 +1720,8 @@ export async function getMyScoreHistory(userId: string): Promise<MyScoreHistory[
               name: true,
               venue: true,
               startDate: true,
-              endDate: true
+              endDate: true,
+              rounds: true
             }
           }
         },
@@ -1616,6 +1762,9 @@ export async function getMyScoreHistory(userId: string): Promise<MyScoreHistory[
     .map((entry) => {
       const round1 = entry.rounds.find((round) => round.round === 1);
       const round2 = entry.rounds.find((round) => round.round === 2);
+      const maxScoredRound = Math.max(0, ...entry.rounds.map((round) => round.round));
+      const configuredRounds = entry.tournament.rounds ?? entry.rounds.length;
+      const roundCount = Math.max(configuredRounds, maxScoredRound, 1);
       const round1Total = round1 ? getRoundTotal(round1.scoreData) : null;
       const round2Total = round2 ? getRoundTotal(round2.scoreData) : null;
       const total36 =
@@ -1623,7 +1772,10 @@ export async function getMyScoreHistory(userId: string): Promise<MyScoreHistory[
           ? (round1Total ?? 0) + (round2Total ?? 0)
           : null;
       const finalRound = [...entry.rounds].reverse().find((round) => round.round >= 2) ?? round1;
-      const statuses = entry.rounds.map((round) => getScoreSubmissionStatus(round.scoreData));
+      const statuses = Array.from({ length: roundCount }, (_, index) => {
+        const round = entry.rounds.find((item) => item.round === index + 1);
+        return round ? getScoreSubmissionStatus(round.scoreData) : "NOT_STARTED";
+      });
       const status = mergeScoreStatus(statuses);
       const memoRound = entry.rounds.find((round) => getPlayerMemo(round.scoreData));
       const rejectionRound = entry.rounds.find((round) => getRejectionReason(round.scoreData));
@@ -1658,12 +1810,10 @@ export async function getMyTournamentScoreDetail(
   const player = await prisma.player.findFirst({
     where: {
       userId,
-      sport: { code: "GOLF", active: true },
-      scores: {
-        some: { tournamentId }
-      }
+      sport: { code: "GOLF", active: true }
     },
     select: {
+      id: true,
       name: true,
       affiliation: true,
       user: {
@@ -1677,40 +1827,55 @@ export async function getMyTournamentScoreDetail(
           id: true,
           round: true,
           rank: true,
-          scoreData: true,
-          tournament: {
-            select: {
-              id: true,
-              name: true,
-              venue: true,
-              startDate: true,
-              endDate: true
-            }
-          }
+          scoreData: true
         },
         orderBy: [{ round: "asc" }, { createdAt: "asc" }]
       }
     }
   });
 
-  if (!player?.scores.length) {
+  if (!player) {
     return null;
   }
 
-  const tournament = player.scores[0].tournament;
-  const rounds = player.scores.map((score) => {
-    const status = getScoreSubmissionStatus(score.scoreData);
+  const tournament = await prisma.tournament.findFirst({
+    where: {
+      id: tournamentId,
+      sport: { code: "GOLF", active: true }
+    },
+    select: {
+      id: true,
+      name: true,
+      venue: true,
+      startDate: true,
+      endDate: true,
+      rounds: true
+    }
+  });
+
+  if (!tournament) {
+    return null;
+  }
+
+  const scoreByRound = new Map(player.scores.map((score) => [score.round, score]));
+  const maxScoredRound = Math.max(0, ...player.scores.map((score) => score.round));
+  const configuredRounds = tournament.rounds ?? player.scores.length;
+  const roundCount = Math.max(configuredRounds, maxScoredRound, 1);
+  const rounds = Array.from({ length: roundCount }, (_, index) => {
+    const roundNumber = index + 1;
+    const score = scoreByRound.get(roundNumber);
+    const status = score ? getScoreSubmissionStatus(score.scoreData) : "NOT_STARTED";
 
     return {
-      id: score.id,
-      round: score.round,
-      front9: numberFromScoreData(score.scoreData, "front9"),
-      back9: numberFromScoreData(score.scoreData, "back9"),
-      roundTotal: getRoundTotal(score.scoreData),
-      groupNo: getScoreGroupNo(score.scoreData),
-      teeTime: getScoreTeeTime(score.scoreData),
-      playerMemo: getPlayerMemo(score.scoreData),
-      rejectionReason: getRejectionReason(score.scoreData),
+      id: score?.id ?? `${tournament.id}-round-${roundNumber}-not-started`,
+      round: roundNumber,
+      front9: score ? numberFromScoreData(score.scoreData, "front9") : null,
+      back9: score ? numberFromScoreData(score.scoreData, "back9") : null,
+      roundTotal: score ? getRoundTotal(score.scoreData) : null,
+      groupNo: score ? getScoreGroupNo(score.scoreData) : null,
+      teeTime: score ? getScoreTeeTime(score.scoreData) : null,
+      playerMemo: score ? getPlayerMemo(score.scoreData) : null,
+      rejectionReason: score ? getRejectionReason(score.scoreData) : null,
       status,
       statusLabel: getScoreStatusLabel(status),
       statusMessage: getScoreStatusMessage(status),
@@ -1723,10 +1888,11 @@ export async function getMyTournamentScoreDetail(
     typeof round1Total === "number" || typeof round2Total === "number"
       ? (round1Total ?? 0) + (round2Total ?? 0)
       : null;
-  const finalScore = [...player.scores].reverse().find((score) => score.round >= 2) ?? player.scores[0];
+  const finalScore = [...player.scores].reverse().find((score) => score.round >= 2) ?? player.scores[0] ?? null;
   const status = mergeScoreStatus(rounds.map((round) => round.status));
   const memo = rounds.find((round) => round.playerMemo)?.playerMemo ?? null;
   const rejectionReason = rounds.find((round) => round.rejectionReason)?.rejectionReason ?? null;
+  const categoryScore = player.scores[0] ?? null;
 
   return {
     tournamentId: tournament.id,
@@ -1737,11 +1903,11 @@ export async function getMyTournamentScoreDetail(
     period: `${toDateLabel(tournament.startDate)} ~ ${toDateLabel(tournament.endDate)}`,
     playerName: player.name,
     school: player.affiliation,
-    category: getScoreCategory(player.scores[0].scoreData),
+    category: categoryScore ? getScoreCategory(categoryScore.scoreData) : null,
     gender: player.user?.gender ?? null,
     groupNo: rounds.find((round) => round.groupNo)?.groupNo ?? null,
     teeTime: rounds.find((round) => round.teeTime)?.teeTime ?? null,
-    finalRank: numberFromScoreData(finalScore.scoreData, "finalRank") ?? finalScore.rank,
+    finalRank: finalScore ? numberFromScoreData(finalScore.scoreData, "finalRank") ?? finalScore.rank : null,
     rounds,
     total36,
     playerMemo: memo,
@@ -1788,6 +1954,7 @@ export async function getMyScoreInputContext(
       venue: true,
       startDate: true,
       endDate: true,
+      rounds: true,
       scores: {
         where: {
           playerId: player.id,
@@ -1806,8 +1973,15 @@ export async function getMyScoreInputContext(
     return null;
   }
 
+  if (round < 1 || round > Math.max(tournament.rounds, 1)) {
+    return null;
+  }
+
   const score = tournament.scores[0] ?? null;
   const status = score ? getScoreSubmissionStatus(score.scoreData) : "NOT_STARTED";
+  const inputOpenMessage = getInputOpenMessage(tournament.startDate, tournament.endDate);
+  const inputOpen = !inputOpenMessage;
+  const canEdit = inputOpen && isPlayerEditableScoreStatus(status);
 
   return {
     tournamentId: tournament.id,
@@ -1827,7 +2001,10 @@ export async function getMyScoreInputContext(
     status,
     statusLabel: getScoreStatusLabel(status),
     statusMessage: getScoreStatusMessage(status),
-    adminConfirmed: status === "ADMIN_CONFIRMED"
+    adminConfirmed: status === "ADMIN_CONFIRMED",
+    inputOpen,
+    inputOpenMessage,
+    canEdit
   };
 }
 

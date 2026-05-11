@@ -47,6 +47,19 @@ function statusClass(status: MyScoreStatus) {
   return `score-status-badge ${status.toLowerCase().replaceAll("_", "-")}`;
 }
 
+function getRoundInputLabel(status: MyScoreStatus) {
+  switch (status) {
+    case "NOT_STARTED":
+      return "스코어 입력";
+    case "DRAFT":
+      return "이어쓰기";
+    case "ADMIN_REJECTED":
+      return "다시 입력";
+    default:
+      return null;
+  }
+}
+
 function PlayerRequiredPanel({ userType }: { userType: string }) {
   return (
     <div className="result-privacy-panel">
@@ -76,6 +89,8 @@ function ReinputPanel() {
 }
 
 function ScoreDetail({ detail, showReinputPanel }: { detail: MyTournamentScoreDetail; showReinputPanel: boolean }) {
+  const primaryInputRound = detail.rounds.find((round) => getRoundInputLabel(round.status));
+
   return (
     <div className="my-score-detail">
       <header className="my-score-detail-hero">
@@ -103,6 +118,21 @@ function ScoreDetail({ detail, showReinputPanel }: { detail: MyTournamentScoreDe
       </header>
 
       <p className="my-score-status-message">{detail.statusMessage}</p>
+      {primaryInputRound ? (
+        <section className="my-score-input-panel compact">
+          <div>
+            <p className="stitch-label">Score Input</p>
+            <h2>{primaryInputRound.round}R 입력 바로가기</h2>
+            <p>입력이 필요한 라운드를 선택해 임시저장하거나 제출 완료할 수 있습니다.</p>
+          </div>
+          <Link
+            className="my-score-action primary"
+            href={`/mypage/scores/${detail.tournamentId}/input/round/${primaryInputRound.round}`}
+          >
+            {primaryInputRound.round}R {getRoundInputLabel(primaryInputRound.status)}
+          </Link>
+        </section>
+      ) : null}
       {detail.rejectionReason ? (
         <section className="my-score-memo-panel danger">
           <span className="material-symbols-outlined">report</span>
@@ -176,12 +206,12 @@ function ScoreDetail({ detail, showReinputPanel }: { detail: MyTournamentScoreDe
               <p className="my-score-status-message">{round.statusMessage}</p>
               {round.rejectionReason ? <p className="my-score-memo danger">반려 사유: {round.rejectionReason}</p> : null}
               {round.playerMemo ? <p className="my-score-memo">{round.playerMemo}</p> : null}
-              {round.status === "ADMIN_REJECTED" || round.status === "DRAFT" ? (
+              {getRoundInputLabel(round.status) ? (
                 <Link
                   className="my-score-action secondary"
                   href={`/mypage/scores/${detail.tournamentId}/input/round/${round.round}`}
                 >
-                  수정/재입력
+                  {round.round}R {getRoundInputLabel(round.status)}
                 </Link>
               ) : null}
             </article>
@@ -197,10 +227,13 @@ function ScoreDetail({ detail, showReinputPanel }: { detail: MyTournamentScoreDe
         </div>
       </section>
 
-      {detail.status === "ADMIN_REJECTED" || detail.status === "DRAFT" ? (
+      {primaryInputRound ? (
         <div className="my-score-actions">
-          <Link className="my-score-action secondary" href={`/mypage/scores/${detail.tournamentId}/input/round/1`}>
-            재입력
+          <Link
+            className="my-score-action secondary"
+            href={`/mypage/scores/${detail.tournamentId}/input/round/${primaryInputRound.round}`}
+          >
+            {primaryInputRound.round}R {getRoundInputLabel(primaryInputRound.status)}
           </Link>
         </div>
       ) : null}

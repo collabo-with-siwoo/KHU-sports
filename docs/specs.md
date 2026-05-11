@@ -158,6 +158,10 @@ SESSION_MAX_AGE_HOURS
 ### M4 Score Submission State Integration
 
 - `/mypage/scores/[tournamentId]/input/round/[round]`: logged-in `PLAYER` users may create/update their own round score against the current `User -> Player -> Score` schema. Save writes `scoreData.status = DRAFT`; submit writes `scoreData.status = SUBMITTED`. `ADMIN_CONFIRMED` scores are locked against player edits.
+- `/mypage` and `/mypage/scores` surface primary score-input CTAs for currently ongoing golf tournaments so approved PLAYER users can start from My Page without knowing the deep input URL.
+- Player input actions are available for `NOT_STARTED`, `DRAFT`, and `ADMIN_REJECTED` rounds only. `SUBMITTED` and `ADMIN_CONFIRMED` rounds are read-only to players.
+- Score input is limited to the tournament date window using `Tournament.startDate` through `Tournament.endDate` until a dedicated score-input window model is introduced.
+- The score input form automatically calculates `roundTotal` from `front9 + back9`; the server action still validates the same sum before writing.
 - Score submission states are normalized to `DRAFT`, `SUBMITTED`, `ADMIN_CONFIRMED`, and `ADMIN_REJECTED`. My Page renders the required user-facing status messages for every state.
 - Public `/results`, Full Leaderboard, and public Scorecard filter runtime rows through the confirmed-score predicate; only `ADMIN_CONFIRMED` compatible score data is exposed publicly.
 - `/admin/scores` can confirm or reject existing score rows. Confirmation writes `scoreData.status = ADMIN_CONFIRMED`, clears rejection fields, recalculates tournament ranks from confirmed scores, and revalidates result/My Page surfaces. Rejection writes `scoreData.status = ADMIN_REJECTED`, clears public rank, and stores `scoreData.rejectionReason`/`scoreData.adminMemo` for owner/admin views.

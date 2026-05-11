@@ -243,7 +243,8 @@ describe("My Page Score", () => {
               name: "KHU Test Open",
               venue: "Test Course",
               startDate,
-              endDate
+              endDate,
+              rounds: 1
             }
           }
         ]
@@ -268,8 +269,7 @@ describe("My Page Score", () => {
     expect(playerFindFirst).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
-          userId: "other-user",
-          scores: { some: { tournamentId: "t1" } }
+          userId: "other-user"
         })
       })
     );
@@ -277,6 +277,7 @@ describe("My Page Score", () => {
 
   it("does not expose adminMemo as rejectionReason", async () => {
     playerFindFirst.mockResolvedValue({
+      id: "p1",
       name: "김본인",
       affiliation: "경희고",
       user: { gender: "MALE" },
@@ -291,16 +292,17 @@ describe("My Page Score", () => {
             total: 73,
             status: "ADMIN_REJECTED",
             adminMemo: "관리자만 보는 메모"
-          },
-          tournament: {
-            id: "t1",
-            name: "KHU Test Open",
-            venue: "Test Course",
-            startDate,
-            endDate
           }
         }
       ]
+    } as never);
+    tournamentFindFirst.mockResolvedValue({
+      id: "t1",
+      name: "KHU Test Open",
+      venue: "Test Course",
+      startDate,
+      endDate,
+      rounds: 1
     } as never);
 
     const detail = await getMyTournamentScoreDetail("user-1", "t1");

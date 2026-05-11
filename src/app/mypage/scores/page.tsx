@@ -3,7 +3,13 @@ import { redirect } from "next/navigation";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getCurrentMember } from "@/lib/members";
-import { getMyScoreHistory, type MyScoreHistory, type MyScoreStatus } from "@/lib/results";
+import {
+  getMyOpenScoreInputs,
+  getMyScoreHistory,
+  type MyOpenScoreInput,
+  type MyScoreHistory,
+  type MyScoreStatus
+} from "@/lib/results";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +56,73 @@ function EmptyScoresPanel() {
   );
 }
 
+function OpenScoreInputPanel({ items }: { items: MyOpenScoreInput[] }) {
+  if (!items.length) {
+    return null;
+  }
+
+  return (
+    <section className="my-score-input-panel" aria-labelledby="open-score-input-title">
+      <div>
+        <p className="stitch-label">Score Input</p>
+        <h2 id="open-score-input-title">진행 중인 대회 스코어 입력</h2>
+        <p>현재 입력 가능한 대회입니다. 라운드를 선택해 임시저장하거나 제출 완료할 수 있습니다.</p>
+      </div>
+      <div className="my-score-input-list">
+        {items.map((item) => (
+          <article key={item.tournamentId}>
+            <header>
+              <div>
+                <span>{item.status}</span>
+                <strong>{item.tournamentName}</strong>
+                <p>
+                  {item.venue} · {item.period}
+                </p>
+              </div>
+              {item.primaryHref && item.primaryActionLabel ? (
+                <Link className="my-score-action primary" href={item.primaryHref}>
+                  {item.primaryActionLabel}
+                </Link>
+              ) : (
+                <span className="my-score-action muted">입력 대기</span>
+              )}
+            </header>
+            <div className="my-score-round-actions">
+              {item.rounds.map((round) =>
+                round.canEdit && round.actionLabel ? (
+                  <Link className="my-score-action secondary" href={round.href} key={round.round}>
+                    {round.actionLabel}
+                  </Link>
+                ) : (
+                  <span className="score-status-badge" key={round.round}>
+                    {round.round}R {round.statusLabel}
+                  </span>
+                )
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function getHistoryInputLabel(status: MyScoreStatus) {
+  switch (status) {
+    case "NOT_STARTED":
+      return "스코어 입력";
+    case "DRAFT":
+      return "이어쓰기";
+    case "ADMIN_REJECTED":
+      return "다시 입력";
+    default:
+      return null;
+  }
+}
+
 function ScoreHistoryCard({ item }: { item: MyScoreHistory }) {
+  const inputLabel = getHistoryInputLabel(item.status);
+
   return (
     <article className="my-score-card">
       <header>
@@ -84,9 +156,9 @@ function ScoreHistoryCard({ item }: { item: MyScoreHistory }) {
       {item.rejectionReason ? <p className="my-score-memo danger">반려 사유: {item.rejectionReason}</p> : null}
 
       <div className="my-score-actions">
-        {item.status === "ADMIN_REJECTED" || item.status === "DRAFT" ? (
+        {inputLabel ? (
           <Link className="my-score-action secondary" href={`/mypage/scores/${item.tournamentId}/input/round/1`}>
-            재입력
+            {inputLabel}
           </Link>
         ) : null}
         <Link className="my-score-action primary" href={`/mypage/scores/${item.tournamentId}`}>
@@ -104,7 +176,10 @@ export default async function MyScoresPage() {
     redirect("/login?next=%2Fmypage%2Fscores");
   }
 
-  const scores = member.userType === "PLAYER" ? await getMyScoreHistory(member.id) : [];
+  const [scores, openInputs] =
+    member.userType === "PLAYER"
+      ? await Promise.all([getMyScoreHistory(member.id), getMyOpenScoreInputs(member.id)])
+      : [[], [] as MyOpenScoreInput[]];
 
   return (
     <main className="home-app">
@@ -124,14 +199,19 @@ export default async function MyScoresPage() {
 
         {member.userType !== "PLAYER" ? (
           <PlayerRequiredPanel userType={member.userType} />
-        ) : scores.length ? (
-          <div className="my-score-list">
-            {scores.map((item) => (
-              <ScoreHistoryCard item={item} key={item.tournamentId} />
-            ))}
-          </div>
         ) : (
-          <EmptyScoresPanel />
+          <>
+            <OpenScoreInputPanel items={openInputs} />
+            {scores.length ? (
+              <div className="my-score-list">
+                {scores.map((item) => (
+                  <ScoreHistoryCard item={item} key={item.tournamentId} />
+                ))}
+              </div>
+            ) : (
+              <EmptyScoresPanel />
+            )}
+          </>
         )}
       </section>
 

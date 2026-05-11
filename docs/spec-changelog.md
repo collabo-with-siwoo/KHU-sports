@@ -213,3 +213,11 @@
 - Added Supabase SSR middleware to refresh auth cookies across page navigation.
 - Added `SESSION_MAX_AGE_HOURS` with a 12-hour default for app-level session expiry.
 - Updated the public header to show My Page and logout actions while a member session is active.
+
+## 2026-05-11 - Player Score Input Discovery
+
+- Added visible My Page and `/mypage/scores` score-input CTAs for ongoing tournaments so PLAYER users can start score entry without knowing `/mypage/scores/[tournamentId]/input/round/[round]`.
+- Added `getMyOpenScoreInputs(userId)` for ongoing tournament input cards and round-level status/action mapping.
+- Allowed player edit actions only for `NOT_STARTED`, `DRAFT`, and `ADMIN_REJECTED`; `SUBMITTED` and `ADMIN_CONFIRMED` now stay read-only to players in both UI and server action.
+- Limited player self-input to the tournament date window and added input-period messaging.
+- Changed the input form to auto-calculate `roundTotal` from `front9 + back9` while keeping server-side sum validation.

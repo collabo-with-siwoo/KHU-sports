@@ -5,7 +5,7 @@ import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { getCurrentMember } from "@/lib/members";
 import { prisma } from "@/lib/prisma";
-import { getScoreSubmissionStatus } from "@/lib/results";
+import { getScoreSubmissionStatus, isPlayerEditableScoreStatus, isTournamentScoreInputOpen } from "@/lib/results";
 
 export type PlayerScoreInputState = {
   status: "idle" | "success" | "error";
@@ -111,7 +111,10 @@ export async function savePlayerScoreAction(
     },
     select: {
       id: true,
-      sportId: true
+      sportId: true,
+      startDate: true,
+      endDate: true,
+      rounds: true
     }
   });
 
@@ -119,6 +122,20 @@ export async function savePlayerScoreAction(
     return {
       status: "error",
       message: "대회를 찾을 수 없습니다."
+    };
+  }
+
+  if (parsed.data.round > Math.max(tournament.rounds, 1)) {
+    return {
+      status: "error",
+      message: "입력할 수 없는 라운드입니다."
+    };
+  }
+
+  if (!isTournamentScoreInputOpen(tournament.startDate, tournament.endDate)) {
+    return {
+      status: "error",
+      message: "현재는 이 대회의 스코어 입력 기간이 아닙니다."
     };
   }
 
@@ -151,10 +168,10 @@ export async function savePlayerScoreAction(
     }
   });
 
-  if (existing && getScoreSubmissionStatus(existing.scoreData) === "ADMIN_CONFIRMED") {
+  if (existing && !isPlayerEditableScoreStatus(getScoreSubmissionStatus(existing.scoreData))) {
     return {
       status: "error",
-      message: "관리자 확정 완료된 스코어는 수정할 수 없습니다."
+      message: "제출 완료 또는 관리자 확정된 스코어는 선수 페이지에서 수정할 수 없습니다."
     };
   }
 

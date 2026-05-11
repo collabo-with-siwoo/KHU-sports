@@ -82,6 +82,16 @@ function ScoreInputShell({ context }: { context: MyScoreInputContext }) {
         </section>
       ) : null}
 
+      {context.inputOpenMessage ? (
+        <section className="my-score-memo-panel danger">
+          <span className="material-symbols-outlined">event_busy</span>
+          <div>
+            <strong>입력 기간 안내</strong>
+            <p>{context.inputOpenMessage}</p>
+          </div>
+        </section>
+      ) : null}
+
       <ScoreInputForm context={context} />
     </div>
   );

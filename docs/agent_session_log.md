@@ -466,3 +466,27 @@
 - Status: Added Supabase SSR cookie-refresh middleware, a configurable maximum session age, and logged-in header actions for My Page/logout.
 - DB note: Prisma schema validation succeeds, but direct Supabase Postgres/Pooler connections from this machine still fail before schema application.
 - Verification: `npm test`, `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, and `npm run build` passed. Supabase Auth contains user `7d914e66-d226-46c1-8f3a-33f808e5f8d7`, matching the configured initial admin email.
+
+## Session - 2026-05-11 Player Score Input Discovery
+
+- Request: Make it easy for logged-in PLAYER users to find and enter their own score for ongoing tournaments from My Page.
+- Milestone: M4 tournaments and scores foundation.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Implementation notes:
+  - Added ongoing tournament score-input cards on `/mypage/scores` and a compact shortcut on `/mypage`.
+  - Added round-level action labels for first input, draft continuation, and rejected-score re-entry.
+  - Added placeholder NOT_STARTED rounds in My Page detail so missing rounds have a visible input action.
+  - Locked player edits for `SUBMITTED` and `ADMIN_CONFIRMED` states in both UI and server action.
+  - Limited player self-input to the tournament date window and auto-calculated `roundTotal` from front/back nine.
+- Verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test`, and `npm run build` passed. Browser checks confirmed unauthenticated `/mypage/scores` redirects to login and `/mypage` renders on the local production start server.
+
+## Session - 2026-05-11 Superpowers And Agent Instructions
+
+- Request: Install Superpowers and rewrite broken `AGENTS.md` / `CLAUDE.md` into Korean VS Code + Codex friendly development instructions.
+- Status: Completed without committing.
+- Result:
+  - Copied Superpowers into `plugins/superpowers`.
+  - Added `.agents/plugins/marketplace.json` so the repo exposes the local Superpowers plugin.
+  - Rewrote `AGENTS.md` with concise project rules, Superpowers-style workflow, security boundaries, verification commands, and Git safety.
+  - Rewrote `CLAUDE.md` as a Claude Code companion summary pointing back to `AGENTS.md`.
+- Verification: JSON validation passed for `.agents/plugins/marketplace.json`, `plugins/superpowers/.codex-plugin/plugin.json`, and `.vscode/mcp.json`; 14 Superpowers skills were found.

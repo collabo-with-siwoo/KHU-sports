@@ -169,3 +169,16 @@
 - Decision: stop using the custom-domain marker before this branch is pushed.
 - Pre-production review should use the Vercel URL, `https://khu-sports.vercel.app/`, because the current app depends on Vercel/Supabase runtime behavior rather than static hosting.
 - The official production domain can be connected later after the final deployment decision.
+
+## 2026-05-11 - Player Score Input Discovery
+
+- Decision: surface score input from My Page for ongoing tournaments instead of relying on players to know the deep route.
+- Because the current runtime schema does not yet include a `tournament_players` enrollment table, the MVP input list uses the logged-in user's golf `Player` profile plus ongoing `Tournament` rows. Dedicated tournament-player ownership should replace this when that target table is introduced.
+- Player-editable states are `NOT_STARTED`, `DRAFT`, and `ADMIN_REJECTED`; `SUBMITTED` and `ADMIN_CONFIRMED` are locked for players and remain admin-review/admin-confirmation states.
+- Until an explicit score-input window model exists, the tournament `startDate` and `endDate` define the player input period.
+
+## 2026-05-11 - Agent Instruction Cleanup
+
+- Decision: replace the mojibake-heavy `AGENTS.md` and `CLAUDE.md` with clean Korean guidance instead of trying to repair the broken encoded text in place.
+- Decision: keep Superpowers as a repo-local plugin (`plugins/superpowers`) and register it through `.agents/plugins/marketplace.json`, so VS Code/Codex sessions can discover it without relying on a global install.
+- Decision: soften the old mandatory real-time logging protocol. Logs remain useful for long-running, deployment, DB, or security work, but small implementation tasks can finish with a concise final report.

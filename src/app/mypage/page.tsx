@@ -2,7 +2,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getCurrentMember } from "@/lib/members";
-import { listMemberScoreArchive } from "@/lib/results";
+import { getMyOpenScoreInputs, listMemberScoreArchive, type MyOpenScoreInput } from "@/lib/results";
 
 const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
@@ -13,9 +13,40 @@ const mobileNavItems = [
 
 export const dynamic = "force-dynamic";
 
+function ScoreInputShortcut({ items }: { items: MyOpenScoreInput[] }) {
+  if (!items.length) {
+    return null;
+  }
+
+  const primary = items.find((item) => item.primaryHref) ?? items[0];
+
+  return (
+    <section className="my-score-input-panel compact" aria-labelledby="mypage-score-input-title">
+      <div>
+        <p className="stitch-label">Score Input</p>
+        <h2 id="mypage-score-input-title">진행 중인 대회 스코어 입력</h2>
+        <p>
+          {primary.tournamentName} 스코어를 바로 입력할 수 있습니다. 임시저장 후 나중에 이어서 제출할 수 있습니다.
+        </p>
+      </div>
+      {primary.primaryHref && primary.primaryActionLabel ? (
+        <Link className="my-score-action primary" href={primary.primaryHref}>
+          {primary.primaryActionLabel}
+        </Link>
+      ) : (
+        <Link className="my-score-action secondary" href="/mypage/scores">
+          입력 상태 확인
+        </Link>
+      )}
+    </section>
+  );
+}
+
 export default async function MyPage() {
   const member = await getCurrentMember();
   const scoreArchive = member ? await listMemberScoreArchive(member.id).catch(() => []) : [];
+  const openScoreInputs =
+    member?.userType === "PLAYER" ? await getMyOpenScoreInputs(member.id).catch(() => []) : [];
 
   return (
     <main className="home-app">
@@ -43,13 +74,19 @@ export default async function MyPage() {
           </article>
           <article className="stitch-bento-card">
             <i />
-            <strong>선수 등록</strong>
-            <p>로그인 후 참가 신청을 진행하면 관리자가 확인 후 승인합니다.</p>
+            <strong>{member?.userType === "PLAYER" ? "스코어 입력" : "선수 등록"}</strong>
+            <p>
+              {member?.userType === "PLAYER"
+                ? "진행 중인 대회가 있으면 마이페이지에서 바로 라운드 스코어를 입력합니다."
+                : "로그인 후 참가 신청을 진행하면 관리자가 확인 후 승인합니다."}
+            </p>
             <Link className="text-link" href="/mypage/scores">
-              내 기록 아카이브 보기
+              {member?.userType === "PLAYER" ? "스코어 입력/기록 보기" : "내 기록 아카이브 보기"}
             </Link>
           </article>
         </div>
+
+        <ScoreInputShortcut items={openScoreInputs} />
 
         <section className="profile-preview" style={{ marginTop: "48px" }}>
           <div>

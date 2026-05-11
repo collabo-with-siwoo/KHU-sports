@@ -1,124 +1,141 @@
-# AGENTS.md — KHU Sports 골프대회 홈페이지 Agent Instructions
+# AGENTS.md - KHU Sports 개발 에이전트 지침
 
-> **프로젝트**: 경희대학교 골프대회 공식 홈페이지
-> **PRD 참조**: `PRD/04_golf_PRD.md` (v0.3)
-> **기술 스택**: Next.js 14+ (App Router) · Supabase · Cloudflare R2 · Prisma · Tiptap · Resend
+> 프로젝트: 경희대학교 골프대회 공식 홈페이지
+> 주요 런타임: Next.js App Router, TypeScript, Supabase, Prisma, Cloudflare R2, Resend, Vercel
+> 기본 리뷰 URL: `https://khu-sports.vercel.app/`
 
----
+이 문서는 VS Code, Codex CLI/App, Claude Code 등 코드 에이전트가 이 저장소에서 일할 때 따르는 공통 지침입니다. 지침은 가볍게 시작하되, 보안과 검증은 끝까지 지킵니다.
 
-## 🚨 ABSOLUTE FIRST STEP — 세션 시작 시 반드시 실행
+## 1. 작업 시작 루틴
 
-**어떤 작업을 시작하기 전에, 아래 단계를 순서대로 수행합니다.**
-**이 단계를 건너뛰면 모든 작업이 무효 처리됩니다.**
+작업을 시작할 때는 먼저 아래 파일을 짧게 확인합니다.
 
-### Step 0: PRD 숙지
-```
-cat PRD/04_golf_PRD.md    # 제품 요구사항 전문 — 반드시 숙지
-```
-
-### Step 1: 프로젝트 규칙 확인
-```
-cat CLAUDE.md             # Claude 전용 규칙 + 기술 스택 가이드
+```bash
+Get-Content -Raw docs/context.md
+Get-Content -Raw docs/specs.md
+Get-Content -Raw PRD/04_golf_PRD.md
 ```
 
-### Step 2: 현재 상태 파악
-```
-cat docs/context.md       # 현재 프로젝트 상태 (진행 중인 마일스톤, 최근 변경)
-```
+참고:
+- `PRD/04_golf_PRD.md`와 과거 문서 일부는 인코딩이 깨져 있을 수 있습니다. 최신 실행 기준은 `docs/specs.md`, `docs/context.md`, 실제 코드, 사용자 최신 지시를 우선합니다.
+- `CLAUDE.md`는 Claude Code용 보조 요약입니다. 충돌하면 이 `AGENTS.md`를 우선합니다.
+- `.env`에는 실제 키와 비밀번호가 들어갈 수 있으므로 내용을 출력하거나 커밋하지 않습니다.
 
-### Step 3: 최신 스펙 확인
-```
-cat docs/specs.md         # 데이터 모델, API 엔드포인트, 확정 정책
-```
+## 2. Superpowers 스타일 작업 방식
 
----
+이 저장소는 Superpowers 플러그인을 로컬 플러그인으로 사용할 수 있게 설정합니다.
 
-## 🏗️ 프로젝트 아키텍처
+- 로컬 플러그인: `plugins/superpowers`
+- 로컬 마켓플레이스: `.agents/plugins/marketplace.json`
+- Codex에서 플러그인을 설치/활성화한 뒤 관련 skill을 우선 사용합니다.
 
-```
+Superpowers식 기본 흐름:
+
+1. **Brainstorming**: 요구사항이 흐릿하면 바로 구현하지 말고 목표, 사용자, 제약을 짧게 정리합니다.
+2. **Plan**: 파일 단위로 작고 검증 가능한 작업 계획을 세웁니다. 단순 작업은 계획을 길게 쓰지 않습니다.
+3. **TDD where useful**: 권한, 공개/비공개 DTO, 스코어 상태, 엑셀 다운로드처럼 회귀 위험이 큰 로직은 테스트를 먼저 또는 함께 작성합니다.
+4. **Systematic debugging**: 증상만 고치지 말고 재현, 원인, 수정, 회귀 방지 순서로 접근합니다.
+5. **Verification before completion**: 완료 선언 전 타입체크, 린트, 테스트, 빌드 중 변경 범위에 맞는 검증을 실행합니다.
+6. **Finish cleanly**: 변경 파일, 검증 결과, 남은 리스크를 짧게 보고합니다.
+
+Codex에서 sub-agent를 쓸 수 있더라도 사용자가 명시적으로 병렬 에이전트 작업을 요청하지 않으면 직접 처리합니다.
+
+## 3. 프로젝트 구조
+
+```text
 src/
-├── app/                  # Next.js App Router 페이지
-│   ├── (public)/         # 유저 뷰 (메인홈, 공지, 대회결과, 마이페이지)
-│   ├── (auth)/           # 인증 (회원가입, 로그인, 비밀번호 재설정)
-│   ├── admin/            # 어드민 뷰 (대시보드, 공지관리, 회원관리, 스코어관리, 약관관리)
-│   └── api/              # API Routes (Server Actions 우선)
-├── components/           # 공유 컴포넌트
-├── lib/                  # 유틸리티, DB 클라이언트, 인증 헬퍼
-├── prisma/               # Prisma 스키마 + 마이그레이션
-└── types/                # TypeScript 타입 정의
+  app/                  Next.js App Router 페이지와 Route Handler
+    (auth)/             로그인, 회원가입, 비밀번호 재설정
+    admin/              관리자 화면과 보호된 운영 기능
+    mypage/             로그인 사용자/선수 개인 화면
+    results/            공개 대회 결과와 공개 Scorecard
+  components/           공용 UI 컴포넌트
+  lib/                  Prisma, Supabase, 인증, 도메인 read/write 로직
+  types/                공유 TypeScript 타입
+prisma/
+  schema.prisma         DB 스키마
+docs/
+  context.md            현재 진행 상태
+  specs.md              최신 서비스 스펙
+  spec-changelog.md     스펙 변경 기록
+  results-*.md          결과/스코어 설계 문서
 ```
 
-### 핵심 도메인 (PRD §4 기준)
+## 4. 현재 핵심 도메인 규칙
 
-| 도메인 | 파일 위치 | 설명 |
-|--------|----------|------|
-| **인증** | `(auth)/`, `lib/auth/` | 회원가입·로그인·비밀번호 재설정 (Supabase Auth) |
-| **약관** | `admin/terms/`, `(auth)/signup/` | 어드민 직접 작성, 동적 로드, 동의 이력 보관 |
-| **공지** | `(public)/notices/`, `admin/notices/` | Tiptap WYSIWYG, R2 이미지·첨부, 카테고리 |
-| **대회** | `(public)/results/`, `admin/tournaments/` | 대회 등록·결과 공개 (순위·이름·총타수) |
-| **스코어** | `admin/scores/`, `(public)/mypage/` | 수기 + 엑셀 업로드, 본인만 상세 조회 |
-| **회원** | `admin/members/`, `(public)/mypage/` | 휴면·탈퇴 라이프사이클, 익명화 |
+### 인증과 회원
 
----
+- 로그인은 사용자-facing으로 아이디/비밀번호 방식입니다. 내부적으로는 `User.username -> User.email -> Supabase Auth` 매핑을 사용합니다.
+- 가입 직후 회원은 `GENERAL`입니다.
+- `PLAYER` 전환은 관리자 승인으로만 처리합니다.
+- 관리자 로그인은 Supabase Auth 사용자와 `AdminUser.status = ACTIVE` 프로필이 모두 필요합니다.
 
-## 🚨 MANDATORY PROTOCOL — 모든 작업에 예외 없이 적용
+### 스코어와 결과 공개
 
-### Pre-Task (작업 시작 전)
-1. **`/start-session` 워크플로우 실행** — `docs/agent_session_log.md`에 세션 블록 생성
-2. PRD §9 마일스톤 기준으로 현재 작업이 어느 단계(M0~M7)인지 파악
+- 공개 결과 페이지는 `/results`와 `/results/[tournamentId]`입니다.
+- `/results/[tournamentId]`는 Full Leaderboard와 공개 Scorecard 탭을 제공합니다.
+- 공개 페이지에는 경기 기록 필드만 노출합니다: 순위, 선수명, 학교, 참가구분, 성별, 라운드별 스코어, 36홀 합계, 최종순위, 조, 출발시간.
+- 공개 페이지와 공개 다운로드는 전화번호, 이메일, 생년월일, 주소, 보호자 연락처, 선수 메모, 관리자 메모, 검수 로그를 절대 반환하지 않습니다.
+- 공개 결과에는 `ADMIN_CONFIRMED` 스코어만 반영합니다.
+- 선수 마이페이지는 본인 기록만 조회합니다. 본인에게는 `playerMemo`와 제출/반려 상태를 보여줄 수 있지만 `adminMemo`는 보여주지 않습니다.
+- 선수 입력 상태는 `NOT_STARTED`, `DRAFT`, `SUBMITTED`, `ADMIN_CONFIRMED`, `ADMIN_REJECTED`를 사용합니다.
+- 선수는 `NOT_STARTED`, `DRAFT`, `ADMIN_REJECTED` 상태만 입력/수정할 수 있습니다. `SUBMITTED`와 `ADMIN_CONFIRMED`는 선수에게 읽기 전용입니다.
 
-### During-Task (작업 중)
-3. 작업 로그를 `docs/agent_session_log.md`에 실시간 기록
-4. 중요 결정은 `docs/agent_discussion.md`에 기록
-5. **[필수 루틴]** 당장 처리하지 않는 이슈/아이디어 발견 시 → 사용자에게 "docs/backlog/에 기록해둘까요?" 확인
+### 관리자
 
-### Post-Task (작업 완료 후)
-6. 종료 체크리스트:
-   - `docs/agent_session_log.md` — 세션 결론 추가
-   - `docs/agent_discussion.md` — 완료 보고
-   - `docs/context.md` — 현재 상태 갱신 (마일스톤 진행률 포함)
-   - `docs/specs.md` + `docs/spec-changelog.md` — 스펙/코드 변경 시 자동 반영
-7. **[필수 루틴]** 코드가 단 한 줄이라도 수정되었다면, **사용자에게 묻지 말고** 즉시 `docs/specs.md`와 `docs/spec-changelog.md`를 업데이트
+- 모든 `/admin` 하위 페이지는 `requireAdmin` 또는 `requireAdminPermission` 계열 체크를 사용합니다.
+- `SUPER`는 모든 관리자 기능에 접근할 수 있습니다.
+- `MEMBER`는 `AdminUser.permissions` JSON에 따라 메뉴별 권한을 확인합니다.
+- 개인정보 포함 엑셀 다운로드는 `SUPER` 또는 `privacy.export` 권한만 가능하며 `ExportLog`를 남깁니다.
 
-### Verification (검증)
-8. 커밋 전 검증:
-   ```bash
-   npx tsc --noEmit              # TypeScript 타입체크
-   npx next lint                 # ESLint
-   npx prisma validate           # Prisma 스키마 검증
-   ```
+## 5. 코딩 규칙
 
----
+- 기존 패턴을 먼저 따릅니다. 새 추상화는 중복이나 복잡도를 실제로 줄일 때만 추가합니다.
+- 서버 데이터 접근은 Prisma를 우선 사용하고, 필요한 필드만 `select`합니다.
+- 공개 DTO와 My Page/Admin DTO를 분리합니다. 넓게 가져온 뒤 응답에서 지우는 방식은 피합니다.
+- Server Actions와 Route Handlers는 입력을 `zod` 등으로 검증합니다.
+- 비밀값, connection string, 서비스 롤 키는 코드와 로그에 남기지 않습니다.
+- 파일 편집은 작은 단위로 하고, 사용자 변경 사항을 되돌리지 않습니다.
+- Windows/PowerShell 환경입니다. 검색은 `rg`를 우선 사용합니다.
 
-## ⚡ 핵심 정책 요약 (PRD 발췌)
+## 6. 프론트엔드 UX 규칙
 
-> 아래는 개발 시 절대 위반하면 안 되는 확정 정책입니다.
+- 앱/도구 화면은 첫 화면에서 실제 기능을 보여줍니다. 불필요한 랜딩 페이지를 만들지 않습니다.
+- 운영 도구는 조용하고 밀도 있게 만듭니다. 큰 마케팅 히어로보다 스캔 가능한 표, 필터, 상태, 액션을 우선합니다.
+- 선수용 흐름은 모바일에서 먼저 막히지 않아야 합니다.
+- 버튼/필터/탭/체크박스는 URL 상태와 서버 필터링을 우선합니다.
+- 개인정보가 보일 수 있는 텍스트는 화면뿐 아니라 DTO와 쿼리 단계에서 차단합니다.
 
-| 정책 | 규칙 |
-|------|------|
-| 회원가입 | 아이디(영문+숫자)·이름·생년월일·성별·전화번호·이메일·주소 + 약관 동의 |
-| 로그인 | **아이디/비밀번호** 방식 (내부 Supabase Auth는 이메일 매핑) |
-| 회원 유형 | **GENERAL**(일반 가입자) / **PLAYER**(선수) — 어드민만 변경 가능 |
-| 선수 등록 | 이메일(khusports2026@gmail.com) 접수 → 어드민 승인 → PLAYER 전환 |
-| 스코어 조회 | **본인 외 상세 스코어카드 조회 불가** (어드민만 가능) |
-| 대회 결과 공개 | 순위·이름·총타수까지만 공개, 상세 스코어카드는 본인만 |
-| 휴면 | 개인정보 유효기간제 폐지 반영: 1년 미접속 자동 휴면은 법정 의무로 단정하지 않음, MVP에서는 선택 운영 정책/예약 상태로 관리 |
-| 탈퇴 | 30일 유예 → 개인정보 삭제, 스코어는 **익명화 보존** |
-| 약관 관리 | 어드민이 Tiptap으로 직접 작성·버전 발행, 종류 자유 추가 |
-| 파일 업로드 | R2 Presigned URL, Content-Type·Size 검증 |
-| 환경변수 | **코드에 하드코딩 절대 금지**, Vercel 환경변수로만 관리 |
+## 7. 문서 관리
 
----
+코드 변경이 서비스 스펙을 바꾸면 다음 문서도 함께 업데이트합니다.
 
-## 📎 참조 파일
+- `docs/specs.md`
+- `docs/spec-changelog.md`
+- 필요 시 `docs/context.md`
 
-| 파일 | 용도 |
-|------|------|
-| `PRD/04_golf_PRD.md` | 제품 요구사항 정의서 (v0.2) |
-| `CLAUDE.md` | Claude 에이전트 전용 규칙 |
-| `docs/context.md` | 현재 프로젝트 상태 |
-| `docs/specs.md` | 서비스 스펙 명세 (데이터 모델, API) |
-| `docs/spec-changelog.md` | 스펙 변경 이력 |
-| `docs/agent_session_log.md` | 에이전트 세션 로그 |
-| `docs/agent_discussion.md` | 의사결정 기록 |
-| `reference/` | 대회 요강, 동의서, 스코어 엑셀 참고자료 |
+작업 로그는 장기 작업, 배포, DB 변경, 보안 정책 변경처럼 추적 가치가 있을 때만 `docs/agent_session_log.md`와 `docs/agent_discussion.md`에 남깁니다. 작은 문구 수정이나 단순 리팩터는 최종 응답으로 충분합니다.
+
+## 8. 검증 명령
+
+변경 범위에 맞게 아래를 실행합니다.
+
+```bash
+npm run typecheck
+npm run lint
+npm run prisma:validate
+npm test
+npm run build
+```
+
+기본 기준:
+- 타입/스키마/권한/DTO 변경: `typecheck`, `prisma:validate`, 관련 테스트
+- UI 변경: `typecheck`, `lint`, 가능하면 브라우저 확인
+- 배포 전/머지 전: `npm test`, `typecheck`, `lint`, `prisma:validate`, `build`
+
+## 9. Git과 작업 안전
+
+- 현재 작업트리에 사용자 변경이 있을 수 있습니다. 관련 없는 변경은 건드리지 않습니다.
+- `git reset --hard`, `git checkout -- <file>` 같은 되돌리기 명령은 사용자가 명시적으로 요청하지 않으면 실행하지 않습니다.
+- 커밋/푸시는 사용자가 요청했을 때만 합니다.
+- 커밋 전에는 변경 파일과 검증 결과를 확인합니다.

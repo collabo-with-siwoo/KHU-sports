@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import type { MyScoreInputContext } from "@/lib/results";
 import { savePlayerScoreAction, type PlayerScoreInputState } from "./actions";
 
@@ -15,7 +15,10 @@ type ScoreInputFormProps = {
 
 export function ScoreInputForm({ context }: ScoreInputFormProps) {
   const [state, formAction] = useActionState(savePlayerScoreAction, initialState);
-  const locked = context.status === "ADMIN_CONFIRMED";
+  const [front9, setFront9] = useState(context.front9 ?? 0);
+  const [back9, setBack9] = useState(context.back9 ?? 0);
+  const roundTotal = useMemo(() => front9 + back9, [front9, back9]);
+  const locked = !context.canEdit;
 
   return (
     <form action={formAction} className="my-score-input-form">
@@ -26,37 +29,40 @@ export function ScoreInputForm({ context }: ScoreInputFormProps) {
         <label>
           front9
           <input
-            defaultValue={context.front9 ?? 0}
             disabled={locked}
             max="90"
             min="0"
             name="front9"
+            onChange={(event) => setFront9(Number(event.currentTarget.value))}
             required
             type="number"
+            value={front9}
           />
         </label>
         <label>
           back9
           <input
-            defaultValue={context.back9 ?? 0}
             disabled={locked}
             max="90"
             min="0"
             name="back9"
+            onChange={(event) => setBack9(Number(event.currentTarget.value))}
             required
             type="number"
+            value={back9}
           />
         </label>
         <label>
           roundTotal
           <input
-            defaultValue={context.roundTotal ?? 0}
             disabled={locked}
             max="180"
             min="0"
             name="total"
+            readOnly
             required
             type="number"
+            value={roundTotal}
           />
         </label>
       </div>
