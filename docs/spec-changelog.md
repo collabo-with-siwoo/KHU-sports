@@ -211,9 +211,10 @@
 ## 2026-05-11 - Session Persistence
 
 - Added Supabase SSR middleware to refresh auth cookies across page navigation.
-- Added `SESSION_MAX_AGE_HOURS` with a 12-hour default for app-level session expiry.
+- Added `SESSION_MAX_AGE_HOURS` for the app session marker, now defaulting to Supabase's long-lived 400-day cookie window when unset.
 - Updated the public header to show My Page and logout actions while a member session is active.
-- Switched app-level expiry from relying on Supabase `last_sign_in_at` to an HTTP-only `khu_app_session_started_at` cookie so PLAYER member sessions remain stable across home, My Page, and score-input navigation.
+- Switched app-level expiry from relying on Supabase `last_sign_in_at` to an HTTP-only `khu_app_session_started_at` marker cookie so PLAYER member sessions remain stable across home, My Page, and score-input navigation.
+- Hardened member and admin sessions so middleware never force-signs out a valid Supabase session; explicit member/admin logout is the only app-level sign-out path.
 - Preserved login `next` redirects so score-input deep links return to their original page after member login.
 
 ## 2026-05-11 - Player Score Input Discovery
@@ -223,3 +224,4 @@
 - Allowed player edit actions only for `NOT_STARTED`, `DRAFT`, and `ADMIN_REJECTED`; `SUBMITTED` and `ADMIN_CONFIRMED` now stay read-only to players in both UI and server action.
 - Limited player self-input to the tournament date window and added input-period messaging.
 - Changed the input form to auto-calculate `roundTotal` from `front9 + back9` while keeping server-side sum validation.
+- Split `/mypage/scores` into a dedicated score-input hub and added `/mypage/score-results` as the separate personal score result list page.

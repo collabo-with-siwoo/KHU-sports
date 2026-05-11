@@ -11,7 +11,7 @@
 - M1 runtime foundation: login, signup, reset-password, and terms pages exist with Supabase Auth and Prisma-backed profile/agreement persistence. Vercel is the active review runtime because these Server Actions require server execution.
 - M2 notice foundation: public notice reads use Supabase `Notice` rows when available and fall back to PRD-aligned seed notices for empty or not-yet-migrated environments. Homepage latest notices, `/notices`, and `/notices/[id]` share the same read model.
 - M3 admin foundation: `/admin` signs administrators in through Supabase Auth and authorizes access through local `AdminUser` rows. `SUPER` admins bypass menu permissions; `MEMBER` admins require `permissions` JSON grants. Admin/member management screens are available behind RBAC.
-- M4 result foundation: `/results` reads Prisma `Tournament`, `Player`, and `Score` rows when available and falls back to seed summaries. Admin tournament/score screens provide protected create/update foundations, `/results/[tournamentId]` now supports Full Leaderboard plus public Scorecard lookup, and `/mypage/scores` reads the logged-in player's personal score archive.
+- M4 result foundation: `/results` reads Prisma `Tournament`, `Player`, and `Score` rows when available and falls back to seed summaries. Admin tournament/score screens provide protected create/update foundations, `/results/[tournamentId]` now supports Full Leaderboard plus public Scorecard lookup, `/mypage/scores` is the logged-in PLAYER score-input hub, and `/mypage/score-results` lists the player's personal score results.
 - Review deployment: use `https://khu-sports.vercel.app/` until the official production domain is connected.
 
 ## Technology Decisions
@@ -93,7 +93,7 @@ SESSION_MAX_AGE_HOURS
 - `/reset-password`: accepts email and calls Supabase Auth password reset. The response stays generic so account existence is not disclosed.
 - `/terms`: renders active agreement versions from Prisma when available, falling back to UUID seed agreements.
 - `/mypage`: reads the Supabase session and displays the linked local `User` profile when logged in.
-- Session persistence: middleware refreshes Supabase SSR cookies on navigation so login persists across pages. The app also writes an HTTP-only `khu_app_session_started_at` cookie on member login and expires the Supabase session when that app session exceeds `SESSION_MAX_AGE_HOURS`, defaulting to 12 when unset.
+- Session persistence: middleware refreshes Supabase SSR cookies on navigation so member and admin login persist across pages until explicit logout. The app also writes an HTTP-only `khu_app_session_started_at` marker cookie, but middleware must not use that marker to force Supabase sign-out. The marker defaults to Supabase's long-lived cookie window, 400 days, when `SESSION_MAX_AGE_HOURS` is unset.
 - `src/lib/agreements.ts`: UUID seed source for first-run agreement fallback.
 - `src/lib/agreement-service.ts`: Prisma-backed active agreement loader and default agreement seeder.
 - `src/lib/auth/schemas.ts`: zod schemas for M1 inputs; signup schema can be created with dynamic required agreement version IDs.
@@ -140,8 +140,9 @@ SESSION_MAX_AGE_HOURS
 - `/admin/tournaments`: requires `tournaments.read`; the create action requires `tournaments.write` and creates `GOLF` tournaments.
 - `/admin/scores`: requires `scores.read`; the score action requires `scores.write`, finds an existing member by email, creates or updates that member's `Player` profile, promotes the member to `PLAYER`, and upserts the round score.
 - `/mypage`: PLAYER users see a summary entry point for their own tournament archive. GENERAL users see a player-approval notice.
-- `/mypage/scores`: requires a logged-in member. GENERAL users see `선수 등록이 필요합니다`; PLAYER users see their own tournament list with tournament name, venue, period, rank, 1R, 2R, 36-hole total, status, and detail links.
-- `/mypage/scores/[tournamentId]`: requires a logged-in member. GENERAL users see `선수 등록이 필요합니다`; PLAYER users can view only scores linked through `Player.userId = session.user.id`. Missing ownership calls `forbidden()` and renders the app-level 403 page.
+- `/mypage/scores`: requires a logged-in member. GENERAL users see `선수 등록이 필요합니다`; PLAYER users see the score-input hub for open tournaments and a separate link to score results.
+- `/mypage/score-results`: requires a logged-in member. GENERAL users see `선수 등록이 필요합니다`; PLAYER users see their own tournament result list with tournament name, venue, period, rank, 1R, 2R, 36-hole total, status, and detail links.
+- `/mypage/scores/[tournamentId]`: requires a logged-in member. GENERAL users see `선수 등록이 필요합니다`; PLAYER users can view only scores linked through `Player.userId = session.user.id`. Missing ownership calls `forbidden()` and renders the app-level 403 page. The result list entry point is `/mypage/score-results`.
 - Implemented My Page score reads through `getMyScoreHistory(userId)` and `getMyTournamentScoreDetail(userId, tournamentId)`. The current runtime schema maps these DTOs from `User -> Player -> Score` until the target `tournament_players` and `score_submissions` tables are added.
 - My Page score detail fields: tournament name, venue, period, player name, school, participation type, gender, group/start time, rank, front9/back9/roundTotal by round, 36-hole total, playerMemo, submission status, and admin confirmation state.
 - My Page status labels support `아직 스코어 미입력`, `임시저장`, `제출 완료`, `관리자 확정`, and `반려됨`. Current admin-entered `Score` rows default to `관리자 확정`; future `scoreData.status`, `scoreData.submissionStatus`, `scoreData.adminConfirmed`, and `scoreData.playerMemo` values override that compatibility default.

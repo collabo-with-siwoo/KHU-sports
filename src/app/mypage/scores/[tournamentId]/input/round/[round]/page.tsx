@@ -116,7 +116,7 @@ export default async function ScoreInputPage({ params }: ScoreInputPageProps) {
       <Header currentPath="/mypage" isAuthenticated={Boolean(member)} />
 
       <section className="stitch-page-canvas my-score-page">
-        <Link className="results-back-link" href={`/mypage/scores/${tournamentId}`}>
+        <Link className="results-back-link" href="/mypage/scores">
           <span className="material-symbols-outlined">arrow_back</span>
           스코어 상세
         </Link>

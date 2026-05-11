@@ -1,4 +1,4 @@
-const DEFAULT_SESSION_MAX_AGE_HOURS = 12;
+const DEFAULT_SESSION_MAX_AGE_HOURS = 24 * 400;
 export const APP_SESSION_COOKIE_NAME = "khu_app_session_started_at";
 
 export function getSessionMaxAgeMs() {

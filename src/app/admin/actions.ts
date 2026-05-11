@@ -1,7 +1,9 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { APP_SESSION_COOKIE_NAME, getAppSessionCookieOptions } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -94,6 +96,11 @@ export async function adminSignInAction(
 export async function adminSignOutAction() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
+  const cookieStore = await cookies();
+  cookieStore.set(APP_SESSION_COOKIE_NAME, "", {
+    ...getAppSessionCookieOptions(),
+    maxAge: 0
+  });
   redirect("/admin");
 }
 

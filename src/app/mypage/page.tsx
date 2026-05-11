@@ -83,6 +83,11 @@ export default async function MyPage() {
             <Link className="text-link" href="/mypage/scores">
               {member?.userType === "PLAYER" ? "스코어 입력/기록 보기" : "내 기록 아카이브 보기"}
             </Link>
+            {member?.userType === "PLAYER" ? (
+              <Link className="text-link" href="/mypage/score-results">
+                스코어 결과 보기
+              </Link>
+            ) : null}
           </article>
         </div>
 

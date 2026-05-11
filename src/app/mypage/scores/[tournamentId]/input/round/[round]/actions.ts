@@ -62,6 +62,7 @@ function buildPlayerScoreData(
 
 async function revalidatePlayerScoreSurfaces(tournamentId: string) {
   revalidatePath("/mypage/scores");
+  revalidatePath("/mypage/score-results");
   revalidatePath(`/mypage/scores/${tournamentId}`);
   revalidatePath(`/results/${tournamentId}`);
   revalidatePath("/admin/scores");
