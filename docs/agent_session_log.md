@@ -68,18 +68,18 @@
 
 ## 2026-05-10 20:05 KST - GitHub Pages and Cloudflare domain
 
-- Request: Before Supabase work, connect the Cloudflare-registered domain `khu-sports.com` using GitHub Pages.
+- Request: Before Supabase work, connect the Cloudflare-registered custom domain using GitHub Pages.
 - Milestone: M0 deployment setup / M1 static preview compatibility.
 - Branch: `feat/m1-auth-agreements`.
 - Reference checks: Consulted GitHub Pages custom domain and custom workflow docs, and Cloudflare DNS record docs.
 - Status: Adding static export settings, GitHub Pages workflow, CNAME, and deployment documentation.
 - Result:
   - Added `.github/workflows/deploy-github-pages.yml`.
-  - Added `public/CNAME` with `khu-sports.com` and `public/.nojekyll`.
+  - Added a custom-domain marker file and `public/.nojekyll`.
   - Added conditional Next.js static export mode through `GITHUB_PAGES=true`.
   - Added `docs/deployment.md` with Cloudflare DNS records.
   - Converted M1 forms to client-side validation for static export compatibility.
-  - Verified `GITHUB_PAGES=true npm run build:pages`; `out/CNAME` contains `khu-sports.com`.
+  - Verified `GITHUB_PAGES=true npm run build:pages`; the static export included the custom-domain marker.
 - Conclusion: Repository is ready for GitHub Pages static deployment after GitHub Pages is set to GitHub Actions and Cloudflare DNS records are configured.
 
 ## 2026-05-10 20:20 KST - Hero title wrapping fix
@@ -234,3 +234,225 @@
   - Verification passed: typecheck, lint, Prisma validation, and production build.
   - Local route checks passed: `/results` returned 200, and unauthenticated `/admin/notices` redirects to `/admin?next=%2Fadmin%2Fnotices`.
 - Conclusion: M3 is now covered at the route/session/RBAC level. M4 has a first DB-backed tournament/score foundation, with Excel upload, hole-by-hole private scorecards, and richer admin workflows remaining as follow-up slices.
+
+## 2026-05-11 10:25 KST - M4 readiness and branch safety review
+
+- Request: New computer setup; decide whether starting fresh M4 work from `develop` is safe while prior M3 work remains uncommitted elsewhere.
+- Milestone: Transition review between M3 admin RBAC and M4 player/tournament/score.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Status: Inspected git branch, remote/develop state, local dirty files, and M3/M4 dependency surface before recommending whether to branch from `develop`.
+- Findings:
+  - Current checkout is `main` at `origin/main`; local dirty files are only this session's required docs logs.
+  - `origin/develop` is an ancestor of `origin/main`, so branching directly from `develop` would drop the latest Supabase/Auth/Notice foundation already on `main`.
+  - No committed M3 RBAC implementation or admin invite branch is present on the remote; prior M3 work is presumed to be uncommitted elsewhere.
+  - M4 Prisma models already exist, but public `/results` currently includes a scorecard-style mock UI that must be corrected before real public M4 data is exposed.
+  - After `npm ci`, `npm run typecheck` and `npm run lint` passed. `npm run prisma:validate` requires local env vars, and passed with temporary dummy `DATABASE_URL`/`DIRECT_URL`.
+- Conclusion: Do not start a full M4 implementation directly from stale `origin/develop`. First fast-forward or recreate `develop` from `origin/main`, recover/merge the M3 work, then branch M4. A narrow M4 planning/data-read slice can proceed from the latest `main`-equivalent base if it avoids admin RBAC/invite files and removes public detailed scorecard exposure.
+
+## 2026-05-11 10:55 KST - Results/scorecard/archive branch setup
+
+- Request: Proceed with the recommended separate branch strategy for the new direction: Full Leaderboard as full standings, Scorecard as player detail score, and My Page as personal record archive.
+- Milestone: M4 policy/IA preparation, without merging to `main`.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Result:
+  - Created `feature/results-scorecard-archive` from current `main` / `origin/main` at `f6d1b79`.
+  - Carried only required docs/session notes as local modifications.
+  - No application code or policy spec has been changed yet; the next prompt should start with item 0, policy change reflection.
+
+## 2026-05-11 11:10 KST - Pull latest main and commit readiness review
+
+- Request: Previous computer cleanup has completed; run `git pull origin main` and check whether anything else should be committed.
+- Milestone: Branch/base synchronization before new results-scorecard-archive work.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Status: Pulled `origin/main` into `feature/results-scorecard-archive` and inspected the resulting working tree.
+- Result:
+  - `git pull origin main` fast-forwarded from `f6d1b79` to `31611e9`.
+  - Latest main includes M3 admin RBAC guardrails, protected admin tournament/score pages, manual score upsert actions, and DB-backed public results with no public hole-by-hole scorecards.
+  - The only post-pull local modifications are required documentation/session notes in `docs/agent_discussion.md`, `docs/agent_session_log.md`, and `docs/context.md`.
+  - Verification passed: `npm run typecheck`, `npm run lint`, `npm run prisma:validate` with temporary dummy DB URLs because local `.env` is absent, and `npm run build`.
+- Conclusion: No application code needs an additional commit from this computer before starting the next requested work. The docs/session note changes can be committed with the next documentation/policy commit or left local until the next work slice is ready.
+
+## 2026-05-11 11:25 KST - Continue M3 and M4 without committing
+
+- Request: Continue M3 and M4 development on `feature/results-scorecard-archive`, do not commit yet, and merge later.
+- Milestone: M3 admin RBAC completion and M4 tournaments/scores expansion.
+- Pre-task checks: `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md` were read before the preceding pull/sync step in this session.
+- Status: Implemented the next M3/M4 slices without committing.
+- Result:
+  - Added `/admin/admins` with `admins.read`/`admins.write` protection for admin profile, status, role, and menu permission management.
+  - Added `/admin/members` with `members.read`/`members.write` protection for GENERAL/PLAYER switching and golf `Player` profile creation/update.
+  - Added shared member score archive reads to `src/lib/results.ts`.
+  - Updated `/mypage` so logged-in PLAYER users can see their own tournament archive and round score summaries.
+  - Updated `docs/specs.md`, `docs/spec-changelog.md`, `docs/context.md`, and `docs/agent_discussion.md`.
+  - Verification passed: `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, and `npm run build`.
+  - Browser checks passed: `/mypage` renders the score archive section when logged out, and unauthenticated `/admin/admins` and `/admin/members` redirect to `/admin?next=...` instead of throwing when local Supabase env vars are absent.
+
+## 2026-05-11 12:15 KST - Results IA and public scorecard policy design
+
+- Request: Apply the updated score disclosure policy and design the `/results` and `/results/[tournamentId]` information architecture before writing code.
+- Milestone: M4 results IA and screen design.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Status: Updated PRD/spec documentation only; no application code changes for this step.
+- Result:
+  - Added `docs/results-ia.md` covering `/results`, `/results/[tournamentId]`, Full Leaderboard, Scorecard, component list, data flow, public/private fields, filters, empty states, and mobile behavior.
+  - Updated `PRD/04_golf_PRD.md` to reflect public Full Leaderboard and public competition-record Scorecard policy.
+  - Updated `docs/specs.md`, `docs/spec-changelog.md`, `docs/context.md`, and `docs/agent_discussion.md`.
+- Verification: Documentation-only change; no code verification run for this step.
+
+## 2026-05-11 12:40 KST - Results API and query design
+
+- Request: Design DB query structure and APIs for Full Leaderboard, public Scorecard, public player history, and My Page score history.
+- Milestone: M4 results API design.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Status: Documented the target read models and authorization boundaries only; no application code changed in this step.
+- Result:
+  - Added `docs/results-api-design.md` with DTOs, function boundaries, Prisma/raw SQL query sketches, Supabase view alternatives, sorting rules, indexes, and security checklist.
+  - Updated `docs/specs.md`, `docs/spec-changelog.md`, `docs/context.md`, and `docs/agent_discussion.md`.
+- Verification: Documentation-only change; no code verification run for this step.
+
+## 2026-05-11 13:10 KST - Results detail Full Leaderboard implementation
+
+- Request: Implement the `/results/[tournamentId]` Full Leaderboard tab with URL query-param search/filter, pagination, mobile layout, loading/error states, and Scorecard navigation.
+- Milestone: M4 public results detail.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Status: Implemented server-side filtered leaderboard reads against the current `Tournament`/`Player`/`Score` schema while preserving the public DTO boundary.
+- Result:
+  - Added `getTournamentLeaderboard(tournamentId, filters)` plus `PublicLeaderboardRow` and pagination result types in `src/lib/results.ts`.
+  - Added `/results/[tournamentId]/page.tsx`, `leaderboard-filters.tsx`, `loading.tsx`, and `error.tsx`.
+  - Added Full Leaderboard tabs, filters, desktop table, mobile cards, empty state, pagination, and Scorecard URL navigation.
+  - Added a detail entry link from the current `/results` selector view.
+  - Updated `docs/specs.md`, `docs/spec-changelog.md`, `docs/context.md`, and `docs/agent_discussion.md`.
+- Verification:
+  - `npm run typecheck` passed.
+  - `npm run lint` passed.
+  - Temporary-env `npm run prisma:validate` passed.
+  - `npm run build` passed.
+  - Browser checks passed for `/results/seed-2026` desktop/mobile rendering, URL search update, and Scorecard button navigation to `?tab=scorecard&playerId=...`.
+## 2026-05-11 12:56 KST - Scorecard tab implementation
+
+- Milestone: M4 tournaments and scores foundation.
+- Scope: implement `/results/[tournamentId]` Scorecard tab with public player search, URL-linked player selection, and DTO-limited public scorecard detail.
+- Notes: current runtime schema still uses `Tournament`/`Player`/`Score`, so implementation must map safely from that schema and avoid private user/contact/admin fields.
+- Status: Implemented without committing.
+- Result:
+  - Added `PlayerSearchFilters`, `PublicScorecardSearchRow`, `PublicScorecard`, `PublicScorecardRound`, and `PublicHoleScore` DTOs in `src/lib/results.ts`.
+  - Added `searchTournamentPlayers(tournamentId, filters)` and `getPublicPlayerScorecard(tournamentId, tournamentPlayerId)` with public-field-only selects.
+  - Added `/results/[tournamentId]/scorecard-filters.tsx`.
+  - Reworked `/results/[tournamentId]/page.tsx` so Scorecard search, result selection, direct `playerId` loading, and round cards render in the tab.
+  - Added responsive Scorecard styles and optional hole-score table styling in `src/app/globals.css`.
+  - Updated `docs/specs.md`, `docs/spec-changelog.md`, `docs/context.md`, and `docs/agent_discussion.md`.
+- Verification:
+  - `npm run typecheck` passed.
+  - `npm run lint` passed.
+  - Temporary-env `npm run prisma:validate` passed.
+  - `npm run build` passed.
+  - Browser checks passed for `/results/seed-2026?tab=scorecard`, search URL updates, selected-player detail, direct `playerId` detail, and mobile viewport rendering.
+
+## 2026-05-11 13:25 KST - My Page personal score pages
+
+- Request: Implement `/mypage/scores` and `/mypage/scores/[tournamentId]` for logged-in PLAYER-only personal score history and detail.
+- Milestone: M4 tournaments and scores foundation.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Notes: current runtime schema uses `User -> Player -> Score`; target `tournament_player` and score submission status tables are not in Prisma yet, so owner access is enforced through `Player.userId`.
+- Status: Implemented without committing.
+- Result:
+  - Added `src/lib/members.ts` to share current logged-in member lookup.
+  - Added My Page score DTOs plus `getMyScoreHistory(userId)` and `getMyTournamentScoreDetail(userId, tournamentId)` in `src/lib/results.ts`.
+  - Added `/mypage/scores` archive page and `/mypage/scores/[tournamentId]` owner-only detail page.
+  - Enabled Next.js `experimental.authInterrupts` and added `src/app/forbidden.tsx` for 403 forbidden score-detail access.
+  - Added responsive My Page score archive/detail styles in `src/app/globals.css`.
+  - Updated `docs/specs.md`, `docs/spec-changelog.md`, `docs/context.md`, and `docs/agent_discussion.md`.
+- Verification:
+  - `npm run typecheck` passed.
+  - `npm run lint` passed.
+  - Temporary-env `npm run prisma:validate` passed.
+  - `npm run build` passed.
+  - Browser checks passed for unauthenticated redirects from `/mypage/scores` and `/mypage/scores/seed-2026` to login with `next` query params.
+
+## 2026-05-11 13:55 KST - Player score input and publication state integration
+
+- Request: Connect player score input, admin confirmation/rejection, public result publication, and My Page state display.
+- Milestone: M4 tournaments and scores foundation.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Notes: current runtime schema still uses `User -> Player -> Score`; submission state is stored in `Score.scoreData` until target submission/result tables are added.
+- Status: Implemented without committing.
+- Result:
+  - Added `/mypage/scores/[tournamentId]/input/round/[round]` for PLAYER round score draft/save and submit.
+  - Added `DRAFT`, `SUBMITTED`, `ADMIN_CONFIRMED`, and `ADMIN_REJECTED` normalization and My Page status messages.
+  - Updated public results reads to include confirmed score rows only.
+  - Added `/admin/scores` confirm/reject actions, rejection reason storage, and confirmed-score rank recalculation.
+  - Updated docs/spec changelog/context/discussion for the state-flow contract.
+- Verification:
+  - `npm run typecheck` passed.
+  - `npm run lint` passed.
+  - Temporary-env `npm run prisma:validate` passed.
+  - `npm run build` passed.
+  - Browser checks passed for `/results/seed-2026`, direct public Scorecard URL, unauthenticated `/admin/scores` redirect, and unauthenticated score-input redirect to login with `next`.
+
+## 2026-05-11 14:25 KST - Advanced result score search
+
+- Request: Enhance Full Leaderboard, Scorecard, and admin tournament score search/filter/sort UX.
+- Milestone: M4 tournaments and scores foundation.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Status: Implemented without committing.
+- Result:
+  - Expanded result search params with player name, school, category, gender, group number, rank range, final-day-only, sort key, sort direction, and pagination.
+  - Added whitespace-insensitive/case-insensitive server-side name and school filtering.
+  - Added server-side sorting by rank, name, school, 1R score, and 36-hole total.
+  - Rebuilt Full Leaderboard and Scorecard filter panels with mobile-friendly collapse/expand.
+  - Added `/admin/tournaments/[tournamentId]/scores` and linked it from `/admin/tournaments`.
+- Verification:
+  - `npm run typecheck` passed.
+  - `npm run lint` passed.
+  - Temporary-env `npm run prisma:validate` passed.
+  - `npm run build` passed.
+  - Browser checks passed for Full Leaderboard advanced query params, Scorecard search query rendering, and unauthenticated `/admin/tournaments/seed-2026/scores` redirect with the expected `next` URL.
+## Session - 2026-05-11 15:16 KST - Admin score Excel exports
+
+- Started task: Implement admin XLSX downloads for public leaderboard, admin score status, scorecards, and restricted privacy exports.
+- Mandatory context read: `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Milestone: M4 tournaments and scores foundation, with an M3 RBAC extension for `privacy.export`.
+- Initial implementation direction: add an `ExportLog` model, extend admin permissions with `privacy.export`, generate XLSX server-side, keep public/admin score exports PII-free, and require SUPER or privacy export permission plus a reason for personal-info export.
+- Implementation notes:
+  - Added a server-side `.xlsx` workbook builder. Initially tested `xlsx`, then replaced it with `exceljs` because npm audit reported high-severity SheetJS advisories with no available fix.
+  - Added `ExportLog` Prisma model and regenerated Prisma Client after stopping local Next dev processes that were locking Prisma's Windows query engine DLL.
+  - Added `/admin/tournaments/[tournamentId]/exports/[exportType]` route handler.
+  - Added download controls to `/admin/tournaments/[tournamentId]/scores`.
+  - Added `privacy.export` permission handling and admin form support.
+  - Added `submittedAt`, `adminConfirmedAt`, and `rejectedAt` score JSON timestamps for export columns.
+- Status: Implemented without committing.
+- Verification:
+  - `npm run typecheck` passed.
+  - `npm run lint` passed.
+  - Temporary-env `npm run prisma:validate` passed.
+  - `npm run build` passed.
+  - `npm audit --omit=dev` passed with 0 vulnerabilities after switching to `exceljs`.
+  - Browser checks passed for unauthenticated admin score page and private export route redirects to `/admin?next=...`.
+## Session - 2026-05-11 M4 pre-QA gap review
+
+- Request: Review whether anything is missing before QA now that M4 appears implemented, and outline M5+ work.
+- Mandatory context read: `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Milestone: M4 completion review, no code changes intended.
+- Result: M4 is functionally ready for QA as a current-schema MVP, but QA scope should explicitly track remaining gaps: production DB schema application, target tournament-player/submission/result table migration, realistic test data, player application/upload flow, Excel upload, hole-by-hole input, admin invite email, and non-score R2/Tiptap write work.
+- Follow-up implementation: Added Vitest QA tests and `docs/qa-results-score-features.md`. Hardened My Page privacy so `adminMemo` is not exposed as fallback rejection reason.
+- Verification: `npm test`, `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, `npm audit --omit=dev`, and `npm run build` passed.
+
+## Session - 2026-05-11 Pre-Merge Commit And Push
+
+- Request: Before merging, check for conflict risk, remove the custom-domain setup, and commit/push the current M3/M4 work.
+- Milestone: M4 pre-merge stabilization.
+- Branch: `feature/results-scorecard-archive`.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Status: Preparing the branch for verification, commit, and push.
+- Deployment decision: use `https://khu-sports.vercel.app/` for review until the official domain is connected later.
+- Verification: `npm test`, `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, `npm audit --omit=dev`, and `npm run build` passed.
+- Result: Committed M4 results/score management work and pushed `feature/results-scorecard-archive` to origin. Current branch is 1 commit ahead of `origin/main`, with `origin/main` confirmed as an ancestor.
+
+## Session - 2026-05-11 Production Merge
+
+- Request: Merge `feature/results-scorecard-archive` into `main` and trigger the Vercel production deployment.
+- Milestone: M4 production rollout.
+- Branch flow: fast-forwarded local `main` to `origin/main`, then merged `origin/feature/results-scorecard-archive` with no conflicts.
+- Deployment target: `https://khu-sports.vercel.app/`.
+- Verification: `npm test`, `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, `npm audit --omit=dev`, and `npm run build` passed.
+- Status: Creating the merge commit and pushing `main`.

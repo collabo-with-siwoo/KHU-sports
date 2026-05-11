@@ -3,13 +3,29 @@ import type { AdminUser, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export type AdminPermissionKey = "notices" | "members" | "scores" | "tournaments" | "admins";
-export type AdminPermissionAction = "read" | "write";
+export type AdminPermissionKey = "notices" | "members" | "scores" | "tournaments" | "admins" | "privacy";
+export type AdminPermissionAction = "read" | "write" | "export";
 
 export type CurrentAdmin = Pick<
   AdminUser,
   "id" | "email" | "name" | "role" | "permissions" | "status"
 >;
+
+export const adminPermissionKeys: AdminPermissionKey[] = [
+  "notices",
+  "members",
+  "scores",
+  "tournaments",
+  "admins",
+  "privacy"
+];
+
+export function fullAdminPermissions() {
+  return adminPermissionKeys.reduce<PermissionMap>((permissions, key) => {
+    permissions[key] = { read: true, write: true, export: true };
+    return permissions;
+  }, {});
+}
 
 type PermissionMap = Partial<
   Record<AdminPermissionKey, Partial<Record<AdminPermissionAction, boolean>>>
@@ -38,18 +54,30 @@ export function canAccessAdmin(
 }
 
 export async function getCurrentAdmin(): Promise<CurrentAdmin | null> {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-    error
-  } = await supabase.auth.getUser();
+  let userEmail: string | undefined;
 
-  if (error || !user?.email) {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+      error
+    } = await supabase.auth.getUser();
+
+    if (error || !user?.email) {
+      return null;
+    }
+
+    userEmail = user.email;
+  } catch {
+    return null;
+  }
+
+  if (!userEmail) {
     return null;
   }
 
   const admin = await prisma.adminUser.findUnique({
-    where: { email: user.email.toLowerCase() },
+    where: { email: userEmail.toLowerCase() },
     select: {
       id: true,
       email: true,

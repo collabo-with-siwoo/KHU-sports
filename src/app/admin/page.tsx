@@ -15,7 +15,7 @@ const adminModules = [
     label: "02",
     title: "회원 승인",
     body: "GENERAL 회원을 확인하고 PLAYER 전환을 처리합니다.",
-    href: "/admin",
+    href: "/admin/members",
     permission: "members"
   },
   {
@@ -31,6 +31,13 @@ const adminModules = [
     body: "수기 입력과 엑셀 업로드 흐름을 연결할 예정입니다.",
     href: "/admin/scores",
     permission: "scores"
+  },
+  {
+    label: "05",
+    title: "관리자 관리",
+    body: "운영 멤버를 초대하고 메뉴별 권한을 부여합니다.",
+    href: "/admin/admins",
+    permission: "admins"
   }
 ] as const;
 

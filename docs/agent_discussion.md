@@ -36,7 +36,7 @@
 
 - GitHub Pages can host the current site only as a static preview. Real Supabase-backed login/signup persistence needs a server runtime later.
 - To make the Pages export work, M1 forms now use client-side zod validation instead of Server Actions.
-- `khu-sports.com` is represented in `public/CNAME`; Cloudflare DNS must point the apex records to GitHub Pages IPs and `www` to the GitHub Pages default domain.
+- The previous custom domain was represented in `public/CNAME`; Cloudflare DNS would have needed apex records pointing to GitHub Pages IPs and `www` to the GitHub Pages default domain.
 
 ## 2026-05-10 22:07 KST - Stitch design integration
 
@@ -86,3 +86,86 @@
 - `INITIAL_SUPER_ADMIN_EMAIL` seeds the local admin profile, but a matching Supabase Auth user must exist because login is still performed through Supabase Auth.
 - M4 public results must stay privacy-safe. The public page can show leaderboard and round totals, but hole-by-hole scorecards remain limited to the logged-in player or admin.
 - M4 starts with manual score entry for existing members. Excel upload, Tiptap notice persistence, and R2 attachments remain separate follow-up slices.
+
+## 2026-05-11 10:25 KST - M4 readiness review
+
+- M4 depends on the M3 admin RBAC boundary for protected admin write screens, but public-safe read pages and Prisma data-model checks can be evaluated independently.
+- Because earlier M3 work is reportedly uncommitted on another machine, starting from `develop` must avoid touching the same admin-auth/RBAC files unless the M3 branch is recovered or merged first.
+- Branching directly from current `origin/develop` is unsafe because `origin/develop` is behind `origin/main`; the latest runtime foundation is only on `main`.
+- The safest next base is a synced `develop` that fast-forwards to `origin/main`, followed by recovery/merge of the uncommitted M3 work before any admin-write M4 implementation.
+- New-direction work is isolated on `feature/results-scorecard-archive` from current `main`, so it can proceed without publishing to `main` until policy/IA/API changes are reviewed.
+
+## 2026-05-11 11:25 KST - M3/M4 continuation
+
+- The pulled M3/M4 baseline covers admin login, permission guards, protected tournament/score pages, and public-safe results.
+- Remaining useful M3 completion work is admin profile management and member approval because those are direct prerequisites for score entry and PLAYER access.
+- Remaining useful M4 completion work is the logged-in player's My Page score archive because public `/results` intentionally cannot expose detailed personal score data.
+- Admin invite email delivery is still not implemented; `/admin/admins` stores the local admin profile/permissions and requires a matching Supabase Auth user to log in.
+
+## 2026-05-11 12:15 KST - Public scorecard policy shift
+
+- The product direction now treats public Scorecard as a competition-record view, not as a private player profile.
+- Public result pages may show score fields such as round scores, 36-hole total, final rank, group, and start time.
+- Public result pages still must not read or render `User` private fields or admin-only metadata such as phone, email, birth date, address, guardian contact, player memo, admin memo, or review logs.
+- `/results` should become the tournament index, while `/results/[tournamentId]` should own the tabbed Full Leaderboard and Scorecard experience.
+
+## 2026-05-11 12:40 KST - Results API query boundary
+
+- The public read model and My Page read model should be implemented as separate repository functions and DTOs, not as a shared broad query with response filtering afterward.
+- Full Leaderboard must use `ADMIN_CONFIRMED` scores only. `tournament_results` can be the materialized ranking source, but it must be recalculated from confirmed submissions and guarded by confirmed-score predicates in public reads.
+- The conditional sort rule, `finalRank` first and fallback to `round1Rank`, should happen in SQL so pagination remains deterministic.
+- Public player history should use `playerPublicKey` as the stable public identifier. `userId` remains private and belongs only to authenticated My Page queries.
+- My Page can expose `playerMemo` because the query is constrained by `tournament_players.userId = session.user.id`; `adminMemo` and review logs stay admin-only.
+
+## 2026-05-11 13:10 KST - Current-schema leaderboard implementation
+
+- The target M4 result tables are not in the Prisma schema yet, so the first `/results/[tournamentId]` implementation maps from the current `Tournament`/`Player`/`Score` schema.
+- Public DTO safety is still enforced through explicit selection: player name, affiliation as school, gender only, and score JSON/rank fields. User contact/profile fields are not selected.
+- Category, group, tee time, final eligibility, and final rank are read from score JSON if present; otherwise category defaults to `일반부`, group/tee time stay empty, and final eligibility is inferred from a second-round score.
+- The Scorecard tab is wired as route state now so Leaderboard buttons can navigate to the future implementation without changing the URL contract later.
+
+## 2026-05-11 - Public Scorecard Runtime Mapping
+
+- Decision: implement public Scorecard search/detail against the current `Tournament`/`Player`/`Score` Prisma schema until the future tournament-player/result tables are introduced.
+- Public reads select only competition-safe fields (`Player.name`, `Player.affiliation`, `User.gender`, score rank, score JSON, and tournament metadata). Contact fields, profile birth/address fields, player notes, admin notes, and review logs are not selected or returned.
+- Completion: Scorecard search and detail now use separate public DTOs and URL state. Direct `?tab=scorecard&playerId=...` entry renders the public scorecard without exposing private profile or admin-only fields.
+
+## 2026-05-11 - My Page Score Ownership Boundary
+
+- Decision: implement My Page score reads through `User.id -> Player.userId -> Score` while the target `tournament_players` table is not yet available.
+- Detail pages must return a 403-style forbidden interrupt when the logged-in user has no linked player score for the requested tournament. My Page DTOs may include `playerMemo` and submission/admin-confirmation state, but must not expose admin memo or review logs.
+- Completion: `/mypage/scores` and `/mypage/scores/[tournamentId]` now use owner-only read functions. Current admin-entered `Score` rows default to `관리자 확정`, while future score JSON status fields can represent draft, submitted, rejected, and player memo states.
+- Completion: `/mypage/scores` and `/mypage/scores/[tournamentId]` now use owner-only read functions. Current admin-entered `Score` rows default to `愿由ъ옄 ?뺤젙`, while future score JSON status fields can represent draft, submitted, rejected, and player memo states.
+
+## 2026-05-11 - Score Publication State Boundary
+
+- Decision: use `Score.scoreData.status` as the runtime submission-state bridge until dedicated score-submission/result tables are introduced.
+- Public reads must pass the confirmed-score predicate before mapping DTOs. `DRAFT`, `SUBMITTED`, and `ADMIN_REJECTED` rows remain visible only to the owner/admin.
+- Admin confirmation is the publication event: it writes `ADMIN_CONFIRMED`, clears rejection fields, recalculates tournament ranks from confirmed rows, and revalidates public result and My Page surfaces.
+- Admin rejection writes `ADMIN_REJECTED` plus `rejectionReason`; the reason is visible to the owner and admin but is not returned by public leaderboard or Scorecard DTOs.
+
+## 2026-05-11 - Result Search Contract
+
+- Decision: use one shared filter vocabulary for Full Leaderboard, public Scorecard search, and tournament-level admin score search: name, school, category, gender, group number, rank range, final-day-only, sort key, sort direction, and page.
+- MVP search normalizes whitespace and letter case for player names and schools. Korean initial-consonant search is deliberately deferred.
+- Current schema does not yet have materialized `tournament_results`, so filtering/sorting is performed server-side after minimal Prisma selects. When the target tables are introduced, the same contract should move closer to SQL with indexes/materialized rank fields.
+
+## 2026-05-11 - Admin Score Export Boundary
+
+- Decision: implement four separate tournament export types behind one route family so each export type can enforce its own data boundary.
+- Public leaderboard and scorecard exports use confirmed-score rows and do not select contact/profile PII.
+- Admin score-status export can include admin memo and player memo for operations, but still excludes contact/profile PII.
+- Personal-info export is intentionally separate, requires `SUPER` or `privacy.export`, requires a human-entered reason, and writes `ExportLog`.
+- Current schema has no guardian contact field, so that export column stays blank until the user/profile model adds a source field.
+
+## 2026-05-11 - M4 QA Privacy Fix
+
+- Decision: player-visible rejection reason must come only from `scoreData.rejectionReason`.
+- `scoreData.adminMemo` remains admin-only and must not be used as a My Page fallback even when a score is rejected.
+- Added Vitest coverage for the My Page DTO boundary so this does not regress silently.
+
+## 2026-05-11 - Pre-Merge Deployment URL
+
+- Decision: stop using the custom-domain marker before this branch is pushed.
+- Pre-production review should use the Vercel URL, `https://khu-sports.vercel.app/`, because the current app depends on Vercel/Supabase runtime behavior rather than static hosting.
+- The official production domain can be connected later after the final deployment decision.

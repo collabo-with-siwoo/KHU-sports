@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { prisma } from "@/lib/prisma";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getCurrentMember } from "@/lib/members";
+import { listMemberScoreArchive } from "@/lib/results";
 
 const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
@@ -13,33 +13,9 @@ const mobileNavItems = [
 
 export const dynamic = "force-dynamic";
 
-async function getCurrentMember() {
-  try {
-    const supabase = await createSupabaseServerClient();
-    const { data } = await supabase.auth.getUser();
-
-    if (!data.user) {
-      return null;
-    }
-
-    return prisma.user.findUnique({
-      where: { id: data.user.id },
-      select: {
-        username: true,
-        email: true,
-        name: true,
-        userType: true,
-        status: true,
-        lastLoginAt: true
-      }
-    });
-  } catch {
-    return null;
-  }
-}
-
 export default async function MyPage() {
   const member = await getCurrentMember();
+  const scoreArchive = member ? await listMemberScoreArchive(member.id).catch(() => []) : [];
 
   return (
     <main className="home-app">
@@ -69,6 +45,9 @@ export default async function MyPage() {
             <i />
             <strong>선수 등록</strong>
             <p>로그인 후 참가 신청을 진행하면 관리자가 확인 후 승인합니다.</p>
+            <Link className="text-link" href="/mypage/scores">
+              내 기록 아카이브 보기
+            </Link>
           </article>
         </div>
 
@@ -94,6 +73,84 @@ export default async function MyPage() {
               {member ? "회원 정보 수정 예정" : "회원가입"}
             </Link>
           </div>
+        </section>
+
+        <section className="score-archive-section">
+          <div className="stitch-page-title compact">
+            <p className="stitch-label">Score Archive</p>
+            <h2>내 기록 아카이브</h2>
+            <p>
+              PLAYER 승인 후 관리자 입력이 완료된 대회 기록과 라운드별 상세 스코어카드를
+              본인에게만 표시합니다.
+            </p>
+          </div>
+
+          {!member ? (
+            <div className="result-privacy-panel">
+              <span className="material-symbols-outlined">login</span>
+              <div>
+                <strong>로그인이 필요합니다</strong>
+                <p>본인 기록 아카이브는 로그인 후 확인할 수 있습니다.</p>
+                <Link href="/login">로그인</Link>
+              </div>
+            </div>
+          ) : member.userType !== "PLAYER" ? (
+            <div className="result-privacy-panel">
+              <span className="material-symbols-outlined">lock_person</span>
+              <div>
+                <strong>선수 등록 승인이 필요합니다</strong>
+                <p>
+                  현재 회원 유형은 {member.userType}입니다. 관리자가 PLAYER로 승인한 뒤
+                  본인의 상세 스코어카드와 누적 기록을 확인할 수 있습니다.
+                </p>
+              </div>
+            </div>
+          ) : scoreArchive.length ? (
+            <div className="score-archive-list">
+              {scoreArchive.map((archive) => (
+                <article className="score-archive-card" key={archive.tournamentId}>
+                  <header>
+                    <div>
+                      <span>{archive.status}</span>
+                      <strong>{archive.tournamentName}</strong>
+                      <p>
+                        {archive.period} · {archive.venue} · {archive.affiliation}
+                      </p>
+                    </div>
+                    <em>
+                      {archive.total}타 / {archive.topar > 0 ? `+${archive.topar}` : archive.topar}
+                    </em>
+                  </header>
+                  <div className="score-round-table">
+                    <div>
+                      <span>R</span>
+                      <span>전반</span>
+                      <span>후반</span>
+                      <span>합계</span>
+                      <span>순위</span>
+                    </div>
+                    {archive.rounds.map((round) => (
+                      <div key={round.id}>
+                        <strong>{round.round}R</strong>
+                        <span>{round.front9}</span>
+                        <span>{round.back9}</span>
+                        <span>{round.total}</span>
+                        <span>{round.rank ? `${round.rank}위` : "-"}</span>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="result-privacy-panel">
+              <span className="material-symbols-outlined">scoreboard</span>
+              <div>
+                <strong>아직 등록된 스코어가 없습니다</strong>
+                <p>관리자가 대회별 스코어를 입력하면 이곳에 내 기록이 누적됩니다.</p>
+              </div>
+            </div>
+          )}
         </section>
       </section>
 

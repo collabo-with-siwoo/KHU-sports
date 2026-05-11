@@ -82,6 +82,12 @@ export function ResultsView({ tournaments }: ResultsViewProps) {
           </div>
         </div>
 
+        {currentTournament && (
+          <div className="results-detail-entry">
+            <Link href={`/results/${currentTournament.id}`}>선택 대회 결과 보기</Link>
+          </div>
+        )}
+
         <p className="results-note">
           공개 결과는 순위, 선수명, 총타수까지만 제공합니다. 상세 스코어카드는 로그인 후
           본인 기록에서만 확인할 수 있습니다.

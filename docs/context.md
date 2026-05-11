@@ -23,9 +23,9 @@
 - M1 local foundation now validates login/signup/reset forms in the browser for GitHub Pages static preview and dynamically renders active agreement seed data.
 - Actual Supabase Auth, username-to-email lookup, and User/UserAgreement persistence remain blocked on external Supabase project configuration.
 - GitHub Pages workflow added at `.github/workflows/deploy-github-pages.yml`.
-- Custom domain file added at `public/CNAME` with `khu-sports.com`.
+- Custom-domain setup has been paused; the official review URL is `https://khu-sports.vercel.app/` until formal deployment.
 - Deployment instructions added in `docs/deployment.md`.
-- DNS check on 2026-05-10 returned no A records for `khu-sports.com`; Cloudflare DNS still needs GitHub Pages records.
+- Earlier GitHub Pages custom-domain DNS work is no longer the active deployment path.
 - Adjusted hero heading styles so desktop Korean titles remain on one line.
 - New branch: `feat/stitch-next-ui`.
 - Integrated the Stitch "Majestic Green" visual direction into the actual Next.js pages instead of relying on the root static `index.html`.
@@ -61,12 +61,26 @@
 - Added protected `/admin/tournaments` and `/admin/scores` M4 screens.
 - Added tournament creation and manual round-score upsert Server Actions guarded by admin permissions.
 - `/results` now reads Prisma tournament/score rows with seed fallback and no longer exposes public hole-by-hole scorecards.
+- 2026-05-11 M4 readiness review: do not branch directly from current `origin/develop` because it is behind `origin/main`. Sync `develop` to the latest `main` foundation and recover/merge the uncommitted M3 RBAC work before starting admin-write M4 work.
+- New branch: `feature/results-scorecard-archive`, created from current `main` for the new results direction. No app code has been changed on this branch yet.
+- `feature/results-scorecard-archive` has been fast-forwarded with `git pull origin main` to `31611e9` (`merge: admin RBAC and score foundation`).
+- Added `/admin/admins` for admin profile/permission management and `/admin/members` for GENERAL/PLAYER approval.
+- `/mypage` now shows a logged-in PLAYER's personal score archive from Prisma `Player`/`Score` rows.
+- Results IA policy changed: `/results` becomes the tournament index, `/results/[tournamentId]` becomes the tabbed Full Leaderboard + public Scorecard detail page. Public Scorecard exposes competition fields only and excludes all private contact/admin fields. Detailed design is in `docs/results-ia.md`.
+- Results API/query design was added in `docs/results-api-design.md`. It separates public leaderboard/scorecard DTOs from My Page DTOs, requires `ADMIN_CONFIRMED` score rows for public reads, and defines self-only My Page access through `session.user.id`.
+- `/results/[tournamentId]` now implements the Full Leaderboard tab with URL query-param filters, pagination, desktop table, mobile cards, and Scorecard tab/playerId navigation state.
+- `/results/[tournamentId]` now implements the Scorecard tab with URL query-param search, search results, direct `playerId` scorecard loading, round cards, and optional hole-score table rendering when `scoreData` contains hole scores.
+- `/mypage/scores` and `/mypage/scores/[tournamentId]` now implement the logged-in PLAYER personal score archive and detail views. Ownership is enforced through `Player.userId`; non-owned tournament detail access uses a 403 forbidden interrupt.
+- `/mypage/scores/[tournamentId]/input/round/[round]` now lets PLAYER users save drafts and submit their own round scores. Public results ignore `DRAFT`, `SUBMITTED`, and `ADMIN_REJECTED`; `/admin/scores` confirms/rejects submissions and confirmed rows drive leaderboard/scorecard publication.
+- Full Leaderboard, public Scorecard, and `/admin/tournaments/[tournamentId]/scores` now share advanced server-side search/filter/sort semantics for player name, school, category, gender, group number, rank range, final-day qualification, rank/name/school/1R/36-hole sorting, and URL-persisted pagination.
+- `/admin/tournaments/[tournamentId]/scores` now provides XLSX downloads for public leaderboard, admin score status, confirmed scorecards, and restricted personal-info operations exports. Personal-info exports require `SUPER` or `privacy.export`, require a reason, and write `ExportLog`.
+- M4 QA coverage now includes Vitest tests for Full Leaderboard, public Scorecard, My Page Score ownership/privacy, and Admin Export authorization/privacy/logging. Manual QA checklist lives in `docs/qa-results-score-features.md`.
 
 ## Remaining M0 External Tasks
 
 - Create Cloudflare R2 public/private buckets.
 - Configure Resend sending domain.
-- Connect/verify production domain DNS in Vercel.
+- Keep the official production domain unconnected until the final deployment decision; use `https://khu-sports.vercel.app/` for review.
 - Create/verify the Supabase Auth user for `INITIAL_SUPER_ADMIN_EMAIL` so the seeded admin profile can log in.
 
 ## Verification
@@ -81,8 +95,7 @@
 - `http://localhost:3000/signup`: 200
 - `http://localhost:3000/terms`: 200
 - `http://localhost:3000/reset-password`: 200
-- `GITHUB_PAGES=true npm run build:pages`: passed, generated `out/` with `CNAME`
-- `Resolve-DnsName khu-sports.com -Type A`: no A records returned yet
+- `GITHUB_PAGES=true npm run build:pages`: historical static-export check passed; Vercel is now the active review runtime.
 - 2026-05-10 Stitch integration verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm run build`, and `GITHUB_PAGES=true npm run build:pages` passed.
 - Local checks returned expected Korean content for `/`, `/admin`, and `/results`.
 - Playwright screenshot checks passed for desktop/mobile home and desktop admin after title wrapping adjustments.
@@ -101,3 +114,24 @@
 - 2026-05-11 M3/M4 foundation verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, and `npm run build` passed.
 - 2026-05-11 M3 seed verification: `npm run db:seed` created 1 active `SUPER` `AdminUser`; current tournament and score counts are 0.
 - 2026-05-11 local route checks: `http://127.0.0.1:3000/results` returned 200 and unauthenticated `/admin/notices` returned a 307 redirect to `/admin?next=%2Fadmin%2Fnotices`.
+- 2026-05-11 M4 readiness verification: after `npm ci`, `npm run typecheck` and `npm run lint` passed. `npm run prisma:validate` needs local `DATABASE_URL`/`DIRECT_URL`; schema validation passed with temporary dummy URLs.
+- 2026-05-11 post-pull verification on `feature/results-scorecard-archive`: `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, and `npm run build` passed.
+- 2026-05-11 M3/M4 expansion verification: `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, and `npm run build` passed.
+- 2026-05-11 browser checks: `/mypage` renders the score archive section while logged out; unauthenticated `/admin/admins` and `/admin/members` redirect to `/admin?next=...`.
+- 2026-05-11 results IA documentation update: no code verification needed; documentation-only PRD/spec update.
+- 2026-05-11 results API query design update: no code verification needed; documentation-only API/DB query design.
+- 2026-05-11 `/results/[tournamentId]` Full Leaderboard implementation: `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, and `npm run build` passed.
+- 2026-05-11 browser checks: `/results/seed-2026` renders Full Leaderboard on desktop and mobile; name search updates the URL to `?tab=leaderboard&name=...`; Scorecard buttons navigate to `?tab=scorecard&playerId=...`.
+- 2026-05-11 `/results/[tournamentId]` Scorecard implementation: `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, and `npm run build` passed.
+- 2026-05-11 browser checks: `/results/seed-2026?tab=scorecard` renders the prompt and search form; player-name search updates URL params and shows a result list; selecting a player and direct `?tab=scorecard&playerId=seed-2026-1` both render the public scorecard detail.
+- 2026-05-11 My Page personal score implementation: `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, and `npm run build` passed.
+- 2026-05-11 browser checks: unauthenticated `/mypage/scores` redirects to `/login?next=%2Fmypage%2Fscores`; unauthenticated `/mypage/scores/seed-2026` redirects to `/login?next=%2Fmypage%2Fscores%2Fseed-2026`.
+- 2026-05-11 score input/result integration verification: `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, and `npm run build` passed.
+- 2026-05-11 browser checks: `/results/seed-2026` and direct public Scorecard URL render; unauthenticated `/admin/scores` redirects to `/admin?next=%2Fadmin%2Fscores`; unauthenticated `/mypage/scores/seed-2026/input/round/1` redirects to login with the expected `next` query.
+- 2026-05-11 advanced result search verification: `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, and `npm run build` passed.
+- 2026-05-11 browser checks: Full Leaderboard advanced query params persist in URL and render; Scorecard search query renders; unauthenticated `/admin/tournaments/seed-2026/scores` redirects to `/admin?next=%2Fadmin%2Ftournaments%2Fseed-2026%2Fscores`.
+- 2026-05-11 admin score export verification: `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, `npm run build`, and `npm audit --omit=dev` passed.
+- 2026-05-11 browser checks: unauthenticated `/admin/tournaments/{tournamentId}/scores` and `/admin/tournaments/{tournamentId}/exports/private?reason=test` redirect to `/admin?next=...`.
+- 2026-05-11 M4 QA test verification: `npm test` passed with 3 test files and 14 tests. `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, `npm audit --omit=dev`, and `npm run build` passed.
+- 2026-05-11 pre-merge deployment cleanup: removed the custom-domain marker and set the review URL to `https://khu-sports.vercel.app/`.
+- 2026-05-11 pre-merge verification: `npm test`, `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, `npm audit --omit=dev`, and `npm run build` passed.
