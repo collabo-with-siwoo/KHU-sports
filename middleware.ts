@@ -2,9 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import {
   APP_SESSION_COOKIE_NAME,
-  getAppSessionCookieOptions,
-  getAppSessionStartedAt,
-  isAppSessionExpired
+  getAppSessionCookieOptions
 } from "@/lib/auth/session";
 
 export async function middleware(request: NextRequest) {
@@ -34,27 +32,15 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const sessionCookieOptions = getAppSessionCookieOptions();
-  const appSessionStartedAt = getAppSessionStartedAt(
-    request.cookies.get(APP_SESSION_COOKIE_NAME)?.value
-  );
+  const hasAppSessionCookie = Boolean(request.cookies.get(APP_SESSION_COOKIE_NAME)?.value);
 
-  if (user && appSessionStartedAt && isAppSessionExpired(appSessionStartedAt)) {
-    await supabase.auth.signOut();
-    response.cookies.set(APP_SESSION_COOKIE_NAME, "", {
-      ...sessionCookieOptions,
-      maxAge: 0
-    });
-
-    return response;
-  }
-
-  if (user && !appSessionStartedAt) {
+  if (user && !hasAppSessionCookie) {
     const startedAt = String(Date.now());
     request.cookies.set(APP_SESSION_COOKIE_NAME, startedAt);
     response.cookies.set(APP_SESSION_COOKIE_NAME, startedAt, sessionCookieOptions);
   }
 
-  if (!user && appSessionStartedAt) {
+  if (!user && hasAppSessionCookie) {
     response.cookies.set(APP_SESSION_COOKIE_NAME, "", {
       ...sessionCookieOptions,
       maxAge: 0
