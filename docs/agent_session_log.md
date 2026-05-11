@@ -446,3 +446,4 @@
 - Status: Preparing the branch for verification, commit, and push.
 - Deployment decision: use `https://khu-sports.vercel.app/` for review until the official domain is connected later.
 - Verification: `npm test`, `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, `npm audit --omit=dev`, and `npm run build` passed.
+- Result: Committed M4 results/score management work and pushed `feature/results-scorecard-archive` to origin. Current branch is 1 commit ahead of `origin/main`, with `origin/main` confirmed as an ancestor.
