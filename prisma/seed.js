@@ -3,6 +3,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const systemAuthorId = "00000000-0000-0000-0000-000000000001";
+const initialSuperAdminEmail = process.env.INITIAL_SUPER_ADMIN_EMAIL?.toLowerCase();
 
 const agreements = [
   {
@@ -82,6 +83,36 @@ async function main() {
         content: agreement.content,
         effectiveAt: new Date(`${agreement.effectiveAt}T00:00:00.000Z`),
         createdBy: systemAuthorId
+      }
+    });
+  }
+
+  if (initialSuperAdminEmail) {
+    await prisma.adminUser.upsert({
+      where: { email: initialSuperAdminEmail },
+      update: {
+        role: "SUPER",
+        status: "ACTIVE",
+        permissions: {
+          notices: { read: true, write: true },
+          members: { read: true, write: true },
+          scores: { read: true, write: true },
+          tournaments: { read: true, write: true },
+          admins: { read: true, write: true }
+        }
+      },
+      create: {
+        email: initialSuperAdminEmail,
+        name: "초기 최고 관리자",
+        role: "SUPER",
+        status: "ACTIVE",
+        permissions: {
+          notices: { read: true, write: true },
+          members: { read: true, write: true },
+          scores: { read: true, write: true },
+          tournaments: { read: true, write: true },
+          admins: { read: true, write: true }
+        }
       }
     });
   }

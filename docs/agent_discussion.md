@@ -78,3 +78,11 @@
 
 - Successful signup should not leave users on the same page with an ambiguous status message.
 - The app redirects to login and opens a modal that explicitly tells users to verify the email address they entered before attempting normal login.
+
+## 2026-05-11 08:33 KST - M3 verification and M4 direction
+
+- M3 was not actually complete at the start of this branch. The schema had `AdminUser`, but admin routes did not check Supabase sessions or menu permissions.
+- The minimum M3 completion bar is now: Supabase Auth session, active `AdminUser` profile, `SUPER` bypass, and `MEMBER` permission JSON checks before every admin subpage.
+- `INITIAL_SUPER_ADMIN_EMAIL` seeds the local admin profile, but a matching Supabase Auth user must exist because login is still performed through Supabase Auth.
+- M4 public results must stay privacy-safe. The public page can show leaderboard and round totals, but hole-by-hole scorecards remain limited to the logged-in player or admin.
+- M4 starts with manual score entry for existing members. Excel upload, Tiptap notice persistence, and R2 attachments remain separate follow-up slices.

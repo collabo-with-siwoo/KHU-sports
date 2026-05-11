@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { requireAdminPermission } from "@/lib/admin/auth";
 import { listAdminNotices } from "@/lib/notices";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function AdminNoticesPage() {
+  await requireAdminPermission("notices", "read", "/admin/notices");
   const notices = await listAdminNotices();
 
   return (
@@ -24,7 +26,7 @@ export default async function AdminNoticesPage() {
             <h1>공지사항 관리</h1>
             <p>
               Supabase 공지 데이터를 기준으로 공개 상태와 첨부 파일을 관리하는 화면입니다.
-              저장 액션은 관리자 인증/RBAC가 붙는 M3에서 활성화합니다.
+              저장 액션은 Tiptap/R2 업로드가 붙는 다음 단계에서 활성화합니다.
             </p>
           </div>
           <Link className="admin-primary-link" href="/admin/notices/new">

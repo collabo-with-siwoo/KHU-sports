@@ -4234,6 +4234,13 @@ p {
   font-weight: 800;
 }
 
+.admin-notice-head.tournament-grid,
+.admin-notice-row.tournament-grid,
+.admin-notice-head.score-grid,
+.admin-notice-row.score-grid {
+  grid-template-columns: 0.8fr minmax(0, 1.8fr) 1.2fr 0.8fr;
+}
+
 .admin-notice-form {
   display: grid;
   gap: 18px;
@@ -4266,6 +4273,82 @@ p {
   color: var(--muted);
   font-weight: 900;
   min-height: 52px;
+}
+
+.admin-notice-form button:not(:disabled) {
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+}
+
+.admin-notice-form button:not(:disabled):hover {
+  background: var(--primary-dark);
+}
+
+.admin-dashboard-hero {
+  align-items: flex-start;
+  background: linear-gradient(135deg, rgba(8, 55, 42, 0.96), rgba(17, 78, 57, 0.9));
+  border-radius: 0 0 28px 28px;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  min-height: 360px;
+  padding: 42px min(7vw, 96px);
+}
+
+.admin-dashboard-hero h1 {
+  font-size: clamp(42px, 7vw, 82px);
+  line-height: 1.02;
+  margin: 28px 0 18px;
+  max-width: 780px;
+}
+
+.admin-dashboard-hero p:not(.eyebrow, .form-message) {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 18px;
+  line-height: 1.8;
+  max-width: 660px;
+}
+
+.result-privacy-panel {
+  align-items: flex-start;
+  background: #ffffff;
+  border: 1px solid #e1e8e5;
+  border-radius: 8px;
+  box-shadow: 0 16px 40px rgba(12, 37, 26, 0.08);
+  display: flex;
+  gap: 18px;
+  padding: 28px;
+}
+
+.result-privacy-panel > span {
+  align-items: center;
+  background: #e6f2ec;
+  border-radius: 999px;
+  color: #0f6b4c;
+  display: inline-flex;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
+.result-privacy-panel strong {
+  color: #113f31;
+  display: block;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.result-privacy-panel p {
+  color: #587166;
+  line-height: 1.7;
+  margin: 0 0 18px;
+}
+
+.result-privacy-panel a {
+  color: #0f6b4c;
+  font-weight: 900;
+  text-decoration: none;
 }
 
 @media (max-width: 760px) {
