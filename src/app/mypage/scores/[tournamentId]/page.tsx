@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getCurrentMember } from "@/lib/members";
 import {
+  formatToPar,
   getMyTournamentScoreDetail,
   type MyScoreStatus,
   type MyTournamentScoreDetail
@@ -60,6 +61,39 @@ function getRoundInputLabel(status: MyScoreStatus) {
   }
 }
 
+function HoleScoreTable({ holes }: { holes: NonNullable<MyTournamentScoreDetail["rounds"][number]["holeScores"]> }) {
+  return (
+    <div className="scorecard-hole-table" aria-label="홀별 스코어">
+      <div>
+        <span>Hole</span>
+        {holes.map((hole) => (
+          <span key={`hole-${hole.hole}`}>{hole.hole}</span>
+        ))}
+      </div>
+      <div>
+        <span>Par</span>
+        {holes.map((hole) => (
+          <span key={`par-${hole.hole}`}>{hole.par}</span>
+        ))}
+      </div>
+      <div>
+        <span>Score</span>
+        {holes.map((hole) => (
+          <strong className={hole.scoreName ?? undefined} key={`score-${hole.hole}`}>
+            {hole.score ?? "-"}
+          </strong>
+        ))}
+      </div>
+      <div>
+        <span>+/-</span>
+        {holes.map((hole) => (
+          <span key={`topar-${hole.hole}`}>{formatToPar(hole.toPar)}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function PlayerRequiredPanel({ userType }: { userType: string }) {
   return (
     <div className="result-privacy-panel">
@@ -108,7 +142,9 @@ function ScoreDetail({ detail, showReinputPanel }: { detail: MyTournamentScoreDe
           </div>
           <div>
             <dt>36홀 합계</dt>
-            <dd>{formatScore(detail.total36)}</dd>
+            <dd>
+              {formatScore(detail.total36)} ({formatToPar(detail.totalToPar)})
+            </dd>
           </div>
           <div>
             <dt>관리자 확정</dt>
@@ -196,9 +232,16 @@ function ScoreDetail({ detail, showReinputPanel }: { detail: MyTournamentScoreDe
                 </div>
                 <div>
                   <dt>roundTotal</dt>
-                  <dd>{formatScore(round.roundTotal)}</dd>
+                  <dd>
+                    {formatScore(round.roundTotal)} ({formatToPar(round.toPar)})
+                  </dd>
+                </div>
+                <div>
+                  <dt>Par</dt>
+                  <dd>{formatScore(round.par)}</dd>
                 </div>
               </dl>
+              {round.holeScores?.length ? <HoleScoreTable holes={round.holeScores} /> : null}
               <div className="my-score-round-footer">
                 <span className={statusClass(round.status)}>{round.statusLabel}</span>
                 <span>{round.adminConfirmed ? "관리자 확정" : "관리자 미확정"}</span>

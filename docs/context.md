@@ -79,6 +79,7 @@
 - My Page score input discovery was improved: PLAYER users now see ongoing tournament score-input CTAs on `/mypage` and `/mypage/scores`, round totals are auto-calculated, and submitted/confirmed rounds are locked against player edits.
 - Superpowers is installed as a repo-local Codex plugin at `plugins/superpowers`, with marketplace metadata in `.agents/plugins/marketplace.json`. `AGENTS.md` and `CLAUDE.md` were rewritten as clean Korean VS Code/Codex-friendly agent instructions.
 - Player login persistence was hardened with an app-owned HTTP-only session-start cookie and login `next` redirects so score-input deep links return to the intended page after authentication.
+- Golf scoring was expanded to tournament-level 18-hole par setup, player/admin hole-by-hole score entry, automatic front9/back9/total aggregation, and par-relative result display.
 
 ## Remaining M0 External Tasks
 
@@ -143,3 +144,5 @@
 - 2026-05-11 player score input discovery verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test`, and `npm run build` passed. Browser checks confirmed unauthenticated `/mypage/scores` redirects to login and `/mypage` renders on the production start server.
 - 2026-05-11 agent instruction cleanup verification: local plugin manifest, marketplace JSON, and VS Code MCP JSON all parsed successfully; 14 Superpowers skills are present.
 - 2026-05-11 player session persistence hardening verification: `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` passed.
+- 2026-05-11 hole-by-hole golf scoring verification: `npm run db:push`, `npm run typecheck`, `npm run prisma:validate`, `npm test`, `npm run lint`, and `npm run build` passed after adding `Tournament.courseData`.
+- 2026-05-11 route smoke checks on local production server: `/results` returned 200, `/admin/tournaments` returned 307 unauthenticated redirect, and `/mypage/scores` returned 307 unauthenticated redirect.

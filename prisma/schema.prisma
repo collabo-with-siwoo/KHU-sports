@@ -175,6 +175,7 @@ model Tournament {
   endDate   DateTime @db.Date
   venue     String?
   rounds    Int      @default(1)
+  courseData Json?
   scores    Score[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

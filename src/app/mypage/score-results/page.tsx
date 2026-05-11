@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getCurrentMember } from "@/lib/members";
 import {
+  formatToPar,
   getMyScoreHistory,
   type MyScoreHistory,
   type MyScoreStatus
@@ -95,7 +96,9 @@ function ScoreHistoryCard({ item }: { item: MyScoreHistory }) {
         </div>
         <div>
           <dt>36홀 합계</dt>
-          <dd>{formatScore(item.total36)}</dd>
+          <dd>
+            {formatScore(item.total36)} ({formatToPar(item.totalToPar)})
+          </dd>
         </div>
       </dl>
 

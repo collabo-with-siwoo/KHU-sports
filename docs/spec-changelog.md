@@ -225,3 +225,11 @@
 - Limited player self-input to the tournament date window and added input-period messaging.
 - Changed the input form to auto-calculate `roundTotal` from `front9 + back9` while keeping server-side sum validation.
 - Split `/mypage/scores` into a dedicated score-input hub and added `/mypage/score-results` as the separate personal score result list page.
+
+## 2026-05-11 - Hole-By-Hole Golf Scoring
+
+- Added `Tournament.courseData` to store per-tournament 18-hole par setup.
+- Added shared golf scoring helpers for hole pars, hole scores, front/back totals, round total, and par-relative formatting.
+- Changed admin tournament creation and update flows so admins can configure each hole as par 3/4/5/6.
+- Changed admin score entry and player score self-entry from front9/back9 totals to 18 gross hole scores.
+- Public leaderboard, public Scorecard, My Page results, and admin score views now display aggregate scores relative to par as `E`, `+1`, or `-1`.

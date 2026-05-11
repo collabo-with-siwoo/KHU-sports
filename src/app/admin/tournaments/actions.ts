@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdminPermission } from "@/lib/admin/auth";
+import { buildCourseData, parseHoleParsFromFormData } from "@/lib/golf-scoring";
 import { prisma } from "@/lib/prisma";
 
 export type TournamentActionState = {
@@ -57,7 +58,8 @@ export async function createTournamentAction(
       startDate: new Date(`${parsed.data.startDate}T00:00:00.000Z`),
       endDate: new Date(`${parsed.data.endDate}T00:00:00.000Z`),
       venue: parsed.data.venue || null,
-      rounds: parsed.data.rounds
+      rounds: parsed.data.rounds,
+      courseData: buildCourseData(parseHoleParsFromFormData(formData))
     }
   });
 
@@ -70,3 +72,26 @@ export async function createTournamentAction(
   };
 }
 
+export async function updateTournamentCourseAction(formData: FormData) {
+  await requireAdminPermission("tournaments", "write", "/admin/tournaments");
+
+  const parsed = z.string().uuid().safeParse(String(formData.get("tournamentId") ?? ""));
+
+  if (!parsed.success) {
+    return;
+  }
+
+  await prisma.tournament.update({
+    where: { id: parsed.data },
+    data: {
+      courseData: buildCourseData(parseHoleParsFromFormData(formData))
+    }
+  });
+
+  revalidatePath("/admin/tournaments");
+  revalidatePath("/admin/scores");
+  revalidatePath("/results");
+  revalidatePath(`/results/${parsed.data}`);
+  revalidatePath("/mypage/scores");
+  revalidatePath("/mypage/score-results");
+}

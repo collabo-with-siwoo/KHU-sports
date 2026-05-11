@@ -147,7 +147,9 @@ SESSION_MAX_AGE_HOURS
 - My Page score detail fields: tournament name, venue, period, player name, school, participation type, gender, group/start time, rank, front9/back9/roundTotal by round, 36-hole total, playerMemo, submission status, and admin confirmation state.
 - My Page status labels support `아직 스코어 미입력`, `임시저장`, `제출 완료`, `관리자 확정`, and `반려됨`. Current admin-entered `Score` rows default to `관리자 확정`; future `scoreData.status`, `scoreData.submissionStatus`, `scoreData.adminConfirmed`, and `scoreData.playerMemo` values override that compatibility default.
 - My Page score DTOs may expose `playerMemo` from score JSON to the owner only. They do not expose admin memo or review logs.
-- Current manual score entry stores golf score data as `{ front9, back9, total, par }`. Excel upload and hole-by-hole scorecards remain future M4/M5 slices.
+- Current manual/player score entry stores golf score data as hole-level JSON: `{ holePars, holeScores, front9, back9, total, frontPar, backPar, par, toPar }`. `holeScores` contains one item per hole with hole number, par, gross score, par-relative value, and score name such as eagle/birdie/bogey.
+- `/admin/tournaments` stores per-tournament course setup in `Tournament.courseData`, currently `{ holePars, frontPar, backPar, totalPar }`, and allows admins to update each hole's par value.
+- Leaderboard, public Scorecard, My Page results, and admin score views display aggregate score relative to par as `E`, `+1`, or `-1` style values, derived from the confirmed/player score JSON.
 - Detailed IA and data-flow notes live in `docs/results-ia.md`.
 - Full Leaderboard and public Scorecard query/API design lives in `docs/results-api-design.md`.
 - Public leaderboard reads must use confirmed score data only: `score_submissions.status = ADMIN_CONFIRMED`.
@@ -162,7 +164,7 @@ SESSION_MAX_AGE_HOURS
 - `/mypage` and `/mypage/scores` surface primary score-input CTAs for currently ongoing golf tournaments so approved PLAYER users can start from My Page without knowing the deep input URL.
 - Player input actions are available for `NOT_STARTED`, `DRAFT`, and `ADMIN_REJECTED` rounds only. `SUBMITTED` and `ADMIN_CONFIRMED` rounds are read-only to players.
 - Score input is limited to the tournament date window using `Tournament.startDate` through `Tournament.endDate` until a dedicated score-input window model is introduced.
-- The score input form automatically calculates `roundTotal` from `front9 + back9`; the server action still validates the same sum before writing.
+- The score input form collects 18 hole scores. The server calculates `front9`, `back9`, `roundTotal`, round par, and `toPar` from the tournament hole-par setup before writing.
 - Score submission states are normalized to `DRAFT`, `SUBMITTED`, `ADMIN_CONFIRMED`, and `ADMIN_REJECTED`. My Page renders the required user-facing status messages for every state.
 - Public `/results`, Full Leaderboard, and public Scorecard filter runtime rows through the confirmed-score predicate; only `ADMIN_CONFIRMED` compatible score data is exposed publicly.
 - `/admin/scores` can confirm or reject existing score rows. Confirmation writes `scoreData.status = ADMIN_CONFIRMED`, clears rejection fields, recalculates tournament ranks from confirmed scores, and revalidates result/My Page surfaces. Rejection writes `scoreData.status = ADMIN_REJECTED`, clears public rank, and stores `scoreData.rejectionReason`/`scoreData.adminMemo` for owner/admin views.

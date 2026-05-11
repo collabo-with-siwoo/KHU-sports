@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { buildRoundSummary, parseHoleScoresFromFormData } from "@/lib/golf-scoring";
 import { getCurrentMember } from "@/lib/members";
 import { prisma } from "@/lib/prisma";
 import { getScoreSubmissionStatus, isPlayerEditableScoreStatus, isTournamentScoreInputOpen } from "@/lib/results";
@@ -12,20 +13,12 @@ export type PlayerScoreInputState = {
   message: string;
 };
 
-const inputSchema = z
-  .object({
-    tournamentId: z.string().uuid("대회 정보가 올바르지 않습니다."),
-    round: z.coerce.number().int().min(1).max(4),
-    front9: z.coerce.number().int().min(0).max(90),
-    back9: z.coerce.number().int().min(0).max(90),
-    total: z.coerce.number().int().min(0).max(180),
-    playerMemo: z.string().trim().max(500, "메모는 500자 이내로 입력해 주세요.").optional(),
-    intent: z.enum(["draft", "submit"])
-  })
-  .refine((value) => value.front9 + value.back9 === value.total, {
-    message: "총타수는 front9와 back9의 합계와 같아야 합니다.",
-    path: ["total"]
-  });
+const inputSchema = z.object({
+  tournamentId: z.string().uuid("대회 정보가 올바르지 않습니다."),
+  round: z.coerce.number().int().min(1).max(4),
+  playerMemo: z.string().trim().max(500, "메모는 500자 이내로 입력해주세요.").optional(),
+  intent: z.enum(["draft", "submit"])
+});
 
 function scoreDataObject(scoreData: Prisma.JsonValue): Prisma.JsonObject {
   if (scoreData && typeof scoreData === "object" && !Array.isArray(scoreData)) {
@@ -38,19 +31,25 @@ function scoreDataObject(scoreData: Prisma.JsonValue): Prisma.JsonObject {
 function buildPlayerScoreData(
   existing: Prisma.JsonValue,
   values: {
-    front9: number;
-    back9: number;
-    total: number;
+    holeScores: number[];
+    holePars: unknown;
     playerMemo?: string;
     status: "DRAFT" | "SUBMITTED";
   }
 ): Prisma.JsonObject {
+  const summary = buildRoundSummary(values.holeScores, values.holePars);
+
   return {
     ...scoreDataObject(existing),
-    front9: values.front9,
-    back9: values.back9,
-    total: values.total,
-    par: 72,
+    holePars: summary.holeScores.map((hole) => hole.par),
+    holeScores: summary.holeScores,
+    front9: summary.front9,
+    back9: summary.back9,
+    total: summary.total,
+    frontPar: summary.frontPar,
+    backPar: summary.backPar,
+    par: summary.par,
+    toPar: summary.toPar,
     playerMemo: values.playerMemo?.trim() || null,
     status: values.status,
     adminConfirmed: false,
@@ -91,9 +90,6 @@ export async function savePlayerScoreAction(
   const parsed = inputSchema.safeParse({
     tournamentId: String(formData.get("tournamentId") ?? ""),
     round: String(formData.get("round") ?? "1"),
-    front9: String(formData.get("front9") ?? "0"),
-    back9: String(formData.get("back9") ?? "0"),
-    total: String(formData.get("total") ?? "0"),
     playerMemo: String(formData.get("playerMemo") ?? ""),
     intent: String(formData.get("intent") ?? "draft")
   });
@@ -101,7 +97,16 @@ export async function savePlayerScoreAction(
   if (!parsed.success) {
     return {
       status: "error",
-      message: parsed.error.issues[0]?.message ?? "스코어 정보를 확인해 주세요."
+      message: parsed.error.issues[0]?.message ?? "스코어 정보를 확인해주세요."
+    };
+  }
+
+  const holeScores = parseHoleScoresFromFormData(formData);
+
+  if (!holeScores) {
+    return {
+      status: "error",
+      message: "1번부터 18번 홀까지 타수를 모두 입력해주세요."
     };
   }
 
@@ -115,7 +120,8 @@ export async function savePlayerScoreAction(
       sportId: true,
       startDate: true,
       endDate: true,
-      rounds: true
+      rounds: true,
+      courseData: true
     }
   });
 
@@ -172,15 +178,14 @@ export async function savePlayerScoreAction(
   if (existing && !isPlayerEditableScoreStatus(getScoreSubmissionStatus(existing.scoreData))) {
     return {
       status: "error",
-      message: "제출 완료 또는 관리자 확정된 스코어는 선수 페이지에서 수정할 수 없습니다."
+      message: "제출 완료 또는 관리자 확정 스코어는 선수 페이지에서 수정할 수 없습니다."
     };
   }
 
   const nextStatus = parsed.data.intent === "submit" ? "SUBMITTED" : "DRAFT";
   const scoreData = buildPlayerScoreData(existing?.scoreData ?? {}, {
-    front9: parsed.data.front9,
-    back9: parsed.data.back9,
-    total: parsed.data.total,
+    holeScores,
+    holePars: tournament.courseData,
     playerMemo: parsed.data.playerMemo,
     status: nextStatus
   });
@@ -212,7 +217,7 @@ export async function savePlayerScoreAction(
     status: "success",
     message:
       nextStatus === "SUBMITTED"
-        ? "제출 완료되었습니다. 관리자 확인 대기 중입니다."
-        : "임시저장 상태입니다. 제출을 완료해 주세요."
+        ? "제출 완료했습니다. 관리자 확인 대기 중입니다."
+        : "임시저장했습니다. 제출 완료까지 진행해주세요."
   };
 }

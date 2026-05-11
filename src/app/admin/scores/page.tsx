@@ -2,7 +2,7 @@ import Link from "next/link";
 import { confirmScoreAction, rejectScoreAction } from "./actions";
 import { ScoreForm } from "./score-form";
 import { requireAdminPermission } from "@/lib/admin/auth";
-import { listAdminScoreRows, listAdminTournaments } from "@/lib/results";
+import { formatToPar, listAdminScoreRows, listAdminTournaments } from "@/lib/results";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +51,7 @@ export default async function AdminScoresPage() {
               </strong>
               <time>{score.round}R</time>
               <em>
-                {score.total}타{score.rank ? ` · ${score.rank}위` : ""}
+                {score.total}타 ({formatToPar(score.toPar)}){score.rank ? ` · ${score.rank}위` : ""}
               </em>
               <div className="admin-score-review">
                 <span className={`score-status-badge ${score.status.toLowerCase().replaceAll("_", "-")}`}>

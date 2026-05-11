@@ -4,6 +4,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { getCurrentMember } from "@/lib/members";
 import {
+  formatToPar,
   getPublicPlayerScorecard,
   getTournamentLeaderboard,
   searchTournamentPlayers,
@@ -219,7 +220,9 @@ function ScorecardSearchResults({
                 <td>{formatGender(row.gender)}</td>
                 <td className="num">{formatScore(row.round1Total)}</td>
                 <td className="num">{formatScore(row.round2Total)}</td>
-                <td className="num total">{formatScore(row.total36)}</td>
+                <td className="num total">
+                  {formatScore(row.total36)} ({formatToPar(row.totalToPar)})
+                </td>
                 <td>{row.rank ?? "-"}</td>
                 <td>{row.groupNo ?? "-"}</td>
                 <td>
@@ -258,7 +261,9 @@ function ScorecardSearchResults({
               </div>
               <div>
                 <dt>총타수</dt>
-                <dd>{formatScore(row.total36)}</dd>
+                <dd>
+                  {formatScore(row.total36)} ({formatToPar(row.totalToPar)})
+                </dd>
               </div>
               <div>
                 <dt>조</dt>
@@ -308,7 +313,15 @@ function HoleScoreTable({ holes }: { holes: NonNullable<PublicScorecard["rounds"
       <div>
         <span>Score</span>
         {holes.map((hole) => (
-          <strong key={`score-${hole.hole}`}>{hole.score ?? "-"}</strong>
+          <strong className={hole.scoreName ?? undefined} key={`score-${hole.hole}`}>
+            {hole.score ?? "-"}
+          </strong>
+        ))}
+      </div>
+      <div>
+        <span>+/-</span>
+        {holes.map((hole) => (
+          <span key={`topar-${hole.hole}`}>{formatToPar(hole.toPar)}</span>
         ))}
       </div>
     </div>
@@ -337,7 +350,9 @@ function ScorecardDetail({ scorecard }: { scorecard: PublicScorecard }) {
           </div>
           <div>
             <dt>36홀 합계</dt>
-            <dd>{formatScore(scorecard.total36)}</dd>
+            <dd>
+              {formatScore(scorecard.total36)} ({formatToPar(scorecard.totalToPar)})
+            </dd>
           </div>
         </dl>
       </header>
@@ -362,7 +377,9 @@ function ScorecardDetail({ scorecard }: { scorecard: PublicScorecard }) {
               </div>
               <div>
                 <dt>roundTotal</dt>
-                <dd>{formatScore(round.roundTotal)}</dd>
+                <dd>
+                  {formatScore(round.roundTotal)} ({formatToPar(round.toPar)})
+                </dd>
               </div>
             </dl>
             {round.holeScores?.length ? <HoleScoreTable holes={round.holeScores} /> : null}
@@ -471,7 +488,9 @@ export default async function ResultsDetailPage({ params, searchParams }: Result
                           <td>{formatGender(row.gender)}</td>
                           <td className="num">{formatScore(row.round1Total)}</td>
                           <td className="num">{formatScore(row.round2Total)}</td>
-                          <td className="num total">{formatScore(row.total36)}</td>
+                          <td className="num total">
+                            {formatScore(row.total36)} ({formatToPar(row.totalToPar)})
+                          </td>
                           <td>{row.finalRoundEligible ? "진출" : "-"}</td>
                           <td>{row.groupNo ?? "-"}</td>
                           <td>{row.teeTime ?? "-"}</td>
@@ -509,7 +528,9 @@ export default async function ResultsDetailPage({ params, searchParams }: Result
                         </div>
                         <div>
                           <dt>36홀</dt>
-                          <dd>{formatScore(row.total36)}</dd>
+                          <dd>
+                            {formatScore(row.total36)} ({formatToPar(row.totalToPar)})
+                          </dd>
                         </div>
                         <div>
                           <dt>조/출발</dt>

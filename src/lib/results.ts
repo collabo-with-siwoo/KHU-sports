@@ -1,5 +1,12 @@
 import type { Prisma } from "@prisma/client";
+import {
+  DEFAULT_GOLF_HOLE_PARS,
+  buildCourseData,
+  extractHoleScores
+} from "@/lib/golf-scoring";
 import { prisma } from "@/lib/prisma";
+
+export { formatToPar } from "@/lib/golf-scoring";
 
 export type PublicResultRow = {
   rank: string;
@@ -30,6 +37,7 @@ export type PublicLeaderboardRow = {
   round1Total: number | null;
   round2Total: number | null;
   total36: number | null;
+  totalToPar: number | null;
   finalRoundEligible: boolean;
   groupNo: string | null;
   teeTime: string | null;
@@ -77,6 +85,7 @@ export type PublicScorecardSearchRow = {
   round1Total: number | null;
   round2Total: number | null;
   total36: number | null;
+  totalToPar: number | null;
   rank: number | null;
   groupNo: string | null;
   finalRoundEligible: boolean;
@@ -92,8 +101,10 @@ export type PublicScorecardSearchResult = {
 
 export type PublicHoleScore = {
   hole: number;
-  par: number | null;
+  par: number;
   score: number | null;
+  toPar: number | null;
+  scoreName: string | null;
 };
 
 export type PublicScorecardRound = {
@@ -103,6 +114,8 @@ export type PublicScorecardRound = {
   front9: number | null;
   back9: number | null;
   roundTotal: number | null;
+  par: number | null;
+  toPar: number | null;
   holeScores: PublicHoleScore[] | null;
 };
 
@@ -114,6 +127,7 @@ export type PublicScorecard = {
   gender: "MALE" | "FEMALE" | null;
   rounds: PublicScorecardRound[];
   total36: number | null;
+  totalToPar: number | null;
   finalRank: number | null;
 };
 
@@ -145,6 +159,8 @@ export type AdminTournamentRow = {
   endDate: string;
   venue: string;
   rounds: number;
+  holePars: number[];
+  totalPar: number;
   scoreCount: number;
 };
 
@@ -158,6 +174,7 @@ export type AdminScoreRow = {
   front9: number;
   back9: number;
   total: number;
+  toPar: number | null;
   rank: number | null;
   status: MyScoreStatus;
   statusLabel: string;
@@ -189,6 +206,7 @@ export type AdminTournamentScoreRow = {
   round1Total: number | null;
   round2Total: number | null;
   total36: number | null;
+  totalToPar: number | null;
   groupNo: string | null;
   teeTime: string | null;
   finalRoundEligible: boolean;
@@ -231,6 +249,7 @@ export type MyScoreHistory = {
   round1Total: number | null;
   round2Total: number | null;
   total36: number | null;
+  totalToPar: number | null;
   finalRank: number | null;
   playerMemo: string | null;
   rejectionReason: string | null;
@@ -245,6 +264,9 @@ export type MyTournamentScoreRound = {
   front9: number | null;
   back9: number | null;
   roundTotal: number | null;
+  par: number | null;
+  toPar: number | null;
+  holeScores: PublicHoleScore[] | null;
   groupNo: string | null;
   teeTime: string | null;
   playerMemo: string | null;
@@ -271,6 +293,7 @@ export type MyTournamentScoreDetail = {
   finalRank: number | null;
   rounds: MyTournamentScoreRound[];
   total36: number | null;
+  totalToPar: number | null;
   playerMemo: string | null;
   rejectionReason: string | null;
   status: MyScoreStatus;
@@ -292,6 +315,10 @@ export type MyScoreInputContext = {
   front9: number | null;
   back9: number | null;
   roundTotal: number | null;
+  par: number;
+  toPar: number | null;
+  holePars: number[];
+  holeScores: PublicHoleScore[] | null;
   playerMemo: string | null;
   rejectionReason: string | null;
   status: MyScoreStatus;
@@ -396,42 +423,8 @@ function booleanFromScoreData(data: Prisma.JsonValue, key: string) {
   return typeof value === "boolean" ? value : null;
 }
 
-function holeScoresFromScoreData(data: Prisma.JsonValue): PublicHoleScore[] | null {
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
-    return null;
-  }
-
-  const rawScores = data.holeScores ?? data.holes ?? data.hbh;
-
-  if (!Array.isArray(rawScores)) {
-    return null;
-  }
-
-  const holeScores = rawScores
-    .map((item, index) => {
-      if (typeof item === "number") {
-        return {
-          hole: index + 1,
-          par: null,
-          score: item
-        };
-      }
-
-      if (!item || typeof item !== "object" || Array.isArray(item)) {
-        return null;
-      }
-
-      const hole = item as Record<string, Prisma.JsonValue>;
-
-      return {
-        hole: typeof hole.hole === "number" ? hole.hole : index + 1,
-        par: typeof hole.par === "number" ? hole.par : null,
-        score: typeof hole.score === "number" ? hole.score : null
-      };
-    })
-    .filter((item): item is PublicHoleScore => Boolean(item));
-
-  return holeScores.length ? holeScores : null;
+function holeScoresFromScoreData(data: Prisma.JsonValue, fallbackPars: unknown = DEFAULT_GOLF_HOLE_PARS): PublicHoleScore[] | null {
+  return extractHoleScores(data, fallbackPars);
 }
 
 function getRoundTotal(data: Prisma.JsonValue) {
@@ -439,6 +432,22 @@ function getRoundTotal(data: Prisma.JsonValue) {
     numberFromScoreData(data, "total") ??
     (numberFromScoreData(data, "front9") ?? 0) + (numberFromScoreData(data, "back9") ?? 0)
   );
+}
+
+function getRoundPar(data: Prisma.JsonValue, fallbackPars: unknown = DEFAULT_GOLF_HOLE_PARS) {
+  return numberFromScoreData(data, "par") ?? buildCourseData(fallbackPars).totalPar;
+}
+
+function getRoundToPar(data: Prisma.JsonValue, fallbackPars: unknown = DEFAULT_GOLF_HOLE_PARS) {
+  return numberFromScoreData(data, "toPar") ?? getRoundTotal(data) - getRoundPar(data, fallbackPars);
+}
+
+function getTotalToPar(rounds: Array<{ scoreData: Prisma.JsonValue }>, fallbackPars: unknown = DEFAULT_GOLF_HOLE_PARS) {
+  if (!rounds.length) {
+    return null;
+  }
+
+  return rounds.reduce((sum, round) => sum + getRoundToPar(round.scoreData, fallbackPars), 0);
 }
 
 function dateOnly(value: Date) {
@@ -551,6 +560,7 @@ function fallbackLeaderboardResult(
       round1Total,
       round2Total,
       total36,
+      totalToPar: total36 === null ? null : total36 - 144,
       finalRoundEligible: true,
       groupNo: null,
       teeTime: null
@@ -852,6 +862,7 @@ export async function getTournamentLeaderboard(
         startDate: true,
         endDate: true,
         rounds: true,
+        courseData: true,
         scores: {
           select: {
             playerId: true,
@@ -901,6 +912,7 @@ export async function getTournamentLeaderboard(
         finalRank: number | null;
         round1Rank: number | null;
         roundTotals: Record<number, number>;
+        roundToPars: Record<number, number>;
       }
     >();
 
@@ -920,10 +932,12 @@ export async function getTournamentLeaderboard(
         finalRoundEligible: null,
         finalRank: null,
         round1Rank: null,
-        roundTotals: {}
+        roundTotals: {},
+        roundToPars: {}
       };
 
       current.roundTotals[score.round] = getRoundTotal(score.scoreData);
+      current.roundToPars[score.round] = getRoundToPar(score.scoreData, tournament.courseData);
       current.category = current.category ?? getScoreCategory(score.scoreData);
       current.groupNo = current.groupNo ?? getScoreGroupNo(score.scoreData);
       current.teeTime = current.teeTime ?? getScoreTeeTime(score.scoreData);
@@ -949,6 +963,12 @@ export async function getTournamentLeaderboard(
         typeof round1Total === "number" || typeof round2Total === "number"
           ? (round1Total ?? 0) + (round2Total ?? 0)
           : null;
+      const round1ToPar = player.roundToPars[1] ?? null;
+      const round2ToPar = player.roundToPars[2] ?? null;
+      const totalToPar =
+        typeof round1ToPar === "number" || typeof round2ToPar === "number"
+          ? (round1ToPar ?? 0) + (round2ToPar ?? 0)
+          : null;
 
       return {
         rank: player.finalRank ?? player.round1Rank,
@@ -960,6 +980,7 @@ export async function getTournamentLeaderboard(
         round1Total,
         round2Total,
         total36,
+        totalToPar,
         finalRoundEligible: player.finalRoundEligible ?? typeof round2Total === "number",
         groupNo: player.groupNo,
         teeTime: player.teeTime
@@ -1089,6 +1110,7 @@ export async function searchTournamentPlayers(
       round1Total: row.round1Total,
       round2Total: row.round2Total,
       total36: row.total36,
+      totalToPar: row.totalToPar,
       rank: row.rank,
       groupNo: row.groupNo,
       finalRoundEligible: row.finalRoundEligible
@@ -1128,6 +1150,8 @@ function fallbackScorecard(tournamentId: string, tournamentPlayerId: string): Pu
         front9: null,
         back9: null,
         roundTotal: row.round1Total,
+        par: null,
+        toPar: null,
         holeScores: null
       },
       {
@@ -1137,10 +1161,13 @@ function fallbackScorecard(tournamentId: string, tournamentPlayerId: string): Pu
         front9: null,
         back9: null,
         roundTotal: row.round2Total,
+        par: null,
+        toPar: null,
         holeScores: null
       }
     ].filter((round) => typeof round.roundTotal === "number"),
     total36: row.total36,
+    totalToPar: row.totalToPar,
     finalRank: row.rank
   };
 }
@@ -1157,6 +1184,7 @@ export async function getPublicPlayerScorecard(
       },
       select: {
         name: true,
+        courseData: true,
         scores: {
           where: {
             playerId: tournamentPlayerId
@@ -1200,7 +1228,9 @@ export async function getPublicPlayerScorecard(
       front9: numberFromScoreData(score.scoreData, "front9"),
       back9: numberFromScoreData(score.scoreData, "back9"),
       roundTotal: getRoundTotal(score.scoreData),
-      holeScores: holeScoresFromScoreData(score.scoreData)
+      par: getRoundPar(score.scoreData, tournament.courseData),
+      toPar: getRoundToPar(score.scoreData, tournament.courseData),
+      holeScores: holeScoresFromScoreData(score.scoreData, tournament.courseData)
     }));
     const round1Total = rounds.find((round) => round.round === 1)?.roundTotal ?? null;
     const round2Total = rounds.find((round) => round.round === 2)?.roundTotal ?? null;
@@ -1208,6 +1238,7 @@ export async function getPublicPlayerScorecard(
       typeof round1Total === "number" || typeof round2Total === "number"
         ? (round1Total ?? 0) + (round2Total ?? 0)
         : null;
+    const totalToPar = getTotalToPar(publicScores, tournament.courseData);
     const finalScore = [...publicScores].reverse().find((score) => score.round >= 2) ?? firstScore;
 
     return {
@@ -1218,6 +1249,7 @@ export async function getPublicPlayerScorecard(
       gender: firstScore.player.user?.gender ?? null,
       rounds,
       total36,
+      totalToPar,
       finalRank: numberFromScoreData(finalScore.scoreData, "finalRank") ?? finalScore.rank
     };
   } catch {
@@ -1254,6 +1286,7 @@ export async function listPublicTournamentResults(): Promise<PublicTournamentRes
           affiliation: string;
           rank: number | null;
           roundTotals: number[];
+          roundToPars: number[];
         }
       >();
 
@@ -1266,10 +1299,12 @@ export async function listPublicTournamentResults(): Promise<PublicTournamentRes
           name: score.player.name,
           affiliation: score.player.affiliation ?? "-",
           rank: score.rank,
-          roundTotals: []
+          roundTotals: [],
+          roundToPars: []
         };
 
         current.roundTotals[score.round - 1] = getRoundTotal(score.scoreData);
+        current.roundToPars[score.round - 1] = getRoundToPar(score.scoreData, tournament.courseData);
         current.rank = score.rank ?? current.rank;
         grouped.set(score.playerId, current);
       }
@@ -1277,15 +1312,14 @@ export async function listPublicTournamentResults(): Promise<PublicTournamentRes
       const rows = [...grouped.values()]
         .map((player) => {
           const total = player.roundTotals.reduce((sum, value) => sum + (value ?? 0), 0);
-          const playedRounds = player.roundTotals.filter((value) => typeof value === "number").length;
-          const parTotal = 72 * Math.max(playedRounds, 1);
+          const topar = player.roundToPars.reduce((sum, value) => sum + (value ?? 0), 0);
 
           return {
             rank: player.rank ? String(player.rank) : "",
             name: player.name,
             affiliation: player.affiliation,
             total,
-            topar: total - parTotal,
+            topar,
             progress: "F",
             roundTotals: player.roundTotals
           };
@@ -1330,16 +1364,22 @@ export async function listAdminTournaments(): Promise<AdminTournamentRow[]> {
     orderBy: { startDate: "desc" }
   });
 
-  return tournaments.map((tournament) => ({
-    id: tournament.id,
-    name: tournament.name,
-    sportName: tournament.sport.name,
-    startDate: toDateLabel(tournament.startDate),
-    endDate: toDateLabel(tournament.endDate),
-    venue: tournament.venue ?? "-",
-    rounds: tournament.rounds,
-    scoreCount: tournament._count.scores
-  }));
+  return tournaments.map((tournament) => {
+    const course = buildCourseData(tournament.courseData);
+
+    return {
+      id: tournament.id,
+      name: tournament.name,
+      sportName: tournament.sport.name,
+      startDate: toDateLabel(tournament.startDate),
+      endDate: toDateLabel(tournament.endDate),
+      venue: tournament.venue ?? "-",
+      rounds: tournament.rounds,
+      holePars: course.holePars,
+      totalPar: course.totalPar,
+      scoreCount: tournament._count.scores
+    };
+  });
 }
 
 export async function listAdminScoreRows(): Promise<AdminScoreRow[]> {
@@ -1361,6 +1401,7 @@ export async function listAdminScoreRows(): Promise<AdminScoreRow[]> {
     front9: numberFromScoreData(score.scoreData, "front9") ?? 0,
     back9: numberFromScoreData(score.scoreData, "back9") ?? 0,
     total: getRoundTotal(score.scoreData),
+    toPar: getRoundToPar(score.scoreData, score.tournament.courseData),
     rank: score.rank,
     status: getScoreSubmissionStatus(score.scoreData),
     statusLabel: getScoreStatusLabel(getScoreSubmissionStatus(score.scoreData)),
@@ -1389,6 +1430,7 @@ export async function getAdminTournamentScores(
       startDate: true,
       endDate: true,
       rounds: true,
+      courseData: true,
       scores: {
         select: {
           playerId: true,
@@ -1431,6 +1473,7 @@ export async function getAdminTournamentScores(
       gender: "MALE" | "FEMALE" | null;
       rank: number | null;
       roundTotals: Record<number, number>;
+      roundToPars: Record<number, number>;
       groupNo: string | null;
       teeTime: string | null;
       finalRoundEligible: boolean | null;
@@ -1453,6 +1496,7 @@ export async function getAdminTournamentScores(
       gender: score.player.user?.gender ?? null,
       rank: null,
       roundTotals: {},
+      roundToPars: {},
       groupNo: null,
       teeTime: null,
       finalRoundEligible: null,
@@ -1460,6 +1504,7 @@ export async function getAdminTournamentScores(
     };
 
     current.roundTotals[score.round] = getRoundTotal(score.scoreData);
+    current.roundToPars[score.round] = getRoundToPar(score.scoreData, tournament.courseData);
     current.category = current.category ?? getScoreCategory(score.scoreData);
     current.groupNo = current.groupNo ?? getScoreGroupNo(score.scoreData);
     current.teeTime = current.teeTime ?? getScoreTeeTime(score.scoreData);
@@ -1477,6 +1522,12 @@ export async function getAdminTournamentScores(
       typeof round1Total === "number" || typeof round2Total === "number"
         ? (round1Total ?? 0) + (round2Total ?? 0)
         : null;
+    const round1ToPar = player.roundToPars[1] ?? null;
+    const round2ToPar = player.roundToPars[2] ?? null;
+    const totalToPar =
+      typeof round1ToPar === "number" || typeof round2ToPar === "number"
+        ? (round1ToPar ?? 0) + (round2ToPar ?? 0)
+        : null;
     const mergedStatus = mergeScoreStatus(player.statuses);
 
     return {
@@ -1489,6 +1540,7 @@ export async function getAdminTournamentScores(
       round1Total,
       round2Total,
       total36,
+      totalToPar,
       groupNo: player.groupNo,
       teeTime: player.teeTime,
       finalRoundEligible: player.finalRoundEligible ?? typeof round2Total === "number",
@@ -1658,6 +1710,7 @@ export async function getMyOpenScoreInputs(userId: string): Promise<MyOpenScoreI
       startDate: true,
       endDate: true,
       rounds: true,
+      courseData: true,
       scores: {
         where: { playerId: player.id },
         select: {
@@ -1721,7 +1774,8 @@ export async function getMyScoreHistory(userId: string): Promise<MyScoreHistory[
               venue: true,
               startDate: true,
               endDate: true,
-              rounds: true
+              rounds: true,
+              courseData: true
             }
           }
         },
@@ -1771,6 +1825,7 @@ export async function getMyScoreHistory(userId: string): Promise<MyScoreHistory[
         typeof round1Total === "number" || typeof round2Total === "number"
           ? (round1Total ?? 0) + (round2Total ?? 0)
           : null;
+      const totalToPar = getTotalToPar(entry.rounds, entry.tournament.courseData);
       const finalRound = [...entry.rounds].reverse().find((round) => round.round >= 2) ?? round1;
       const statuses = Array.from({ length: roundCount }, (_, index) => {
         const round = entry.rounds.find((item) => item.round === index + 1);
@@ -1790,6 +1845,7 @@ export async function getMyScoreHistory(userId: string): Promise<MyScoreHistory[
         round1Total,
         round2Total,
         total36,
+        totalToPar,
         finalRank: finalRound
           ? numberFromScoreData(finalRound.scoreData, "finalRank") ?? finalRound.rank
           : null,
@@ -1849,7 +1905,8 @@ export async function getMyTournamentScoreDetail(
       venue: true,
       startDate: true,
       endDate: true,
-      rounds: true
+      rounds: true,
+      courseData: true
     }
   });
 
@@ -1872,6 +1929,9 @@ export async function getMyTournamentScoreDetail(
       front9: score ? numberFromScoreData(score.scoreData, "front9") : null,
       back9: score ? numberFromScoreData(score.scoreData, "back9") : null,
       roundTotal: score ? getRoundTotal(score.scoreData) : null,
+      par: score ? getRoundPar(score.scoreData, tournament.courseData) : null,
+      toPar: score ? getRoundToPar(score.scoreData, tournament.courseData) : null,
+      holeScores: score ? holeScoresFromScoreData(score.scoreData, tournament.courseData) : null,
       groupNo: score ? getScoreGroupNo(score.scoreData) : null,
       teeTime: score ? getScoreTeeTime(score.scoreData) : null,
       playerMemo: score ? getPlayerMemo(score.scoreData) : null,
@@ -1888,6 +1948,7 @@ export async function getMyTournamentScoreDetail(
     typeof round1Total === "number" || typeof round2Total === "number"
       ? (round1Total ?? 0) + (round2Total ?? 0)
       : null;
+  const totalToPar = getTotalToPar(player.scores, tournament.courseData);
   const finalScore = [...player.scores].reverse().find((score) => score.round >= 2) ?? player.scores[0] ?? null;
   const status = mergeScoreStatus(rounds.map((round) => round.status));
   const memo = rounds.find((round) => round.playerMemo)?.playerMemo ?? null;
@@ -1910,6 +1971,7 @@ export async function getMyTournamentScoreDetail(
     finalRank: finalScore ? numberFromScoreData(finalScore.scoreData, "finalRank") ?? finalScore.rank : null,
     rounds,
     total36,
+    totalToPar,
     playerMemo: memo,
     rejectionReason,
     status,
@@ -1955,6 +2017,7 @@ export async function getMyScoreInputContext(
       startDate: true,
       endDate: true,
       rounds: true,
+      courseData: true,
       scores: {
         where: {
           playerId: player.id,
@@ -1982,6 +2045,7 @@ export async function getMyScoreInputContext(
   const inputOpenMessage = getInputOpenMessage(tournament.startDate, tournament.endDate);
   const inputOpen = !inputOpenMessage;
   const canEdit = inputOpen && isPlayerEditableScoreStatus(status);
+  const course = buildCourseData(tournament.courseData);
 
   return {
     tournamentId: tournament.id,
@@ -1996,6 +2060,10 @@ export async function getMyScoreInputContext(
     front9: score ? numberFromScoreData(score.scoreData, "front9") : null,
     back9: score ? numberFromScoreData(score.scoreData, "back9") : null,
     roundTotal: score ? getRoundTotal(score.scoreData) : null,
+    par: score ? getRoundPar(score.scoreData, tournament.courseData) : course.totalPar,
+    toPar: score ? getRoundToPar(score.scoreData, tournament.courseData) : null,
+    holePars: course.holePars,
+    holeScores: score ? holeScoresFromScoreData(score.scoreData, tournament.courseData) : null,
     playerMemo: score ? getPlayerMemo(score.scoreData) : null,
     rejectionReason: score ? getRejectionReason(score.scoreData) : null,
     status,

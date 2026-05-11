@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdminPermission } from "@/lib/admin/auth";
 import {
+  formatToPar,
   getAdminTournamentScores,
   type AdminTournamentScoreFilters,
   type AdminTournamentScoreRow,
@@ -274,8 +275,9 @@ export default async function AdminTournamentScoresPage({ params, searchParams }
                 {row.category ?? "-"} · {formatGender(row.gender)}
               </span>
               <em>
-                1R {formatScore(row.round1Total)} · 2R {formatScore(row.round2Total)} · 36홀 {formatScore(row.total36)}
-              </em>
+                  1R {formatScore(row.round1Total)} · 2R {formatScore(row.round2Total)} · 36홀 {formatScore(row.total36)} (
+                  {formatToPar(row.totalToPar)})
+                </em>
               <span>
                 {row.groupNo ?? "-"} · {row.teeTime ?? "-"}
               </span>

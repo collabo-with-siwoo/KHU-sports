@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
+import { formatToPar } from "@/lib/golf-scoring";
 import type { MyScoreInputContext } from "@/lib/results";
 import { savePlayerScoreAction, type PlayerScoreInputState } from "./actions";
 
@@ -15,57 +16,65 @@ type ScoreInputFormProps = {
 
 export function ScoreInputForm({ context }: ScoreInputFormProps) {
   const [state, formAction] = useActionState(savePlayerScoreAction, initialState);
-  const [front9, setFront9] = useState(context.front9 ?? 0);
-  const [back9, setBack9] = useState(context.back9 ?? 0);
-  const roundTotal = useMemo(() => front9 + back9, [front9, back9]);
+  const [scores, setScores] = useState<string[]>(
+    context.holePars.map((par, index) => {
+      const existing = context.holeScores?.find((hole) => hole.hole === index + 1)?.score;
+      return typeof existing === "number" ? String(existing) : "";
+    })
+  );
   const locked = !context.canEdit;
+  const numericScores = scores.map((score) => Number(score));
+  const isComplete = numericScores.every((score) => Number.isInteger(score) && score > 0);
+  const front9 = isComplete ? numericScores.slice(0, 9).reduce((sum, score) => sum + score, 0) : null;
+  const back9 = isComplete ? numericScores.slice(9).reduce((sum, score) => sum + score, 0) : null;
+  const roundTotal = isComplete ? numericScores.reduce((sum, score) => sum + score, 0) : null;
+  const toPar = useMemo(
+    () => (typeof roundTotal === "number" ? roundTotal - context.par : null),
+    [context.par, roundTotal]
+  );
 
   return (
     <form action={formAction} className="my-score-input-form">
       <input name="tournamentId" type="hidden" value={context.tournamentId} />
       <input name="round" type="hidden" value={context.round} />
 
-      <div className="my-score-input-grid">
-        <label>
-          front9
-          <input
-            disabled={locked}
-            max="90"
-            min="0"
-            name="front9"
-            onChange={(event) => setFront9(Number(event.currentTarget.value))}
-            required
-            type="number"
-            value={front9}
-          />
-        </label>
-        <label>
-          back9
-          <input
-            disabled={locked}
-            max="90"
-            min="0"
-            name="back9"
-            onChange={(event) => setBack9(Number(event.currentTarget.value))}
-            required
-            type="number"
-            value={back9}
-          />
-        </label>
-        <label>
-          roundTotal
-          <input
-            disabled={locked}
-            max="180"
-            min="0"
-            name="total"
-            readOnly
-            required
-            type="number"
-            value={roundTotal}
-          />
-        </label>
-      </div>
+      <section className="score-hole-inputs player-scorecard-input">
+        <header className="score-hole-summary">
+          <span>OUT {front9 ?? "-"}</span>
+          <span>IN {back9 ?? "-"}</span>
+          <strong>Total {roundTotal ?? "-"}</strong>
+          <strong>{formatToPar(toPar)}</strong>
+        </header>
+        <div className="score-hole-grid">
+          {context.holePars.map((par, index) => {
+            const currentScore = Number(scores[index]);
+            const scoreToPar = Number.isInteger(currentScore) && currentScore > 0 ? currentScore - par : null;
+
+            return (
+              <label key={index}>
+                <span>
+                  {index + 1}H · Par {par}
+                </span>
+                <input
+                  disabled={locked}
+                  max="20"
+                  min="1"
+                  name={`hole${index + 1}`}
+                  onChange={(event) => {
+                    const nextScores = [...scores];
+                    nextScores[index] = event.currentTarget.value;
+                    setScores(nextScores);
+                  }}
+                  required
+                  type="number"
+                  value={scores[index]}
+                />
+                <small>{formatToPar(scoreToPar)}</small>
+              </label>
+            );
+          })}
+        </div>
+      </section>
 
       <label className="my-score-input-memo">
         playerMemo
@@ -74,7 +83,7 @@ export function ScoreInputForm({ context }: ScoreInputFormProps) {
           disabled={locked}
           maxLength={500}
           name="playerMemo"
-          placeholder="본인 기록용 메모를 입력하세요."
+          placeholder="본인 기록 메모를 입력하세요"
           rows={4}
         />
       </label>

@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { requireAdminPermission } from "@/lib/admin/auth";
+import { buildRoundSummary, parseHoleScoresFromFormData } from "@/lib/golf-scoring";
 import { prisma } from "@/lib/prisma";
 import { getScoreSubmissionStatus } from "@/lib/results";
 
@@ -12,21 +13,13 @@ export type ScoreActionState = {
   message: string;
 };
 
-const scoreSchema = z
-  .object({
-    tournamentId: z.string().uuid("대회를 선택해 주세요."),
-    playerEmail: z.string().trim().email("회원 이메일을 입력해 주세요."),
-    affiliation: z.string().trim().optional(),
-    round: z.coerce.number().int().min(1).max(4),
-    front9: z.coerce.number().int().min(0).max(90),
-    back9: z.coerce.number().int().min(0).max(90),
-    total: z.coerce.number().int().min(0).max(180),
-    rank: z.coerce.number().int().min(1).max(999).optional()
-  })
-  .refine((value) => value.front9 + value.back9 === value.total, {
-    message: "총타수는 전반 9홀과 후반 9홀 합계와 같아야 합니다.",
-    path: ["total"]
-  });
+const scoreSchema = z.object({
+  tournamentId: z.string().uuid("대회를 선택해주세요."),
+  playerEmail: z.string().trim().email("선수 회원 이메일을 입력해주세요."),
+  affiliation: z.string().trim().optional(),
+  round: z.coerce.number().int().min(1).max(4),
+  rank: z.coerce.number().int().min(1).max(999).optional()
+});
 
 function scoreDataObject(scoreData: Prisma.JsonValue): Prisma.JsonObject {
   if (scoreData && typeof scoreData === "object" && !Array.isArray(scoreData)) {
@@ -70,6 +63,7 @@ async function revalidateScoreSurfaces(tournamentId: string) {
   revalidatePath("/results");
   revalidatePath(`/results/${tournamentId}`);
   revalidatePath("/mypage/scores");
+  revalidatePath("/mypage/score-results");
 }
 
 async function recalculateTournamentRanks(tournamentId: string) {
@@ -84,7 +78,7 @@ async function recalculateTournamentRanks(tournamentId: string) {
     orderBy: [{ round: "asc" }, { createdAt: "asc" }]
   });
 
-  const playerTotals = new Map<string, { total36: number; scoreIds: string[] }>();
+  const playerTotals = new Map<string, { total36: number; totalToPar: number; scoreIds: string[] }>();
 
   for (const score of scores) {
     if (getScoreSubmissionStatus(score.scoreData) !== "ADMIN_CONFIRMED") {
@@ -93,13 +87,15 @@ async function recalculateTournamentRanks(tournamentId: string) {
 
     const data = scoreDataObject(score.scoreData);
     const total = typeof data.total === "number" ? data.total : Number(data.total);
+    const toPar = typeof data.toPar === "number" ? data.toPar : total - Number(data.par ?? 72);
 
     if (!Number.isFinite(total)) {
       continue;
     }
 
-    const current = playerTotals.get(score.playerId) ?? { total36: 0, scoreIds: [] };
+    const current = playerTotals.get(score.playerId) ?? { total36: 0, totalToPar: 0, scoreIds: [] };
     current.total36 += total;
+    current.totalToPar += Number.isFinite(toPar) ? toPar : 0;
     current.scoreIds.push(score.id);
     playerTotals.set(score.playerId, current);
   }
@@ -126,6 +122,7 @@ async function recalculateTournamentRanks(tournamentId: string) {
           rank,
           scoreData: confirmedScoreData(score.scoreData, {
             total36: entry.total36,
+            totalToPar: entry.totalToPar,
             finalRank: rank
           })
         }
@@ -145,22 +142,28 @@ export async function createScoreAction(
     playerEmail: String(formData.get("playerEmail") ?? ""),
     affiliation: String(formData.get("affiliation") ?? ""),
     round: String(formData.get("round") ?? "1"),
-    front9: String(formData.get("front9") ?? "0"),
-    back9: String(formData.get("back9") ?? "0"),
-    total: String(formData.get("total") ?? "0"),
     rank: String(formData.get("rank") || "0") === "0" ? undefined : String(formData.get("rank"))
   });
 
   if (!parsed.success) {
     return {
       status: "error",
-      message: parsed.error.issues[0]?.message ?? "스코어 정보를 확인해 주세요."
+      message: parsed.error.issues[0]?.message ?? "스코어 정보를 확인해주세요."
+    };
+  }
+
+  const holeScores = parseHoleScoresFromFormData(formData);
+
+  if (!holeScores) {
+    return {
+      status: "error",
+      message: "1번부터 18번 홀까지 타수를 모두 입력해주세요."
     };
   }
 
   const tournament = await prisma.tournament.findUnique({
     where: { id: parsed.data.tournamentId },
-    select: { id: true, sportId: true }
+    select: { id: true, sportId: true, courseData: true }
   });
 
   if (!tournament) {
@@ -178,7 +181,7 @@ export async function createScoreAction(
   if (!user) {
     return {
       status: "error",
-      message: "선수로 전환할 회원 이메일을 먼저 등록해 주세요."
+      message: "선수로 전환할 회원 이메일을 먼저 등록해주세요."
     };
   }
 
@@ -209,6 +212,19 @@ export async function createScoreAction(
     data: { userType: "PLAYER" }
   });
 
+  const summary = buildRoundSummary(holeScores, tournament.courseData);
+  const scorePatch = {
+    holePars: summary.holeScores.map((hole) => hole.par),
+    holeScores: summary.holeScores,
+    front9: summary.front9,
+    back9: summary.back9,
+    total: summary.total,
+    frontPar: summary.frontPar,
+    backPar: summary.backPar,
+    par: summary.par,
+    toPar: summary.toPar
+  };
+
   await prisma.score.upsert({
     where: {
       tournamentId_playerId_round: {
@@ -219,24 +235,14 @@ export async function createScoreAction(
     },
     update: {
       rank: parsed.data.rank ?? null,
-      scoreData: confirmedScoreData({}, {
-        front9: parsed.data.front9,
-        back9: parsed.data.back9,
-        total: parsed.data.total,
-        par: 72
-      })
+      scoreData: confirmedScoreData({}, scorePatch)
     },
     create: {
       tournamentId: tournament.id,
       playerId: player.id,
       round: parsed.data.round,
       rank: parsed.data.rank ?? null,
-      scoreData: confirmedScoreData({}, {
-        front9: parsed.data.front9,
-        back9: parsed.data.back9,
-        total: parsed.data.total,
-        par: 72
-      })
+      scoreData: confirmedScoreData({}, scorePatch)
     }
   });
 
