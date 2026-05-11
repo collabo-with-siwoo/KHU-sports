@@ -4,6 +4,10 @@ import { APP_SESSION_COOKIE_NAME, getAppSessionCookieOptions } from "@/lib/auth/
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function GET() {
+  redirect("/");
+}
+
+export async function POST() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
   const cookieStore = await cookies();

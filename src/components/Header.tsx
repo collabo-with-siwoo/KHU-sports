@@ -40,9 +40,11 @@ export default function Header({ currentPath = "/", isAuthenticated = false }: H
               <Link className="home-cta-btn" href="/mypage">
                 My Page
               </Link>
-              <Link aria-label="Logout" className="home-icon-btn" href="/logout">
-                <span className="material-symbols-outlined">logout</span>
-              </Link>
+              <form action="/logout" className="home-logout-form" method="post">
+                <button aria-label="Logout" className="home-icon-btn" type="submit">
+                  <span className="material-symbols-outlined">logout</span>
+                </button>
+              </form>
             </>
           ) : (
             <>

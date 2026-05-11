@@ -1313,6 +1313,11 @@ p {
   gap: 12px;
 }
 
+.home-logout-form {
+  display: inline-flex;
+  margin: 0;
+}
+
 .home-icon-btn {
   align-items: center;
   background: transparent;
