@@ -14,14 +14,14 @@ export type CurrentMember = {
 export async function getCurrentMember(): Promise<CurrentMember | null> {
   try {
     const supabase = await createSupabaseServerClient();
-    const { data } = await supabase.auth.getUser();
+    const { data, error } = await supabase.auth.getClaims();
 
-    if (!data.user) {
+    if (error || !data?.claims.sub) {
       return null;
     }
 
     return prisma.user.findUnique({
-      where: { id: data.user.id },
+      where: { id: data.claims.sub },
       select: {
         id: true,
         username: true,

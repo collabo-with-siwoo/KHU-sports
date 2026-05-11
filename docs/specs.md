@@ -93,7 +93,7 @@ SESSION_MAX_AGE_HOURS
 - `/reset-password`: accepts email and calls Supabase Auth password reset. The response stays generic so account existence is not disclosed.
 - `/terms`: renders active agreement versions from Prisma when available, falling back to UUID seed agreements.
 - `/mypage`: reads the Supabase session and displays the linked local `User` profile when logged in.
-- Session persistence: middleware refreshes Supabase SSR cookies on navigation so member and admin login persist across pages until explicit logout. The app also writes an HTTP-only `khu_app_session_started_at` marker cookie, but middleware must not use that marker to force Supabase sign-out. The marker defaults to Supabase's long-lived cookie window, 400 days, when `SESSION_MAX_AGE_HOURS` is unset.
+- Session persistence: middleware refreshes Supabase SSR cookies on auth-sensitive routes (`/admin`, `/mypage`, and auth/logout routes) so member and admin login persist until explicit logout without adding auth-server latency to public pages. The app also writes an HTTP-only `khu_app_session_started_at` marker cookie, but middleware must not use that marker to force Supabase sign-out. The marker defaults to Supabase's long-lived cookie window, 400 days, when `SESSION_MAX_AGE_HOURS` is unset.
 - `src/lib/agreements.ts`: UUID seed source for first-run agreement fallback.
 - `src/lib/agreement-service.ts`: Prisma-backed active agreement loader and default agreement seeder.
 - `src/lib/auth/schemas.ts`: zod schemas for M1 inputs; signup schema can be created with dynamic required agreement version IDs.

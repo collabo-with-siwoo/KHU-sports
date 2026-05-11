@@ -27,20 +27,19 @@ export async function middleware(request: NextRequest) {
     }
   });
 
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const hasUser = Boolean(data?.claims.sub);
 
   const sessionCookieOptions = getAppSessionCookieOptions();
   const hasAppSessionCookie = Boolean(request.cookies.get(APP_SESSION_COOKIE_NAME)?.value);
 
-  if (user && !hasAppSessionCookie) {
+  if (hasUser && !hasAppSessionCookie) {
     const startedAt = String(Date.now());
     request.cookies.set(APP_SESSION_COOKIE_NAME, startedAt);
     response.cookies.set(APP_SESSION_COOKIE_NAME, startedAt, sessionCookieOptions);
   }
 
-  if (!user && hasAppSessionCookie) {
+  if (!hasUser && hasAppSessionCookie) {
     response.cookies.set(APP_SESSION_COOKIE_NAME, "", {
       ...sessionCookieOptions,
       maxAge: 0
@@ -52,6 +51,11 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map)$).*)"
+    "/admin/:path*",
+    "/mypage/:path*",
+    "/login",
+    "/signup",
+    "/reset-password",
+    "/logout"
   ]
 };

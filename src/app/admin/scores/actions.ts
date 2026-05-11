@@ -73,6 +73,7 @@ async function recalculateTournamentRanks(tournamentId: string) {
       id: true,
       playerId: true,
       round: true,
+      rank: true,
       scoreData: true
     },
     orderBy: [{ round: "asc" }, { createdAt: "asc" }]
@@ -101,6 +102,8 @@ async function recalculateTournamentRanks(tournamentId: string) {
   }
 
   const ranked = [...playerTotals.entries()].sort(([, a], [, b]) => a.total36 - b.total36);
+  const scoreById = new Map(scores.map((score) => [score.id, score]));
+  const updates: Prisma.PrismaPromise<unknown>[] = [];
   let lastTotal: number | null = null;
   let lastRank = 0;
 
@@ -110,24 +113,41 @@ async function recalculateTournamentRanks(tournamentId: string) {
     lastRank = rank;
 
     for (const scoreId of entry.scoreIds) {
-      const score = scores.find((item) => item.id === scoreId);
+      const score = scoreById.get(scoreId);
 
       if (!score) {
         continue;
       }
 
-      await prisma.score.update({
-        where: { id: scoreId },
-        data: {
-          rank,
-          scoreData: confirmedScoreData(score.scoreData, {
-            total36: entry.total36,
-            totalToPar: entry.totalToPar,
-            finalRank: rank
-          })
-        }
-      });
+      const data = scoreDataObject(score.scoreData);
+
+      if (
+        score.rank === rank &&
+        data.total36 === entry.total36 &&
+        data.totalToPar === entry.totalToPar &&
+        data.finalRank === rank
+      ) {
+        continue;
+      }
+
+      updates.push(
+        prisma.score.update({
+          where: { id: scoreId },
+          data: {
+            rank,
+            scoreData: confirmedScoreData(score.scoreData, {
+              total36: entry.total36,
+              totalToPar: entry.totalToPar,
+              finalRank: rank
+            })
+          }
+        })
+      );
     }
+  }
+
+  if (updates.length) {
+    await prisma.$transaction(updates);
   }
 }
 

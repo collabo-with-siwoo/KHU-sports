@@ -59,15 +59,15 @@ export async function getCurrentAdmin(): Promise<CurrentAdmin | null> {
   try {
     const supabase = await createSupabaseServerClient();
     const {
-      data: { user },
+      data,
       error
-    } = await supabase.auth.getUser();
+    } = await supabase.auth.getClaims();
 
-    if (error || !user?.email) {
+    if (error || !data?.claims.email) {
       return null;
     }
 
-    userEmail = user.email;
+    userEmail = data.claims.email;
   } catch {
     return null;
   }

@@ -2,6 +2,7 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { ensureDefaultAgreements, getRequiredAgreementVersionIdsFrom } from "@/lib/agreement-service";
 import { createSignupSchema, loginSchema, resetPasswordSchema } from "@/lib/auth/schemas";
 import { APP_SESSION_COOKIE_NAME, getAppSessionCookieOptions } from "@/lib/auth/session";
@@ -126,10 +127,6 @@ export async function signInAction(
   }
 
   try {
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastLoginAt: new Date() }
-    });
     await startAppSession();
   } catch {
     return {
@@ -137,6 +134,17 @@ export async function signInAction(
       message: "로그인 상태를 저장하지 못했습니다. 잠시 후 다시 시도해주세요."
     };
   }
+
+  after(
+    prisma.user
+      .update({
+        where: { id: user.id },
+        data: { lastLoginAt: new Date() }
+      })
+      .catch(() => {
+        // Login should not fail after Supabase Auth succeeds because analytics metadata failed to write.
+      })
+  );
 
   redirect(nextPath);
 }

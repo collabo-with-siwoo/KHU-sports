@@ -63,7 +63,6 @@ async function revalidatePlayerScoreSurfaces(tournamentId: string) {
   revalidatePath("/mypage/scores");
   revalidatePath("/mypage/score-results");
   revalidatePath(`/mypage/scores/${tournamentId}`);
-  revalidatePath(`/results/${tournamentId}`);
   revalidatePath("/admin/scores");
 }
 
@@ -71,22 +70,6 @@ export async function savePlayerScoreAction(
   _previousState: PlayerScoreInputState,
   formData: FormData
 ): Promise<PlayerScoreInputState> {
-  const member = await getCurrentMember();
-
-  if (!member) {
-    return {
-      status: "error",
-      message: "로그인이 필요합니다."
-    };
-  }
-
-  if (member.userType !== "PLAYER") {
-    return {
-      status: "error",
-      message: "선수 등록이 필요합니다."
-    };
-  }
-
   const parsed = inputSchema.safeParse({
     tournamentId: String(formData.get("tournamentId") ?? ""),
     round: String(formData.get("round") ?? "1"),
@@ -110,20 +93,37 @@ export async function savePlayerScoreAction(
     };
   }
 
-  const tournament = await prisma.tournament.findFirst({
-    where: {
-      id: parsed.data.tournamentId,
-      sport: { code: "GOLF", active: true }
-    },
-    select: {
-      id: true,
-      sportId: true,
-      startDate: true,
-      endDate: true,
-      rounds: true,
-      courseData: true
-    }
-  });
+  const [member, tournament] = await Promise.all([
+    getCurrentMember(),
+    prisma.tournament.findFirst({
+      where: {
+        id: parsed.data.tournamentId,
+        sport: { code: "GOLF", active: true }
+      },
+      select: {
+        id: true,
+        sportId: true,
+        startDate: true,
+        endDate: true,
+        rounds: true,
+        courseData: true
+      }
+    })
+  ]);
+
+  if (!member) {
+    return {
+      status: "error",
+      message: "로그인이 필요합니다."
+    };
+  }
+
+  if (member.userType !== "PLAYER") {
+    return {
+      status: "error",
+      message: "선수 등록이 필요합니다."
+    };
+  }
 
   if (!tournament) {
     return {
@@ -151,7 +151,20 @@ export async function savePlayerScoreAction(
       sportId: tournament.sportId,
       userId: member.id
     },
-    select: { id: true }
+    select: {
+      id: true,
+      scores: {
+        where: {
+          tournamentId: tournament.id,
+          round: parsed.data.round
+        },
+        select: {
+          id: true,
+          scoreData: true
+        },
+        take: 1
+      }
+    }
   });
 
   if (!player) {
@@ -161,19 +174,7 @@ export async function savePlayerScoreAction(
     };
   }
 
-  const existing = await prisma.score.findUnique({
-    where: {
-      tournamentId_playerId_round: {
-        tournamentId: tournament.id,
-        playerId: player.id,
-        round: parsed.data.round
-      }
-    },
-    select: {
-      id: true,
-      scoreData: true
-    }
-  });
+  const existing = player.scores[0] ?? null;
 
   if (existing && !isPlayerEditableScoreStatus(getScoreSubmissionStatus(existing.scoreData))) {
     return {

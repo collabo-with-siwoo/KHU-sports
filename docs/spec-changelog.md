@@ -233,3 +233,11 @@
 - Changed admin tournament creation and update flows so admins can configure each hole as par 3/4/5/6.
 - Changed admin score entry and player score self-entry from front9/back9 totals to 18 gross hole scores.
 - Public leaderboard, public Scorecard, My Page results, and admin score views now display aggregate scores relative to par as `E`, `+1`, or `-1`.
+
+## 2026-05-12 - Auth And Score Save Performance
+
+- Limited Supabase SSR middleware to auth-sensitive routes so public pages do not pay per-request auth verification latency.
+- Switched member/admin session identity checks from `getUser()` to verified `getClaims()` where only stable JWT identity claims are needed.
+- Moved member `lastLoginAt` persistence after the login response so successful authentication redirects faster.
+- Reduced player score save DB round trips by loading the player and existing round score together, and skipped public result revalidation for non-public draft/submitted saves.
+- Reduced admin rank recalculation writes by batching updates and skipping score rows whose stored rank totals are already current.

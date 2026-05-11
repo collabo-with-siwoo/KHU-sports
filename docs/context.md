@@ -80,6 +80,7 @@
 - Superpowers is installed as a repo-local Codex plugin at `plugins/superpowers`, with marketplace metadata in `.agents/plugins/marketplace.json`. `AGENTS.md` and `CLAUDE.md` were rewritten as clean Korean VS Code/Codex-friendly agent instructions.
 - Player login persistence was hardened with an app-owned HTTP-only session-start cookie and login `next` redirects so score-input deep links return to the intended page after authentication.
 - Golf scoring was expanded to tournament-level 18-hole par setup, player/admin hole-by-hole score entry, automatic front9/back9/total aggregation, and par-relative result display.
+- Login, auth middleware, and score-save paths were optimized: public pages no longer run Supabase auth middleware, member/admin identity checks use verified JWT claims, login `lastLoginAt` writes run after redirect, player score saves perform fewer DB reads, and admin rank recalculation skips unchanged rows.
 
 ## Remaining M0 External Tasks
 
@@ -146,3 +147,4 @@
 - 2026-05-11 player session persistence hardening verification: `npm run typecheck`, `npm run lint`, `npm test`, and `npm run build` passed.
 - 2026-05-11 hole-by-hole golf scoring verification: `npm run db:push`, `npm run typecheck`, `npm run prisma:validate`, `npm test`, `npm run lint`, and `npm run build` passed after adding `Tournament.courseData`.
 - 2026-05-11 route smoke checks on local production server: `/results` returned 200, `/admin/tournaments` returned 307 unauthenticated redirect, and `/mypage/scores` returned 307 unauthenticated redirect.
+- 2026-05-12 auth/score performance verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test`, and `npm run build` passed.
