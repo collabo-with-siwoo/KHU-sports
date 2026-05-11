@@ -214,3 +214,23 @@
   - Added `SignupSuccessModal` on `/login?signup=success`.
   - Replaced the prior inline signup success message with an accessible modal dialog.
   - Updated docs/specs/context/changelog for the new UX contract.
+
+## 2026-05-11 08:33 KST - M3 verification and M4 kickoff
+
+- Request: Create a new branch, verify whether M3 is complete, then proceed to M4.
+- Milestone: M3 admin RBAC, then M4 tournaments/scores.
+- Pre-task checks: Re-read `PRD/04_golf_PRD.md`, `CLAUDE.md`, `docs/context.md`, and `docs/specs.md`.
+- Branch: `feature/m3-rbac-m4-scores`.
+- Finding: M3 is not complete yet. `AdminUser` exists in the schema, but `/admin` is still a visual login shell and `/admin/notices` routes are not protected by Supabase session or `AdminUser.permissions`.
+- Result:
+  - Added Supabase-backed admin login and sign-out actions.
+  - Added `src/lib/admin/auth.ts` with active admin lookup, permission checks, and route guards.
+  - Protected `/admin/notices` and `/admin/notices/new`.
+  - Updated `prisma/seed.js` so `INITIAL_SUPER_ADMIN_EMAIL` seeds a `SUPER/ACTIVE` admin profile.
+  - Added protected `/admin/tournaments` and `/admin/scores` pages.
+  - Added tournament creation and manual score upsert Server Actions.
+  - Reworked `/results` to read Prisma tournament/score rows and avoid public hole-by-hole scorecard exposure.
+  - Ran `npm run db:seed`; Supabase now has 1 active `SUPER` `AdminUser`.
+  - Verification passed: typecheck, lint, Prisma validation, and production build.
+  - Local route checks passed: `/results` returned 200, and unauthenticated `/admin/notices` redirects to `/admin?next=%2Fadmin%2Fnotices`.
+- Conclusion: M3 is now covered at the route/session/RBAC level. M4 has a first DB-backed tournament/score foundation, with Excel upload, hole-by-hole private scorecards, and richer admin workflows remaining as follow-up slices.

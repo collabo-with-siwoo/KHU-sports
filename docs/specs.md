@@ -4,12 +4,14 @@
 
 ## Milestone Status
 
-- Current milestone: M2, notice system.
+- Current milestone: M4, tournaments and scores foundation.
 - M0 scope in this repository: Next.js App Router scaffold, TypeScript strict mode, Prisma schema validation, environment variable template, and documentation baseline.
 - External M0 tasks still require human/account work: Cloudflare R2 buckets, Resend domain, production domain DNS verification.
-- Visual foundation: public user view follows the Stitch "Majestic Green" direction with a hero image, sticky desktop navigation, mobile bottom navigation, bento-style quick links, notice modules, and result summary modules. `/admin` presents a polished login-like shell until real authentication is implemented.
+- Visual foundation: public user view follows the Stitch "Majestic Green" direction with a hero image, sticky desktop navigation, mobile bottom navigation, bento-style quick links, notice modules, and result summary modules.
 - M1 runtime foundation: login, signup, reset-password, and terms pages exist with Supabase Auth and Prisma-backed profile/agreement persistence. Static GitHub Pages remains preview-only and cannot run these Server Actions.
 - M2 notice foundation: public notice reads use Supabase `Notice` rows when available and fall back to PRD-aligned seed notices for empty or not-yet-migrated environments. Homepage latest notices, `/notices`, and `/notices/[id]` share the same read model.
+- M3 admin foundation: `/admin` signs administrators in through Supabase Auth and authorizes access through local `AdminUser` rows. `SUPER` admins bypass menu permissions; `MEMBER` admins require `permissions` JSON grants.
+- M4 result foundation: `/results` reads Prisma `Tournament`, `Player`, and `Score` rows when available and falls back to seed summaries. Admin tournament and score screens provide protected create/update foundations.
 - Static preview deployment: GitHub Pages custom workflow exports the Next.js app to static files and publishes `khu-sports.com` via `public/CNAME`.
 
 ## Technology Decisions
@@ -104,9 +106,27 @@ INITIAL_SUPER_ADMIN_EMAIL
 - `/notices`: public notice list shows category tabs, search/filter controls, and published notice cards.
 - `/notices/[id]`: public detail route renders sanitized notice HTML and public attachment links when available.
 - `/admin/notices`: admin management list reads all notice rows when available and otherwise shows seed notices for layout validation.
-- `/admin/notices/new`: create screen is intentionally disabled until M3 admin authentication/RBAC protects write actions.
+- `/admin/notices`: requires `notices.read`.
+- `/admin/notices/new`: requires `notices.write`; rich-text persistence and R2 upload remain future notice-write work.
 - Notice content stored as HTML must be sanitized before persistence. The current detail route assumes persisted admin-authored HTML has already passed that sanitization boundary.
 - R2 upload integration is not active yet. `NoticeAttachment` public URLs are derived from `R2_PUBLIC_BASE_URL` only for public attachments.
+
+## M3 Admin RBAC Contracts
+
+- `/admin`: shows the login form when no active admin is signed in; shows an authorized admin dashboard when a Supabase session maps to an `AdminUser` with `status = ACTIVE`.
+- Admin login accepts email/password directly through Supabase Auth, then verifies the local `AdminUser` profile.
+- `src/lib/admin/auth.ts` exposes `getCurrentAdmin`, `requireAdmin`, `requireAdminPermission`, and `canAccessAdmin`.
+- `SUPER` administrators can access all admin modules. `MEMBER` administrators require permission JSON such as `{ "scores": { "read": true, "write": false } }`.
+- `npm run db:seed` seeds `INITIAL_SUPER_ADMIN_EMAIL` as `SUPER/ACTIVE` when the environment variable is present. A matching Supabase Auth user must also exist for login.
+
+## M4 Tournament And Score Contracts
+
+- `src/lib/results.ts` is the shared read model for public result summaries and admin tournament/score lists.
+- `/results`: reads tournament/score data from Prisma and falls back to seed summaries when no rows exist. It exposes public-safe fields only: rank, name, affiliation, relative score, round totals, and total score.
+- Public scorecard/detail access remains private. The public “SCORECARD 안내” view explains that detailed hole-by-hole scorecards are available only to the logged-in player or admin.
+- `/admin/tournaments`: requires `tournaments.read`; the create action requires `tournaments.write` and creates `GOLF` tournaments.
+- `/admin/scores`: requires `scores.read`; the score action requires `scores.write`, finds an existing member by email, creates or updates that member's `Player` profile, promotes the member to `PLAYER`, and upserts the round score.
+- Current manual score entry stores golf score data as `{ front9, back9, total, par }`. Excel upload and hole-by-hole scorecards remain future M4/M5 slices.
 
 ## GitHub Pages Static Preview
 
@@ -120,14 +140,14 @@ INITIAL_SUPER_ADMIN_EMAIL
 
 - Stitch baseline screens use an app-style top bar, mobile bottom navigation, compact page headers, dense cards/lists, and light gray canvas backgrounds for `/`, `/results`, and `/notices`.
 - The homepage uses a tournament hero with a golf course image, a next-tournament summary card, bento quick links, a notice panel, and a public mini leaderboard.
-- The public leaderboard page presents only public-safe fields: rank, player name, affiliation, relative score, and total score. Detailed scorecard access remains excluded from public result screens.
+- The public leaderboard page presents only public-safe fields and round totals. Detailed hole-by-hole scorecard access remains excluded from public result screens.
 - The notices page uses category tabs and a feed layout; desktop screens add a left sidebar while mobile screens rely on the bottom navigation.
 - Public navigation uses hover lift/color transitions.
 - Homepage quick-link cards, notice rows, result rows, subpage cards, and admin preview modules provide hover feedback.
 - Public result views must avoid detailed scorecards and expose only rank, player name, and total score.
 - Player registration copy points users toward email submission and admin approval instead of implementing a direct public player-registration workflow.
-- `/admin` login shell is visual-only until M3; submit behavior and Supabase-backed RBAC belong to M3.
-- Admin notice write controls remain disabled until M3 protects mutations with admin authentication and menu permissions.
+- `/admin` is Supabase/RBAC backed; admin subpages must call `requireAdminPermission`.
+- Admin notice rich-text write controls remain disabled until Tiptap/R2 persistence is implemented, even though M3 access checks are active.
 
 ## Verification Commands
 

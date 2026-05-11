@@ -3,9 +3,9 @@
 ## Current Status
 
 - Date: 2026-05-11
-- Active milestone: M2 notice system.
+- Active milestone: M4 tournaments and scores foundation.
 - M0 progress: Vercel and Supabase project setup completed by the user; R2/Resend production setup remains for later milestones.
-- Latest action: Applied the Prisma schema and base seed data to Supabase.
+- Latest action: Added M3 admin RBAC guardrails and began M4 tournament/score runtime wiring.
 - Required docs note: `docs/specs.md` now exists and should be kept synchronized with code changes.
 
 ## Recent Changes
@@ -53,13 +53,21 @@
 - Signup/login/reset Server Actions now return form-level errors instead of throwing application errors when production DB or Supabase environment configuration fails.
 - Prisma datasource now includes `DIRECT_URL` for Supabase migration/schema operations; `.env.example` and deployment docs include both pooled and direct/session URLs.
 - `/login?signup=success` now opens an email-verification modal after successful signup.
+- New branch: `feature/m3-rbac-m4-scores`.
+- M3 verification found that admin/RBAC was not actually complete: admin pages were still visual-only and unprotected.
+- Added Supabase-backed admin login and `AdminUser` permission checks for admin routes.
+- `npm run db:seed` now seeds `INITIAL_SUPER_ADMIN_EMAIL` as an active `SUPER` admin when the env var is set.
+- Local Supabase now has one active `SUPER` `AdminUser`; the matching Supabase Auth user still needs to exist for login.
+- Added protected `/admin/tournaments` and `/admin/scores` M4 screens.
+- Added tournament creation and manual round-score upsert Server Actions guarded by admin permissions.
+- `/results` now reads Prisma tournament/score rows with seed fallback and no longer exposes public hole-by-hole scorecards.
 
 ## Remaining M0 External Tasks
 
 - Create Cloudflare R2 public/private buckets.
 - Configure Resend sending domain.
 - Connect/verify production domain DNS in Vercel.
-- Confirm `INITIAL_SUPER_ADMIN_EMAIL`.
+- Create/verify the Supabase Auth user for `INITIAL_SUPER_ADMIN_EMAIL` so the seeded admin profile can log in.
 
 ## Verification
 
@@ -90,3 +98,6 @@
 - 2026-05-11 Supabase DB setup verification: runtime `select 1` passed, 52 generated schema statements executed, core table check returned 6/6, `Sport` count is 1, and `AgreementVersion` count is 3.
 - 2026-05-11 post-DB verification: `npm run typecheck`, `npm run lint`, and `npm run prisma:validate` passed.
 - 2026-05-11 signup exception hardening verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, and `npm run build` passed.
+- 2026-05-11 M3/M4 foundation verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, and `npm run build` passed.
+- 2026-05-11 M3 seed verification: `npm run db:seed` created 1 active `SUPER` `AdminUser`; current tournament and score counts are 0.
+- 2026-05-11 local route checks: `http://127.0.0.1:3000/results` returned 200 and unauthenticated `/admin/notices` returned a 307 redirect to `/admin?next=%2Fadmin%2Fnotices`.

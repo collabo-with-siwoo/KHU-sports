@@ -108,3 +108,13 @@
 
 - Added a signup-completion modal on `/login?signup=success`.
 - The modal tells users that signup is complete, a verification email was sent, and login works after email verification.
+
+## 2026-05-11 - M3 Admin RBAC And M4 Result Foundation
+
+- Verified that M3 was not complete: admin pages were still visual-only and unprotected.
+- Added Supabase-backed admin login and `AdminUser` permission checks through `src/lib/admin/auth.ts`.
+- Protected `/admin/notices` and `/admin/notices/new` with `notices.read` and `notices.write`.
+- Updated seed logic so `INITIAL_SUPER_ADMIN_EMAIL` creates an active `SUPER` `AdminUser`.
+- Added protected `/admin/tournaments` with tournament creation.
+- Added protected `/admin/scores` with manual score upsert by existing member email.
+- Reworked `/results` to read Prisma tournament/score data with seed fallback and removed public hole-by-hole scorecard exposure.

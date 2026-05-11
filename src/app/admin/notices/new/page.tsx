@@ -1,7 +1,12 @@
 import Link from "next/link";
+import { requireAdminPermission } from "@/lib/admin/auth";
 import { noticeCategories } from "@/lib/notices";
 
-export default function NewAdminNoticePage() {
+export const dynamic = "force-dynamic";
+
+export default async function NewAdminNoticePage() {
+  await requireAdminPermission("notices", "write", "/admin/notices/new");
+
   return (
     <main className="admin-workspace">
       <header className="admin-workspace-header">
@@ -19,8 +24,8 @@ export default function NewAdminNoticePage() {
             <p className="panel-kicker">Create Notice</p>
             <h1>새 공지 작성</h1>
             <p>
-              M2에서는 공지 작성 화면 구조와 데이터 계약을 먼저 고정합니다. 실제 저장,
-              Tiptap 에디터, R2 업로드는 관리자 인증이 연결된 뒤 활성화합니다.
+              관리자 인증과 쓰기 권한은 확인되었습니다. 실제 저장, Tiptap 에디터, R2 업로드는
+              다음 공지 작성 단계에서 연결합니다.
             </p>
           </div>
         </div>
@@ -49,7 +54,7 @@ export default function NewAdminNoticePage() {
             <input disabled type="file" />
           </label>
           <button disabled type="button">
-            M3 관리자 인증 연결 후 저장 가능
+            Tiptap/R2 저장 액션 연결 후 저장 가능
           </button>
         </form>
       </section>
