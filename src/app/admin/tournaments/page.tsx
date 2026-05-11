@@ -25,7 +25,7 @@ export default async function AdminTournamentsPage() {
           <div>
             <p className="panel-kicker">M4 Tournament</p>
             <h1>대회 관리</h1>
-            <p>골프 대회를 등록하고 공개 경기결과와 스코어 입력 흐름의 기준 데이터로 사용합니다.</p>
+            <p>골프 대회를 등록하고 대회별 스코어 검색/검수 화면으로 이동합니다.</p>
           </div>
         </div>
 
@@ -45,7 +45,9 @@ export default async function AdminTournamentsPage() {
               <time dateTime={tournament.startDate}>
                 {tournament.startDate} ~ {tournament.endDate}
               </time>
-              <em>{tournament.scoreCount}건</em>
+              <em>
+                <Link href={`/admin/tournaments/${tournament.id}/scores`}>{tournament.scoreCount}건 보기</Link>
+              </em>
             </div>
           ))}
         </div>
@@ -53,4 +55,3 @@ export default async function AdminTournamentsPage() {
     </main>
   );
 }
-

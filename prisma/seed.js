@@ -98,7 +98,8 @@ async function main() {
           members: { read: true, write: true },
           scores: { read: true, write: true },
           tournaments: { read: true, write: true },
-          admins: { read: true, write: true }
+          admins: { read: true, write: true },
+          privacy: { read: true, write: true, export: true }
         }
       },
       create: {
@@ -109,10 +110,11 @@ async function main() {
         permissions: {
           notices: { read: true, write: true },
           members: { read: true, write: true },
-          scores: { read: true, write: true },
-          tournaments: { read: true, write: true },
-          admins: { read: true, write: true }
-        }
+        scores: { read: true, write: true },
+        tournaments: { read: true, write: true },
+        admins: { read: true, write: true },
+        privacy: { read: true, write: true, export: true }
+      }
       }
     });
   }

@@ -28,7 +28,7 @@
 ## 2026-05-10 - GitHub Pages And Cloudflare Domain
 
 - Added GitHub Pages deployment workflow for static Next.js export.
-- Added `public/CNAME` for `khu-sports.com`.
+- Added a custom-domain marker for the earlier GitHub Pages preview plan.
 - Added `.nojekyll` for GitHub Pages static asset serving.
 - Added `docs/deployment.md` with Cloudflare DNS records and GitHub Pages setup steps.
 - Added conditional Next.js export mode via `GITHUB_PAGES=true`.
@@ -118,3 +118,92 @@
 - Added protected `/admin/tournaments` with tournament creation.
 - Added protected `/admin/scores` with manual score upsert by existing member email.
 - Reworked `/results` to read Prisma tournament/score data with seed fallback and removed public hole-by-hole scorecard exposure.
+
+## 2026-05-11 - M3/M4 Admin And Personal Archive Expansion
+
+- Added `/admin/admins` for RBAC-protected admin profile and permission management.
+- Added `/admin/members` for RBAC-protected member approval and GENERAL/PLAYER switching.
+- PLAYER conversion now creates or updates the golf `Player` profile from the approved user.
+- Added member-specific score archive reads in `src/lib/results.ts`.
+- Updated `/mypage` so logged-in PLAYER users can see their own tournament and round score archive.
+- Kept public `/results` privacy-safe; detailed personal score data remains in My Page.
+
+## 2026-05-11 - Results IA And Public Scorecard Policy
+
+- Updated PRD policy language so public results now support Full Leaderboard and public Scorecard tabs.
+- Defined `/results` as the tournament index for ongoing and completed tournaments.
+- Defined `/results/[tournamentId]` as the tabbed tournament detail page with Full Leaderboard and Scorecard.
+- Added `docs/results-ia.md` with screen structure, component list, data flow, public fields, private fields, filters, empty states, and mobile behavior.
+- Updated `docs/specs.md` with the new public scorecard data contract and privacy boundaries.
+
+## 2026-05-11 - Results API Query Design
+
+- Added `docs/results-api-design.md` for Full Leaderboard, public Scorecard, public player history, and My Page score archive read models.
+- Defined separate public and My Page DTO boundaries: `PublicLeaderboardRow`, `PublicScorecard`, and `MyScoreHistory`.
+- Specified that public result APIs must read only `ADMIN_CONFIRMED` scores and never select private contact fields, player/admin memo fields, or review logs.
+- Specified leaderboard sorting by `finalRank` with fallback to `round1Rank`, preferably at the DB layer for stable pagination.
+- Documented Prisma/raw SQL and Supabase-view query patterns plus recommended indexes for search/filter performance.
+
+## 2026-05-11 - Results Detail Full Leaderboard
+
+- Added `/results/[tournamentId]` with the Full Leaderboard tab as the default view.
+- Added URL-synchronized filters for name, school, participation category, gender, final-day-only, and pagination.
+- Added `getTournamentLeaderboard(tournamentId, filters)` and public `PublicLeaderboardRow` mapping in `src/lib/results.ts`.
+- Added Scorecard tab URL state and Scorecard buttons that navigate to `?tab=scorecard&playerId=...`.
+- Kept public reads on an allowlisted DTO boundary using current `Tournament`/`Player`/`Score` fields until the target M4 result tables are added.
+
+## 2026-05-11 - Results Detail Public Scorecard
+
+- Implemented the `/results/[tournamentId]` Scorecard tab with URL-synchronized player/school/category/gender search.
+- Added `searchTournamentPlayers(tournamentId, filters)` and `getPublicPlayerScorecard(tournamentId, tournamentPlayerId)` with DTOs that return only public competition fields.
+- Added Scorecard search result table/mobile cards, selection links that preserve query params, direct `playerId` detail loading, and round cards for Round 1/2 data.
+- Added optional hole-score table rendering when public `scoreData` contains `holeScores`, `holes`, or `hbh`.
+- Public Scorecard reads continue to avoid selecting or returning phone, email, birth date, address, guardian contact, player memo, admin memo, or review logs.
+
+## 2026-05-11 - My Page Personal Score Archive
+
+- Added `/mypage/scores` for the logged-in PLAYER's tournament score archive.
+- Added `/mypage/scores/[tournamentId]` for owner-only tournament score detail.
+- Added `src/lib/members.ts` as a shared current-member helper for Supabase session to local `User` lookup.
+- Added `getMyScoreHistory(userId)` and `getMyTournamentScoreDetail(userId, tournamentId)` with owner-only DTOs that may include `playerMemo` and submission/admin-confirmation state.
+- Enabled Next.js `experimental.authInterrupts` and added `src/app/forbidden.tsx` so non-owned score detail access can render a 403 forbidden page.
+- Added UI states for login-required redirects, GENERAL player-registration guidance, empty score archive, draft/submitted/admin-confirmed/rejected status badges, and rejected-score reinput buttons.
+- My Page score reads do not expose admin memo or review logs.
+
+## 2026-05-11 - Score Input To Result Publication Integration
+
+- Added `/mypage/scores/[tournamentId]/input/round/[round]` for PLAYER self-entry of round scores.
+- Added player save/submit state writes: `DRAFT` for temporary save and `SUBMITTED` for admin review.
+- Updated public results reads so Full Leaderboard, public Scorecard, and result summaries use confirmed score rows only.
+- Added admin confirm/reject actions on `/admin/scores`; confirmation recalculates tournament ranks from confirmed rows, while rejection stores a rejection reason for owner/admin views.
+- Added My Page state messages and owner-visible rejection reasons without exposing rejection/admin memo fields in public DTOs.
+
+## 2026-05-11 - Advanced Result Search And Sorting
+
+- Expanded Full Leaderboard and Scorecard query params with group number, rank range, final-day-only, sort key, sort direction, and pagination.
+- Normalized player-name and school-name search to ignore whitespace and letter case.
+- Added server-side sorting by rank, player name, school, 1R score, and 36-hole total.
+- Added collapsible filter panels for mobile-friendly result searching.
+- Added `/admin/tournaments/[tournamentId]/scores` for tournament-level admin score search with the same filter/sort contract.
+
+## 2026-05-11 - Admin Score Excel Exports
+
+- Added `exceljs` `.xlsx` generation for tournament-level admin downloads.
+- Added `ExportLog` to record restricted personal-info downloads with admin, export type, tournament, exported timestamp, row count, and reason.
+- Added `privacy.export` as an admin permission action; `SUPER` admins still bypass permission JSON.
+- Added download routes for public leaderboard, admin score status, public scorecards, and private operations exports.
+- Kept public leaderboard and scorecard exports on confirmed-score and no-PII boundaries.
+- Added submission/confirmation/rejection timestamps into score JSON for operational export columns.
+
+## 2026-05-11 - M4 QA Tests
+
+- Added Vitest and `npm test`.
+- Added unit tests for Full Leaderboard sorting/filtering/privacy, public Scorecard detail/hole-score behavior, My Page owner-only score reads, and admin export privacy/authorization/logging.
+- Added `docs/qa-results-score-features.md` as the manual QA checklist.
+- Hardened My Page rejection reason handling so `adminMemo` is never exposed as a player-visible fallback.
+
+## 2026-05-11 - Pre-Merge Deployment URL Cleanup
+
+- Removed the committed custom-domain marker.
+- Updated deployment/spec/context notes so pre-production review uses `https://khu-sports.vercel.app/`.
+- Left official production-domain connection as a later deployment decision.

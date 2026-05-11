@@ -89,6 +89,20 @@ model AdminUser {
   @@index([status])
 }
 
+model ExportLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  adminUserId String   @db.Uuid
+  exportType  String
+  tournamentId String? @db.Uuid
+  exportedAt  DateTime @default(now())
+  rowCount    Int
+  reason      String
+
+  @@index([adminUserId, exportedAt])
+  @@index([tournamentId, exportedAt])
+  @@index([exportType, exportedAt])
+}
+
 model Sport {
   id          String       @id @default(uuid()) @db.Uuid
   code        String       @unique
