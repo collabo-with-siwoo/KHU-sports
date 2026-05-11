@@ -1,25 +1,26 @@
 import Link from "next/link";
 
 const gnbItems = [
-  { label: "홈", href: "/" },
+  { label: "Home", href: "/" },
   { label: "About", href: "/about" },
-  { label: "경기결과", href: "/results" },
-  { label: "대회정보", href: "/schedule" },
-  { label: "공지사항", href: "/notices" }
+  { label: "Results", href: "/results" },
+  { label: "Schedule", href: "/schedule" },
+  { label: "Notices", href: "/notices" }
 ];
 
 interface HeaderProps {
   currentPath?: string;
+  isAuthenticated?: boolean;
 }
 
-export default function Header({ currentPath = "/" }: HeaderProps) {
+export default function Header({ currentPath = "/", isAuthenticated = false }: HeaderProps) {
   return (
     <header className="home-header">
       <div className="home-header-inner">
         <Link className="home-logo" href="/">
           KHU Sports Golf
         </Link>
-        <nav className="home-gnb" aria-label="주요 메뉴">
+        <nav className="home-gnb" aria-label="Primary navigation">
           {gnbItems.map((item) => (
             <Link
               className={item.href === currentPath ? "active" : ""}
@@ -31,15 +32,28 @@ export default function Header({ currentPath = "/" }: HeaderProps) {
           ))}
         </nav>
         <div className="home-header-actions">
-          <button aria-label="검색" className="home-icon-btn" type="button">
+          <button aria-label="Search" className="home-icon-btn" type="button">
             <span className="material-symbols-outlined">search</span>
           </button>
-          <Link className="home-cta-btn" href="/signup">
-            지금 등록하기
-          </Link>
-          <Link aria-label="로그인" className="home-icon-btn" href="/login">
-            <span className="material-symbols-outlined">account_circle</span>
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <Link className="home-cta-btn" href="/mypage">
+                My Page
+              </Link>
+              <Link aria-label="Logout" className="home-icon-btn" href="/logout">
+                <span className="material-symbols-outlined">logout</span>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link className="home-cta-btn" href="/signup">
+                Sign up
+              </Link>
+              <Link aria-label="Login" className="home-icon-btn" href="/login">
+                <span className="material-symbols-outlined">account_circle</span>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

@@ -458,3 +458,11 @@
 - Status: Creating the merge commit and pushing `main`.
 - Result: Pushed merge commit `b59dfbd` to `main`. GitHub Deployments reported Vercel Production success for the merge commit. `https://khu-sports.vercel.app/results/seed-2026` returned 200, while authenticated score/admin routes returned 307 redirects as expected.
 - Follow-up note: local `.env` is absent on this machine, so the production Supabase schema push for the new `ExportLog` model was not executed here.
+
+## Session - 2026-05-11 Auth Persistence And DB Follow-Up
+
+- Request: Admin user has been created/approved; fix login persistence across navigation and handle the pending `ExportLog` schema application.
+- Milestone: M1/M3 auth hardening and M4 deployment stabilization.
+- Status: Added Supabase SSR cookie-refresh middleware, a configurable maximum session age, and logged-in header actions for My Page/logout.
+- DB note: Prisma schema validation succeeds, but direct Supabase Postgres/Pooler connections from this machine still fail before schema application.
+- Verification: `npm test`, `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, and `npm run build` passed. Supabase Auth contains user `7d914e66-d226-46c1-8f3a-33f808e5f8d7`, matching the configured initial admin email.

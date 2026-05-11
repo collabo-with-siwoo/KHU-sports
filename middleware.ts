@@ -1,12 +1,42 @@
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { isSessionExpired } from "@/lib/auth/session";
 
-export function middleware(request: NextRequest) {
-  // M3 will replace this placeholder with Supabase-backed admin RBAC checks.
-  return NextResponse.next({
-    request
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({ request });
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return response;
+  }
+
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+        response = NextResponse.next({ request });
+        cookiesToSet.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+      }
+    }
   });
+
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (user && isSessionExpired(user.last_sign_in_at)) {
+    await supabase.auth.signOut();
+  }
+
+  return response;
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"]
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map)$).*)"
+  ]
 };

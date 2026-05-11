@@ -108,7 +108,7 @@ export default async function MyScoresPage() {
 
   return (
     <main className="home-app">
-      <Header currentPath="/mypage" />
+      <Header currentPath="/mypage" isAuthenticated={Boolean(member)} />
 
       <section className="stitch-page-canvas my-score-page">
         <Link className="results-back-link" href="/mypage">

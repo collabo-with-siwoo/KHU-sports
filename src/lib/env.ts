@@ -13,7 +13,8 @@ export const serverEnvSchema = z.object({
   R2_PUBLIC_BASE_URL: z.string().url(),
   RESEND_API_KEY: z.string().min(1),
   NEXT_PUBLIC_SITE_URL: z.string().url(),
-  INITIAL_SUPER_ADMIN_EMAIL: z.string().email()
+  INITIAL_SUPER_ADMIN_EMAIL: z.string().email(),
+  SESSION_MAX_AGE_HOURS: z.coerce.number().positive().optional()
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;

@@ -207,3 +207,9 @@
 - Removed the committed custom-domain marker.
 - Updated deployment/spec/context notes so pre-production review uses `https://khu-sports.vercel.app/`.
 - Left official production-domain connection as a later deployment decision.
+
+## 2026-05-11 - Session Persistence
+
+- Added Supabase SSR middleware to refresh auth cookies across page navigation.
+- Added `SESSION_MAX_AGE_HOURS` with a 12-hour default for app-level session expiry.
+- Updated the public header to show My Page and logout actions while a member session is active.

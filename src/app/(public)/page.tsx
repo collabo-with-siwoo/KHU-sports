@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { getCurrentMember } from "@/lib/members";
 import { listPublishedNotices } from "@/lib/notices";
 
 const heroBackgroundUrl =
@@ -23,14 +24,18 @@ const tournaments = [
   { name: "그랑디 KGA 회장배 전국대학", date: "2026.05.06 ~ 05.09", venue: "군산CC", format: "72홀 스트로크플레이", status: "예정", statusType: "upcoming" as const },
 ];
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const recentNotices = (await listPublishedNotices()).slice(0, 3);
+  const [member, notices] = await Promise.all([
+    getCurrentMember(),
+    listPublishedNotices()
+  ]);
+  const recentNotices = notices.slice(0, 3);
 
   return (
     <main className="home-app">
-      <Header currentPath="/" />
+      <Header currentPath="/" isAuthenticated={Boolean(member)} />
 
       {/* ===== HERO ===== */}
       <section

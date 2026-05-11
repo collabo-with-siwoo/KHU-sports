@@ -75,6 +75,7 @@
 - Full Leaderboard, public Scorecard, and `/admin/tournaments/[tournamentId]/scores` now share advanced server-side search/filter/sort semantics for player name, school, category, gender, group number, rank range, final-day qualification, rank/name/school/1R/36-hole sorting, and URL-persisted pagination.
 - `/admin/tournaments/[tournamentId]/scores` now provides XLSX downloads for public leaderboard, admin score status, confirmed scorecards, and restricted personal-info operations exports. Personal-info exports require `SUPER` or `privacy.export`, require a reason, and write `ExportLog`.
 - M4 QA coverage now includes Vitest tests for Full Leaderboard, public Scorecard, My Page Score ownership/privacy, and Admin Export authorization/privacy/logging. Manual QA checklist lives in `docs/qa-results-score-features.md`.
+- Session persistence fix in progress: Supabase SSR middleware now refreshes cookies across navigation and expires sessions after the configured maximum age.
 
 ## Remaining M0 External Tasks
 
@@ -135,3 +136,4 @@
 - 2026-05-11 M4 QA test verification: `npm test` passed with 3 test files and 14 tests. `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, `npm audit --omit=dev`, and `npm run build` passed.
 - 2026-05-11 pre-merge deployment cleanup: removed the custom-domain marker and set the review URL to `https://khu-sports.vercel.app/`.
 - 2026-05-11 pre-merge verification: `npm test`, `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, `npm audit --omit=dev`, and `npm run build` passed.
+- 2026-05-11 auth persistence verification: `npm test`, `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, and `npm run build` passed after adding Supabase SSR middleware and the `/logout` route.
