@@ -456,3 +456,5 @@
 - Deployment target: `https://khu-sports.vercel.app/`.
 - Verification: `npm test`, `npm run typecheck`, `npm run lint`, temporary-env `npm run prisma:validate`, `npm audit --omit=dev`, and `npm run build` passed.
 - Status: Creating the merge commit and pushing `main`.
+- Result: Pushed merge commit `b59dfbd` to `main`. GitHub Deployments reported Vercel Production success for the merge commit. `https://khu-sports.vercel.app/results/seed-2026` returned 200, while authenticated score/admin routes returned 307 redirects as expected.
+- Follow-up note: local `.env` is absent on this machine, so the production Supabase schema push for the new `ExportLog` model was not executed here.
