@@ -16,10 +16,11 @@ const mobileNavItems = [
 type ViewMode = "leaderboard" | "summary";
 
 type ResultsViewProps = {
+  isAuthenticated: boolean;
   tournaments: PublicTournamentResult[];
 };
 
-export function ResultsView({ tournaments }: ResultsViewProps) {
+export function ResultsView({ isAuthenticated, tournaments }: ResultsViewProps) {
   const [selectedTournament, setSelectedTournament] = useState(tournaments[0]?.id ?? "");
   const [viewMode, setViewMode] = useState<ViewMode>("leaderboard");
   const currentTournament = useMemo(
@@ -33,7 +34,7 @@ export function ResultsView({ tournaments }: ResultsViewProps) {
 
   return (
     <main className="home-app">
-      <Header currentPath="/results" />
+      <Header currentPath="/results" isAuthenticated={isAuthenticated} />
 
       <section className="stitch-page-canvas results-page">
         <div className="results-title">

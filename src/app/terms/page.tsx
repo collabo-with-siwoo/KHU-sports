@@ -2,6 +2,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getActiveAgreements } from "@/lib/agreement-service";
+import { getCurrentMember } from "@/lib/members";
 
 const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
@@ -10,14 +11,17 @@ const mobileNavItems = [
   { label: "공지사항", icon: "campaign", href: "/notices" }
 ];
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function TermsPage() {
-  const agreements = await getActiveAgreements();
+  const [member, agreements] = await Promise.all([
+    getCurrentMember(),
+    getActiveAgreements()
+  ]);
 
   return (
     <main className="home-app">
-      <Header currentPath="/terms" />
+      <Header currentPath="/terms" isAuthenticated={Boolean(member)} />
 
       <section className="stitch-page-canvas">
         <div className="stitch-page-title">

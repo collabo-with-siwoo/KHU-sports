@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { getCurrentMember } from "@/lib/members";
 
 const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
@@ -52,10 +53,14 @@ const stats = [
   { value: "6,400yds", label: "코스 전장" }
 ];
 
-export default function AboutPage() {
+export const dynamic = "force-dynamic";
+
+export default async function AboutPage() {
+  const member = await getCurrentMember();
+
   return (
     <main className="home-app">
-      <Header currentPath="/about" />
+      <Header currentPath="/about" isAuthenticated={Boolean(member)} />
 
       {/* Hero Banner */}
       <section

@@ -3,13 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { getCurrentMember } from "@/lib/members";
 import { getPublishedNotice, getSeedNoticeStaticParams } from "@/lib/notices";
 
 type NoticeDetailPageProps = {
   params: Promise<{ id: string }>;
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return getSeedNoticeStaticParams();
@@ -27,7 +28,10 @@ export async function generateMetadata({ params }: NoticeDetailPageProps): Promi
 
 export default async function NoticeDetailPage({ params }: NoticeDetailPageProps) {
   const { id } = await params;
-  const notice = await getPublishedNotice(id);
+  const [member, notice] = await Promise.all([
+    getCurrentMember(),
+    getPublishedNotice(id)
+  ]);
 
   if (!notice) {
     notFound();
@@ -35,7 +39,7 @@ export default async function NoticeDetailPage({ params }: NoticeDetailPageProps
 
   return (
     <main className="home-app">
-      <Header currentPath="/notices" />
+      <Header currentPath="/notices" isAuthenticated={Boolean(member)} />
 
       <section className="stitch-page-canvas notice-detail">
         <Link className="notice-back-link" href="/notices">

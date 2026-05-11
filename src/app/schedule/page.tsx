@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { getCurrentMember } from "@/lib/members";
 
 const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
@@ -114,10 +115,14 @@ const infoRows: { icon: string; label: string; key: keyof typeof tournaments[0] 
   { icon: "call", label: "대행사/연락처", key: "organizer" }
 ];
 
-export default function SchedulePage() {
+export const dynamic = "force-dynamic";
+
+export default async function SchedulePage() {
+  const member = await getCurrentMember();
+
   return (
     <main className="home-app">
-      <Header currentPath="/schedule" />
+      <Header currentPath="/schedule" isAuthenticated={Boolean(member)} />
 
       <section className="stitch-page-canvas">
         <div className="tourney-page-header">

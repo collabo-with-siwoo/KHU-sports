@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { getCurrentMember } from "@/lib/members";
 import { listPublishedNotices, noticeCategories } from "@/lib/notices";
 
 const mobileNavItems = [
@@ -10,14 +11,17 @@ const mobileNavItems = [
   { label: "공지사항", icon: "campaign", href: "/notices" }
 ];
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function NoticesPage() {
-  const notices = await listPublishedNotices();
+  const [member, notices] = await Promise.all([
+    getCurrentMember(),
+    listPublishedNotices()
+  ]);
 
   return (
     <main className="home-app notices-page">
-      <Header currentPath="/notices" />
+      <Header currentPath="/notices" isAuthenticated={Boolean(member)} />
 
       <aside className="stitch-sidebar" aria-label="공지 카테고리">
         {noticeCategories.map((category, index) => (

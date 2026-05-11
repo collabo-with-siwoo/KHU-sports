@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { getCurrentMember } from "@/lib/members";
 import {
   getPublicPlayerScorecard,
   getTournamentLeaderboard,
@@ -376,7 +377,10 @@ export default async function ResultsDetailPage({ params, searchParams }: Result
   const { tournamentId } = await params;
   const resolvedSearchParams = (await searchParams) ?? {};
   const tab = activeTab(resolvedSearchParams);
-  const leaderboard = await getTournamentLeaderboard(tournamentId, parseLeaderboardFilters(resolvedSearchParams));
+  const [member, leaderboard] = await Promise.all([
+    getCurrentMember(),
+    getTournamentLeaderboard(tournamentId, parseLeaderboardFilters(resolvedSearchParams))
+  ]);
 
   if (!leaderboard.tournament) {
     notFound();
@@ -393,7 +397,7 @@ export default async function ResultsDetailPage({ params, searchParams }: Result
 
   return (
     <main className="home-app">
-      <Header currentPath="/results" />
+      <Header currentPath="/results" isAuthenticated={Boolean(member)} />
 
       <section className="stitch-page-canvas results-detail-page">
         <Link className="results-back-link" href="/results">
