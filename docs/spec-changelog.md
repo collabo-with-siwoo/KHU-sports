@@ -250,3 +250,4 @@
 - Notice thumbnails upload to the public R2 bucket and store their public URL on `Notice.thumbnailUrl`.
 - Notice attachments upload to the public R2 bucket and store file metadata plus `r2Key` in `NoticeAttachment`.
 - Designed the flow to accept the existing `asset` tournament promotion image as the notice thumbnail and `reference` application PDFs as public attachments.
+- Raised the Next.js Server Action body limit for the notice form to 8MB so the current promotion image and application PDF packet can be submitted on Vercel without a pre-action 400 response.

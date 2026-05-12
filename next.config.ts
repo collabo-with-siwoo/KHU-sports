@@ -5,7 +5,10 @@ const isGithubPagesBuild = process.env.GITHUB_PAGES === "true";
 const nextConfig: NextConfig = {
   output: isGithubPagesBuild ? "export" : undefined,
   experimental: {
-    authInterrupts: true
+    authInterrupts: true,
+    serverActions: {
+      bodySizeLimit: "8mb"
+    }
   },
   images: {
     unoptimized: isGithubPagesBuild,
