@@ -5114,12 +5114,78 @@ p {
 }
 
 .notice-detail-thumbnail {
-  aspect-ratio: 16 / 9;
+  background: var(--surface-low);
   border-radius: 8px;
   display: block;
+  height: auto;
   margin: 22px 0;
-  object-fit: cover;
+  object-fit: contain;
   width: 100%;
+}
+
+.upload-usage,
+.upload-usage-total {
+  background: rgba(26, 60, 52, 0.06);
+  border: 1px solid rgba(26, 60, 52, 0.12);
+  border-radius: 8px;
+  color: var(--primary);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  padding: 10px 12px;
+}
+
+.upload-usage-list {
+  background: var(--surface-low);
+  border: 1px solid var(--surface-mid);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.upload-usage-list > span {
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.upload-usage-list ul {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.upload-usage-list li {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.upload-usage-list li span {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upload-usage-list li strong {
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.upload-usage.is-over,
+.upload-usage-list.is-over,
+.upload-usage-total.is-over {
+  background: rgba(180, 35, 24, 0.08);
+  border-color: rgba(180, 35, 24, 0.24);
+  color: #b42318;
 }
 
 .admin-permission-fieldset {
