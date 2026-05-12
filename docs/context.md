@@ -86,6 +86,7 @@
 - `/admin/notices/new` now provides an active notice creation form for title, category, content, public thumbnail image, and multiple public attachments.
 - Notice uploads are designed for the existing `asset` promotion image and `reference` application PDFs: the image becomes `Notice.thumbnailUrl`, and PDFs become `NoticeAttachment` rows backed by R2 object keys.
 - Next.js Server Action upload body limit for the notice form is set to 8MB so the current promotion image plus application PDFs can be submitted on Vercel without a pre-action 400 response.
+- Notice upload UX now previews selected file usage against image, document, and aggregate request limits, and public notice detail images render uncropped at their natural aspect ratio.
 
 ## Remaining M0 External Tasks
 
