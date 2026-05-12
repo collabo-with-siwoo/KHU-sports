@@ -5065,6 +5065,24 @@ p {
   gap: 8px;
 }
 
+.admin-notice-form small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.admin-notice-check {
+  align-items: center;
+  display: inline-flex !important;
+  gap: 8px !important;
+}
+
+.admin-notice-check input {
+  min-height: auto !important;
+  width: auto;
+}
+
 .admin-notice-form input,
 .admin-notice-form select,
 .admin-notice-form textarea {
@@ -5093,6 +5111,15 @@ p {
 
 .admin-notice-form button:not(:disabled):hover {
   background: var(--primary-dark);
+}
+
+.notice-detail-thumbnail {
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  display: block;
+  margin: 22px 0;
+  object-fit: cover;
+  width: 100%;
 }
 
 .admin-permission-fieldset {

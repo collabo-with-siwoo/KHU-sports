@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -28,10 +29,7 @@ export async function generateMetadata({ params }: NoticeDetailPageProps): Promi
 
 export default async function NoticeDetailPage({ params }: NoticeDetailPageProps) {
   const { id } = await params;
-  const [member, notice] = await Promise.all([
-    getCurrentMember(),
-    getPublishedNotice(id)
-  ]);
+  const [member, notice] = await Promise.all([getCurrentMember(), getPublishedNotice(id)]);
 
   if (!notice) {
     notFound();
@@ -53,17 +51,16 @@ export default async function NoticeDetailPage({ params }: NoticeDetailPageProps
             <time dateTime={notice.publishedAt}>{notice.publishedLabel}</time>
           </div>
           <h1>{notice.title}</h1>
+          {notice.thumbnailUrl ? (
+            <img className="notice-detail-thumbnail" src={notice.thumbnailUrl} alt="" />
+          ) : null}
           <div className="notice-detail-body" dangerouslySetInnerHTML={{ __html: notice.content }} />
 
           {notice.attachments.length > 0 && (
             <section className="notice-attachments" aria-label="첨부 파일">
               <h2>첨부 파일</h2>
               {notice.attachments.map((attachment) => (
-                <a
-                  aria-disabled={!attachment.url}
-                  href={attachment.url ?? "#"}
-                  key={attachment.id}
-                >
+                <a aria-disabled={!attachment.url} href={attachment.url ?? "#"} key={attachment.id}>
                   <span className="material-symbols-outlined">attach_file</span>
                   <strong>{attachment.fileName}</strong>
                   <small>{Math.ceil(attachment.fileSize / 1024).toLocaleString("ko-KR")}KB</small>

@@ -2,10 +2,10 @@
 
 ## Current Status
 
-- Date: 2026-05-11
-- Active milestone: M4 tournaments and scores foundation.
-- M0 progress: Vercel and Supabase project setup completed by the user; R2/Resend production setup remains for later milestones.
-- Latest action: Added M3 admin RBAC guardrails and began M4 tournament/score runtime wiring.
+- Date: 2026-05-12
+- Active milestone: M2 notice upload completion after M4 foundation.
+- M0 progress: Vercel and Supabase project setup completed by the user; R2 public bucket credentials are now configured locally; Resend production setup remains for later milestones.
+- Latest action: Began `feature/m2-r2-notice-upload` to complete admin notice creation with Cloudflare R2 uploads.
 - Required docs note: `docs/specs.md` now exists and should be kept synchronized with code changes.
 
 ## Recent Changes
@@ -81,10 +81,14 @@
 - Player login persistence was hardened with an app-owned HTTP-only session-start cookie and login `next` redirects so score-input deep links return to the intended page after authentication.
 - Golf scoring was expanded to tournament-level 18-hole par setup, player/admin hole-by-hole score entry, automatic front9/back9/total aggregation, and par-relative result display.
 - Login, auth middleware, and score-save paths were optimized: public pages no longer run Supabase auth middleware, member/admin identity checks use verified JWT claims, login `lastLoginAt` writes run after redirect, player score saves perform fewer DB reads, and admin rank recalculation skips unchanged rows.
+- New branch: `feature/m2-r2-notice-upload`.
+- Added R2-backed notice upload helpers and tests.
+- `/admin/notices/new` now provides an active notice creation form for title, category, content, public thumbnail image, and multiple public attachments.
+- Notice uploads are designed for the existing `asset` promotion image and `reference` application PDFs: the image becomes `Notice.thumbnailUrl`, and PDFs become `NoticeAttachment` rows backed by R2 object keys.
 
 ## Remaining M0 External Tasks
 
-- Create Cloudflare R2 public/private buckets.
+- Create Cloudflare R2 private bucket if private application documents are needed later; the public `khusports-media` bucket has been created for notice assets.
 - Configure Resend sending domain.
 - Keep the official production domain unconnected until the final deployment decision; use `https://khu-sports.vercel.app/` for review.
 - Create/verify the Supabase Auth user for `INITIAL_SUPER_ADMIN_EMAIL` so the seeded admin profile can log in.

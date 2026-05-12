@@ -25,8 +25,8 @@ export default async function AdminNoticesPage() {
             <p className="panel-kicker">M2 Notice System</p>
             <h1>공지사항 관리</h1>
             <p>
-              Supabase 공지 데이터를 기준으로 공개 상태와 첨부 파일을 관리하는 화면입니다.
-              저장 액션은 Tiptap/R2 업로드가 붙는 다음 단계에서 활성화합니다.
+              대회 공지, 홍보 이미지, 신청 서류 첨부 파일을 관리합니다. 새 공지 작성에서
+              `asset` 폴더의 홍보 이미지와 `reference` 폴더의 신청 관련 PDF를 업로드할 수 있습니다.
             </p>
           </div>
           <Link className="admin-primary-link" href="/admin/notices/new">
@@ -40,14 +40,14 @@ export default async function AdminNoticesPage() {
             <span>분류</span>
             <span>제목</span>
             <span>공개일</span>
-            <span>상태</span>
+            <span>첨부</span>
           </div>
           {notices.map((notice) => (
             <Link className="admin-notice-row" href={`/notices/${notice.id}`} key={notice.id}>
               <span>{notice.category}</span>
               <strong>{notice.title}</strong>
               <time dateTime={notice.publishedAt}>{notice.publishedLabel}</time>
-              <em>{notice.publishedAt ? "공개" : "초안"}</em>
+              <em>{notice.attachments.length ? `${notice.attachments.length}개` : "없음"}</em>
             </Link>
           ))}
         </div>

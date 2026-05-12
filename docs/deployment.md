@@ -26,7 +26,22 @@ NEXT_PUBLIC_SITE_URL
 INITIAL_SUPER_ADMIN_EMAIL
 ```
 
-R2 and Resend variables are still required before the upload and email milestones are fully active.
+R2 variables are required for admin notice thumbnail and attachment uploads. Resend variables are
+still required before the email milestones are fully active.
+
+```text
+R2_ACCOUNT_ID
+R2_ACCESS_KEY_ID
+R2_SECRET_ACCESS_KEY
+R2_BUCKET_PUBLIC
+R2_BUCKET_PRIVATE
+R2_PUBLIC_BASE_URL
+```
+
+For the current M2 notice workflow, `R2_BUCKET_PUBLIC` should point to the public bucket used for
+promotional images and public application attachments, for example `khusports-media`.
+`R2_PUBLIC_BASE_URL` should be the bucket's public `r2.dev` URL or the configured custom media
+domain without a trailing slash.
 
 ### Supabase Schema Setup
 
