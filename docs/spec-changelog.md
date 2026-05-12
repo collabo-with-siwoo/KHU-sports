@@ -241,3 +241,12 @@
 - Moved member `lastLoginAt` persistence after the login response so successful authentication redirects faster.
 - Reduced player score save DB round trips by loading the player and existing round score together, and skipped public result revalidation for non-public draft/submitted saves.
 - Reduced admin rank recalculation writes by batching updates and skipping score rows whose stored rank totals are already current.
+
+## 2026-05-12 - M2 R2 Notice Upload
+
+- Created `feature/m2-r2-notice-upload`.
+- Added Cloudflare R2 S3-compatible upload helpers and validation for notice images/documents.
+- Enabled `/admin/notices/new` as a real notice creation form with RBAC-protected Server Action persistence.
+- Notice thumbnails upload to the public R2 bucket and store their public URL on `Notice.thumbnailUrl`.
+- Notice attachments upload to the public R2 bucket and store file metadata plus `r2Key` in `NoticeAttachment`.
+- Designed the flow to accept the existing `asset` tournament promotion image as the notice thumbnail and `reference` application PDFs as public attachments.

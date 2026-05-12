@@ -111,9 +111,11 @@ SESSION_MAX_AGE_HOURS
 - `/notices/[id]`: public detail route renders sanitized notice HTML and public attachment links when available.
 - `/admin/notices`: admin management list reads all notice rows when available and otherwise shows seed notices for layout validation.
 - `/admin/notices`: requires `notices.read`.
-- `/admin/notices/new`: requires `notices.write`; rich-text persistence and R2 upload remain future notice-write work.
-- Notice content stored as HTML must be sanitized before persistence. The current detail route assumes persisted admin-authored HTML has already passed that sanitization boundary.
-- R2 upload integration is not active yet. `NoticeAttachment` public URLs are derived from `R2_PUBLIC_BASE_URL` only for public attachments.
+- `/admin/notices/new`: requires `notices.write` and can create a notice with title, category, escaped paragraph HTML content, optional public thumbnail image, and multiple public attachments.
+- Notice content entered through the current textarea form is HTML-escaped on the server and stored as paragraph HTML. A richer Tiptap editor remains a later UX enhancement.
+- R2 upload integration is active for notice thumbnails and public attachments. Uploaded objects are stored under `notices/{noticeId}/...`; `Notice.thumbnailUrl` stores the public image URL, while `NoticeAttachment.r2Key` stores each attachment object key.
+- `asset/제27회 경희대학교 총장배 전국 골프대회.png` is expected to be uploaded as a notice thumbnail for the tournament promotion post. `reference/*.pdf` application documents are expected to be uploaded as public notice attachments.
+- Notice upload validation accepts jpg/png/webp/avif images up to 10MB and pdf/doc/docx/xls/xlsx documents up to 50MB.
 
 ## M3 Admin RBAC Contracts
 
@@ -213,7 +215,7 @@ SESSION_MAX_AGE_HOURS
 - Public result views may show public scorecards, but only with approved public competition fields.
 - Player registration copy points users toward email submission and admin approval instead of implementing a direct public player-registration workflow.
 - `/admin` is Supabase/RBAC backed; admin subpages must call `requireAdminPermission`.
-- Admin notice rich-text write controls remain disabled until Tiptap/R2 persistence is implemented, even though M3 access checks are active.
+- Admin notice write controls are enabled for textarea-based content plus R2 thumbnail/attachment uploads. Tiptap remains a later editor upgrade.
 
 ## Verification Commands
 
