@@ -116,6 +116,7 @@ SESSION_MAX_AGE_HOURS
 - R2 upload integration is active for notice thumbnails and public attachments. Uploaded objects are stored under `notices/{noticeId}/...`; `Notice.thumbnailUrl` stores the public image URL, while `NoticeAttachment.r2Key` stores each attachment object key.
 - `asset/제27회 경희대학교 총장배 전국 골프대회.png` is expected to be uploaded as a notice thumbnail for the tournament promotion post. `reference/*.pdf` application documents are expected to be uploaded as public notice attachments.
 - Notice upload validation accepts jpg/png/webp/avif images up to 10MB and pdf/doc/docx/xls/xlsx documents up to 50MB.
+- The current admin notice form posts files through a Next.js Server Action with an 8MB aggregate request limit, which covers the current `asset` promotion image plus `reference` application PDFs. Larger document workflows should move to presigned direct-to-R2 uploads before raising the advertised per-document limit in production UX.
 
 ## M3 Admin RBAC Contracts
 
