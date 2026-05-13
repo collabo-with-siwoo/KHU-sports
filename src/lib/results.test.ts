@@ -4,6 +4,7 @@ import {
   getMyTournamentScoreDetail,
   getPublicPlayerScorecard,
   getTournamentLeaderboard,
+  listPublicTournamentResults,
   searchTournamentPlayers
 } from "@/lib/results";
 import { prisma } from "@/lib/prisma";
@@ -11,7 +12,8 @@ import { prisma } from "@/lib/prisma";
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     tournament: {
-      findFirst: vi.fn()
+      findFirst: vi.fn(),
+      findMany: vi.fn()
     },
     player: {
       findMany: vi.fn(),
@@ -21,8 +23,75 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 const tournamentFindFirst = vi.mocked(prisma.tournament.findFirst);
+const tournamentFindMany = vi.mocked(prisma.tournament.findMany);
 const playerFindMany = vi.mocked(prisma.player.findMany);
 const playerFindFirst = vi.mocked(prisma.player.findFirst);
+
+const SENSITIVE_SCORE_DATA_KEYS = [
+  "adminMemo",
+  "reviewLog",
+  "reviewedBy",
+  "reviewedAt",
+  "internalNotes",
+  "phone",
+  "email",
+  "birthDate",
+  "address"
+];
+
+const SENSITIVE_VALUE_MARKERS = [
+  "010-0000-0000",
+  "private@example.com",
+  "private admin memo",
+  "private address"
+];
+
+const PUBLIC_FORBIDDEN_KEYS = [
+  ...SENSITIVE_SCORE_DATA_KEYS,
+  "playerMemo",
+  "rejectionReason",
+  "adminConfirmed",
+  "userType",
+  "lastLoginAt",
+  "dormantAt",
+  "withdrawnAt",
+  "username",
+  "userId"
+];
+
+const PUBLIC_FORBIDDEN_VALUES = [
+  ...SENSITIVE_VALUE_MARKERS,
+  "private player memo",
+  "private rejection reason",
+  "private dormant marker",
+  "private withdrawn marker",
+  "ADMIN_CONFIRMED",
+  "ADMIN_REJECTED",
+  "SUBMITTED",
+  "DRAFT",
+  "WITHDRAWN_PENDING",
+  "WITHDRAWN_DELETED"
+];
+
+function expectNoSensitiveLeakage(value: unknown) {
+  const serialized = JSON.stringify(value);
+  for (const key of SENSITIVE_SCORE_DATA_KEYS) {
+    expect(serialized).not.toContain(`"${key}"`);
+  }
+  for (const marker of SENSITIVE_VALUE_MARKERS) {
+    expect(serialized).not.toContain(marker);
+  }
+}
+
+function expectNoPublicLeakage(value: unknown) {
+  const serialized = JSON.stringify(value);
+  for (const key of PUBLIC_FORBIDDEN_KEYS) {
+    expect(serialized, `public response must not contain key "${key}"`).not.toContain(`"${key}"`);
+  }
+  for (const marker of PUBLIC_FORBIDDEN_VALUES) {
+    expect(serialized, `public response must not contain value "${marker}"`).not.toContain(marker);
+  }
+}
 
 const startDate = new Date("2026-05-01T00:00:00.000Z");
 const endDate = new Date("2026-05-02T00:00:00.000Z");
@@ -66,19 +135,31 @@ function score({
       birthDate: "2008-01-01",
       address: "private address",
       playerMemo: "private player memo",
+      rejectionReason: "private rejection reason",
       adminMemo: "private admin memo",
+      reviewLog: [{ at: "2026-05-01T00:00:00Z", by: "admin@example.com", action: "REJECT" }],
+      reviewedBy: "admin@example.com",
+      reviewedAt: "2026-05-01T00:00:00Z",
+      internalNotes: "internal review notes",
       ...scoreData
     },
     player: {
       id: playerId,
       name: playerName,
       affiliation: school,
+      userId: "00000000-0000-0000-0000-000000000099",
       user: {
         gender,
+        username: "leaky_user",
         phone: "010-0000-0000",
         email: "private@example.com",
         birthDate: new Date("2008-01-01T00:00:00.000Z"),
-        address: "private address"
+        address: "private address",
+        userType: "PLAYER",
+        status: "ACTIVE",
+        lastLoginAt: new Date("2026-05-10T12:34:56.000Z"),
+        dormantAt: "private dormant marker",
+        withdrawnAt: "private withdrawn marker"
       }
     }
   };
@@ -124,9 +205,8 @@ describe("Full Leaderboard public DTO", () => {
 
     expect(result.rows.map((row) => row.playerName)).toEqual(["김파이널", "박라운드"]);
     expect(result.rows.map((row) => row.rank)).toEqual([1, 2]);
-    expect(JSON.stringify(result.rows)).not.toContain("private@example.com");
-    expect(JSON.stringify(result.rows)).not.toContain("010-0000-0000");
-    expect(JSON.stringify(result.rows)).not.toContain("private admin memo");
+    expectNoSensitiveLeakage(result);
+    expectNoPublicLeakage(result);
   });
 
   it("filters by name, school, category, gender, and final-round eligibility", async () => {
@@ -166,6 +246,7 @@ describe("Full Leaderboard public DTO", () => {
 
     expect(result.rows).toHaveLength(1);
     expect(result.rows[0].playerName).toBe("김경희");
+    expectNoPublicLeakage(result);
   });
 
   it("uses only ADMIN_CONFIRMED rows for Scorecard search", async () => {
@@ -180,6 +261,7 @@ describe("Full Leaderboard public DTO", () => {
     const result = await searchTournamentPlayers("11111111-1111-4111-8111-111111111111", { pageSize: 10 });
 
     expect(result.rows.map((row) => row.playerName)).toEqual(["김확정"]);
+    expectNoPublicLeakage(result);
   });
 });
 
@@ -214,9 +296,37 @@ describe("Public Scorecard", () => {
     expect(scorecard?.total36).toBe(141);
     expect(scorecard?.rounds[0].holeScores).toHaveLength(2);
     expect(scorecard?.rounds[1].holeScores).toBeNull();
-    expect(JSON.stringify(scorecard)).not.toContain("private@example.com");
-    expect(JSON.stringify(scorecard)).not.toContain("private player memo");
-    expect(JSON.stringify(scorecard)).not.toContain("private admin memo");
+    expectNoSensitiveLeakage(scorecard);
+    expectNoPublicLeakage(scorecard);
+  });
+});
+
+describe("Public Tournament Results", () => {
+  it("returns only ADMIN_CONFIRMED scores and exposes no private fields", async () => {
+    tournamentFindMany.mockResolvedValue([
+      {
+        id: "11111111-1111-4111-8111-111111111111",
+        name: "KHU Test Open",
+        venue: "Test Course",
+        startDate,
+        endDate,
+        rounds: 2,
+        courseData: null,
+        scores: [
+          score({ playerId: "p1", playerName: "김확정", school: "경희고", gender: "MALE", round: 1, rank: 1, total: 70 }),
+          score({ playerId: "p1", playerName: "김확정", school: "경희고", gender: "MALE", round: 2, rank: 1, total: 71 }),
+          score({ playerId: "p2", playerName: "박임시", school: "서울고", gender: "FEMALE", round: 1, rank: 2, total: 72, status: "SUBMITTED" }),
+          score({ playerId: "p3", playerName: "이반려", school: "부산고", gender: "MALE", round: 1, rank: 3, total: 73, status: "ADMIN_REJECTED" })
+        ]
+      }
+    ] as never);
+
+    const results = await listPublicTournamentResults();
+
+    expect(results).toHaveLength(1);
+    expect(results[0].rows.map((row) => row.name)).toEqual(["김확정"]);
+    expectNoSensitiveLeakage(results);
+    expectNoPublicLeakage(results);
   });
 });
 
@@ -258,6 +368,7 @@ describe("My Page Score", () => {
     expect(history[0].playerMemo).toBe("내 메모");
     expect(history[0].rejectionReason).toBe("스코어 확인 필요");
     expect(JSON.stringify(history)).not.toContain("관리자 내부 메모");
+    expectNoSensitiveLeakage(history);
   });
 
   it("returns null for a tournament score detail not owned by the user", async () => {
@@ -309,5 +420,6 @@ describe("My Page Score", () => {
 
     expect(detail?.rejectionReason).toBeNull();
     expect(JSON.stringify(detail)).not.toContain("관리자만 보는 메모");
+    expectNoSensitiveLeakage(detail);
   });
 });
