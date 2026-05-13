@@ -84,6 +84,7 @@ model AdminUser {
   status      AdminStatus
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
+  reviewLogs  ScoreReviewLog[]
 
   @@index([role])
   @@index([status])
@@ -184,21 +185,59 @@ model Tournament {
 }
 
 model Score {
-  id           String     @id @default(uuid()) @db.Uuid
-  tournamentId String     @db.Uuid
-  tournament   Tournament @relation(fields: [tournamentId], references: [id])
-  playerId     String     @db.Uuid
-  player       Player     @relation(fields: [playerId], references: [id])
-  round        Int
-  scoreData    Json
-  rank         Int?
-  notes        String?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id               String       @id @default(uuid()) @db.Uuid
+  tournamentId     String       @db.Uuid
+  tournament       Tournament   @relation(fields: [tournamentId], references: [id])
+  playerId         String       @db.Uuid
+  player           Player       @relation(fields: [playerId], references: [id])
+  round            Int
+  scoreData        Json
+  rank             Int?
+  notes            String?
+  status           ScoreStatus?
+  playerMemo       String?
+  adminMemo        String?
+  rejectionReason  String?
+  submittedAt      DateTime?
+  adminConfirmedAt DateTime?
+  rejectedAt       DateTime?
+  reviewLogs       ScoreReviewLog[]
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 
   @@unique([tournamentId, playerId, round])
   @@index([playerId])
   @@index([tournamentId, rank])
+  @@index([status])
+}
+
+model ScoreReviewLog {
+  id        String            @id @default(uuid()) @db.Uuid
+  scoreId   String            @db.Uuid
+  score     Score             @relation(fields: [scoreId], references: [id], onDelete: Cascade)
+  action    ScoreReviewAction
+  byAdminId String?           @db.Uuid
+  byAdmin   AdminUser?        @relation(fields: [byAdminId], references: [id], onDelete: SetNull)
+  reason    String?
+  metadata  Json?
+  createdAt DateTime          @default(now())
+
+  @@index([scoreId, createdAt])
+  @@index([byAdminId])
+}
+
+enum ScoreStatus {
+  DRAFT
+  SUBMITTED
+  ADMIN_CONFIRMED
+  ADMIN_REJECTED
+}
+
+enum ScoreReviewAction {
+  SUBMIT
+  CONFIRM
+  REJECT
+  REVERT
 }
 
 enum UserStatus {
