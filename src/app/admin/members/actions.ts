@@ -3,7 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdminPermission } from "@/lib/admin/auth";
-import { prisma } from "@/lib/prisma";
+import {
+  convertMemberToPlayer,
+  demoteMemberToGeneral,
+  finalizeWithdrawnMember,
+  recoverPendingWithdrawal,
+  setMemberOperationalStatus
+} from "@/lib/member-lifecycle";
 
 export type MemberActionState = {
   status: "idle" | "success" | "error";
@@ -15,6 +21,31 @@ const memberTypeSchema = z.object({
   userType: z.enum(["GENERAL", "PLAYER"]),
   affiliation: z.string().trim().optional()
 });
+
+const memberStatusSchema = z.object({
+  userId: z.string().uuid("회원을 선택해주세요."),
+  status: z.enum(["ACTIVE", "DORMANT", "WITHDRAWN_PENDING"])
+});
+
+const memberIdSchema = z.object({
+  userId: z.string().uuid("회원을 선택해주세요.")
+});
+
+function revalidateMemberPaths(userId: string) {
+  revalidatePath("/admin/members");
+  revalidatePath(`/admin/members/${userId}`);
+  revalidatePath("/admin/scores");
+  revalidatePath("/mypage");
+  revalidatePath("/mypage/scores");
+  revalidatePath("/mypage/score-results");
+}
+
+function actionError(error: unknown, fallback: string): MemberActionState {
+  return {
+    status: "error",
+    message: error instanceof Error ? error.message : fallback
+  };
+}
 
 export async function updateMemberTypeAction(
   _previousState: MemberActionState,
@@ -34,62 +65,54 @@ export async function updateMemberTypeAction(
     };
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: parsed.data.userId },
-    select: { id: true, name: true, birthDate: true }
-  });
-
-  if (!user) {
-    return {
-      status: "error",
-      message: "회원을 찾을 수 없습니다."
-    };
+  try {
+    if (parsed.data.userType === "PLAYER") {
+      await convertMemberToPlayer(parsed.data.userId, parsed.data.affiliation);
+    } else {
+      await demoteMemberToGeneral(parsed.data.userId);
+    }
+  } catch (error) {
+    return actionError(error, "회원 유형을 변경하지 못했습니다.");
   }
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { userType: parsed.data.userType }
-  });
-
-  if (parsed.data.userType === "PLAYER") {
-    const sport = await prisma.sport.upsert({
-      where: { code: "GOLF" },
-      update: { active: true },
-      create: { code: "GOLF", name: "골프", active: true }
-    });
-
-    await prisma.player.upsert({
-      where: {
-        sportId_userId: {
-          sportId: sport.id,
-          userId: user.id
-        }
-      },
-      update: {
-        name: user.name,
-        birthYear: user.birthDate.getUTCFullYear(),
-        affiliation: parsed.data.affiliation || null,
-        anonymized: false
-      },
-      create: {
-        sportId: sport.id,
-        userId: user.id,
-        name: user.name,
-        birthYear: user.birthDate.getUTCFullYear(),
-        affiliation: parsed.data.affiliation || null
-      }
-    });
-  }
-
-  revalidatePath("/admin/members");
-  revalidatePath("/admin/scores");
-  revalidatePath("/mypage");
+  revalidateMemberPaths(parsed.data.userId);
 
   return {
     status: "success",
     message:
       parsed.data.userType === "PLAYER"
-        ? "PLAYER 전환 및 선수 프로필 저장을 완료했습니다."
+        ? "PLAYER 전환과 선수 프로필 저장을 완료했습니다."
         : "GENERAL 회원으로 변경했습니다. 기존 경기 기록은 보존됩니다."
   };
+}
+
+export async function requestAdminStatusChangeAction(formData: FormData) {
+  await requireAdminPermission("members", "write", "/admin/members");
+  const parsed = memberStatusSchema.parse({
+    userId: String(formData.get("userId") ?? ""),
+    status: String(formData.get("status") ?? "ACTIVE")
+  });
+
+  await setMemberOperationalStatus(parsed.userId, parsed.status);
+  revalidateMemberPaths(parsed.userId);
+}
+
+export async function recoverMemberAction(formData: FormData) {
+  await requireAdminPermission("members", "write", "/admin/members");
+  const parsed = memberIdSchema.parse({
+    userId: String(formData.get("userId") ?? "")
+  });
+
+  await recoverPendingWithdrawal(parsed.userId);
+  revalidateMemberPaths(parsed.userId);
+}
+
+export async function finalizeMemberWithdrawalAction(formData: FormData) {
+  await requireAdminPermission("members", "write", "/admin/members");
+  const parsed = memberIdSchema.parse({
+    userId: String(formData.get("userId") ?? "")
+  });
+
+  await finalizeWithdrawnMember(parsed.userId);
+  revalidateMemberPaths(parsed.userId);
 }
