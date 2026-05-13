@@ -14,6 +14,9 @@ in-flight branches.
   `SetNull` FK to `AdminUser`
 - Adds enums `ScoreStatus` and `ScoreReviewAction`
 - Adds index on `Score.status`
+- Enables RLS on `Score` and `ScoreReviewLog`, then revokes direct
+  `anon`/`authenticated` table access so Supabase Data API clients
+  cannot read score lifecycle columns or review logs directly
 
 There are no `NOT NULL` columns, no defaults that rewrite existing
 rows, no dropped columns, and no renamed fields. Existing reads and
@@ -39,6 +42,11 @@ options:
 
 Either path is safe to retry — every statement is `ADD COLUMN`,
 `CREATE TABLE`, `CREATE INDEX`, or `ADD CONSTRAINT`.
+
+The RLS/REVOKE statements are included because both tables are in the
+Supabase `public` schema, which can be exposed through the Data API.
+The application currently uses server-side Prisma for these records, so
+no direct `anon` or `authenticated` Data API access is required.
 
 ## Read-path compatibility layer
 

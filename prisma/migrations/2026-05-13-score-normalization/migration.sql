@@ -44,3 +44,13 @@ ALTER TABLE "ScoreReviewLog" ADD CONSTRAINT "ScoreReviewLog_scoreId_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "ScoreReviewLog" ADD CONSTRAINT "ScoreReviewLog_byAdminId_fkey" FOREIGN KEY ("byAdminId") REFERENCES "AdminUser"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- Supabase/Data API hardening
+-- These tables live in the exposed `public` schema but are intended to be accessed
+-- only through the server-side Prisma layer. Keep RLS enabled and do not grant
+-- direct anon/authenticated access to sensitive score lifecycle fields or review logs.
+ALTER TABLE "Score" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "ScoreReviewLog" ENABLE ROW LEVEL SECURITY;
+
+REVOKE ALL ON TABLE "Score" FROM anon, authenticated;
+REVOKE ALL ON TABLE "ScoreReviewLog" FROM anon, authenticated;
