@@ -819,6 +819,17 @@ function mergeScoreStatus(statuses: MyScoreStatus[]): MyScoreStatus {
   return statuses[0] ?? "NOT_STARTED";
 }
 
+function logPublicResultFallback(scope: string, error: unknown, context: Record<string, string | number | null> = {}) {
+  if (process.env.NODE_ENV === "test") {
+    return;
+  }
+
+  console.error(`[results] ${scope} fallback`, {
+    ...context,
+    error: error instanceof Error ? error.message : String(error)
+  });
+}
+
 export async function getTournamentDetail(tournamentId: string): Promise<TournamentDetail | null> {
   try {
     const tournament = await prisma.tournament.findFirst({
@@ -837,7 +848,8 @@ export async function getTournamentDetail(tournamentId: string): Promise<Tournam
     });
 
     return tournament ? toTournamentDetail(tournament) : null;
-  } catch {
+  } catch (error) {
+    logPublicResultFallback("getTournamentDetail", error, { tournamentId });
     return null;
   }
 }
@@ -1078,7 +1090,8 @@ export async function getTournamentLeaderboard(
       pageSize,
       pageCount
     };
-  } catch {
+  } catch (error) {
+    logPublicResultFallback("getTournamentLeaderboard", error, { tournamentId });
     return fallbackLeaderboardResult(tournamentId, page, pageSize, filters) ?? {
       tournament: null,
       rows: [],
@@ -1252,7 +1265,8 @@ export async function getPublicPlayerScorecard(
       totalToPar,
       finalRank: numberFromScoreData(finalScore.scoreData, "finalRank") ?? finalScore.rank
     };
-  } catch {
+  } catch (error) {
+    logPublicResultFallback("getPublicPlayerScorecard", error, { tournamentId, tournamentPlayerId });
     return fallbackScorecard(tournamentId, tournamentPlayerId);
   }
 }
@@ -1364,7 +1378,8 @@ export async function listPublicTournamentResults(): Promise<PublicTournamentRes
         rows
       };
     });
-  } catch {
+  } catch (error) {
+    logPublicResultFallback("listPublicTournamentResults", error);
     return fallbackTournaments;
   }
 }

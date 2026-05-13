@@ -29,29 +29,34 @@ function scoreDataObject(scoreData: Prisma.JsonValue): Prisma.JsonObject {
   return {};
 }
 
-function confirmedScoreData(scoreData: Prisma.JsonValue, patch: Prisma.JsonObject = {}): Prisma.JsonObject {
+function confirmedScoreData(
+  scoreData: Prisma.JsonValue,
+  patch: Prisma.JsonObject = {},
+  now = new Date()
+): Prisma.JsonObject {
   const base = scoreDataObject(scoreData);
+  const adminConfirmedAt =
+    typeof base.adminConfirmedAt === "string" && base.adminConfirmedAt.trim()
+      ? base.adminConfirmedAt
+      : now.toISOString();
 
   return {
     ...base,
     ...patch,
     status: "ADMIN_CONFIRMED",
     adminConfirmed: true,
-    adminConfirmedAt:
-      typeof base.adminConfirmedAt === "string" && base.adminConfirmedAt.trim()
-        ? base.adminConfirmedAt
-        : new Date().toISOString(),
+    adminConfirmedAt,
     rejectionReason: null,
     adminMemo: null
   };
 }
 
-function rejectedScoreData(scoreData: Prisma.JsonValue, reason: string): Prisma.JsonObject {
+function rejectedScoreData(scoreData: Prisma.JsonValue, reason: string, now = new Date()): Prisma.JsonObject {
   return {
     ...scoreDataObject(scoreData),
     status: "ADMIN_REJECTED",
     adminConfirmed: false,
-    rejectedAt: new Date().toISOString(),
+    rejectedAt: now.toISOString(),
     rejectionReason: reason,
     adminMemo: reason
   };
@@ -67,88 +72,92 @@ async function revalidateScoreSurfaces(tournamentId: string) {
 }
 
 async function recalculateTournamentRanks(tournamentId: string) {
-  const scores = await prisma.score.findMany({
-    where: { tournamentId },
-    select: {
-      id: true,
-      playerId: true,
-      round: true,
-      rank: true,
-      scoreData: true
-    },
-    orderBy: [{ round: "asc" }, { createdAt: "asc" }]
-  });
+  await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${tournamentId}))`;
 
-  const playerTotals = new Map<string, { total36: number; totalToPar: number; scoreIds: string[] }>();
+    const scores = await tx.score.findMany({
+      where: { tournamentId },
+      select: {
+        id: true,
+        playerId: true,
+        round: true,
+        rank: true,
+        scoreData: true
+      },
+      orderBy: [{ round: "asc" }, { createdAt: "asc" }]
+    });
 
-  for (const score of scores) {
-    if (getScoreSubmissionStatus(score.scoreData) !== "ADMIN_CONFIRMED") {
-      continue;
-    }
+    const playerTotals = new Map<string, { total36: number; totalToPar: number; scoreIds: string[] }>();
 
-    const data = scoreDataObject(score.scoreData);
-    const total = typeof data.total === "number" ? data.total : Number(data.total);
-    const toPar = typeof data.toPar === "number" ? data.toPar : total - Number(data.par ?? 72);
-
-    if (!Number.isFinite(total)) {
-      continue;
-    }
-
-    const current = playerTotals.get(score.playerId) ?? { total36: 0, totalToPar: 0, scoreIds: [] };
-    current.total36 += total;
-    current.totalToPar += Number.isFinite(toPar) ? toPar : 0;
-    current.scoreIds.push(score.id);
-    playerTotals.set(score.playerId, current);
-  }
-
-  const ranked = [...playerTotals.entries()].sort(([, a], [, b]) => a.total36 - b.total36);
-  const scoreById = new Map(scores.map((score) => [score.id, score]));
-  const updates: Prisma.PrismaPromise<unknown>[] = [];
-  let lastTotal: number | null = null;
-  let lastRank = 0;
-
-  for (const [index, [, entry]] of ranked.entries()) {
-    const rank = lastTotal === entry.total36 ? lastRank : index + 1;
-    lastTotal = entry.total36;
-    lastRank = rank;
-
-    for (const scoreId of entry.scoreIds) {
-      const score = scoreById.get(scoreId);
-
-      if (!score) {
+    for (const score of scores) {
+      if (getScoreSubmissionStatus(score.scoreData) !== "ADMIN_CONFIRMED") {
         continue;
       }
 
       const data = scoreDataObject(score.scoreData);
+      const total = typeof data.total === "number" ? data.total : Number(data.total);
+      const toPar = typeof data.toPar === "number" ? data.toPar : total - Number(data.par ?? 72);
 
-      if (
-        score.rank === rank &&
-        data.total36 === entry.total36 &&
-        data.totalToPar === entry.totalToPar &&
-        data.finalRank === rank
-      ) {
+      if (!Number.isFinite(total)) {
         continue;
       }
 
-      updates.push(
-        prisma.score.update({
-          where: { id: scoreId },
-          data: {
-            rank,
-            scoreData: confirmedScoreData(score.scoreData, {
-              total36: entry.total36,
-              totalToPar: entry.totalToPar,
-              finalRank: rank
-            })
-          }
-        })
-      );
+      const current = playerTotals.get(score.playerId) ?? { total36: 0, totalToPar: 0, scoreIds: [] };
+      current.total36 += total;
+      current.totalToPar += Number.isFinite(toPar) ? toPar : 0;
+      current.scoreIds.push(score.id);
+      playerTotals.set(score.playerId, current);
     }
-  }
 
-  if (updates.length) {
-    await prisma.$transaction(updates);
-  }
+    const ranked = [...playerTotals.entries()].sort(([, a], [, b]) => a.total36 - b.total36);
+    const scoreById = new Map(scores.map((score) => [score.id, score]));
+    const updates: Promise<unknown>[] = [];
+    let lastTotal: number | null = null;
+    let lastRank = 0;
+
+    for (const [index, [, entry]] of ranked.entries()) {
+      const rank = lastTotal === entry.total36 ? lastRank : index + 1;
+      lastTotal = entry.total36;
+      lastRank = rank;
+
+      for (const scoreId of entry.scoreIds) {
+        const score = scoreById.get(scoreId);
+
+        if (!score) {
+          continue;
+        }
+
+        const data = scoreDataObject(score.scoreData);
+
+        if (
+          score.rank === rank &&
+          data.total36 === entry.total36 &&
+          data.totalToPar === entry.totalToPar &&
+          data.finalRank === rank
+        ) {
+          continue;
+        }
+
+        updates.push(
+          tx.score.update({
+            where: { id: scoreId },
+            data: {
+              rank,
+              scoreData: confirmedScoreData(score.scoreData, {
+                total36: entry.total36,
+                totalToPar: entry.totalToPar,
+                finalRank: rank
+              })
+            }
+          })
+        );
+      }
+    }
+
+    if (updates.length) {
+      await Promise.all(updates);
+    }
+  });
 }
 
 export async function createScoreAction(
@@ -244,6 +253,7 @@ export async function createScoreAction(
     par: summary.par,
     toPar: summary.toPar
   };
+  const now = new Date();
 
   await prisma.score.upsert({
     where: {
@@ -255,14 +265,28 @@ export async function createScoreAction(
     },
     update: {
       rank: parsed.data.rank ?? null,
-      scoreData: confirmedScoreData({}, scorePatch)
+      scoreData: confirmedScoreData({}, scorePatch, now),
+      status: "ADMIN_CONFIRMED",
+      playerMemo: null,
+      adminMemo: null,
+      rejectionReason: null,
+      submittedAt: null,
+      adminConfirmedAt: now,
+      rejectedAt: null
     },
     create: {
       tournamentId: tournament.id,
       playerId: player.id,
       round: parsed.data.round,
       rank: parsed.data.rank ?? null,
-      scoreData: confirmedScoreData({}, scorePatch)
+      scoreData: confirmedScoreData({}, scorePatch, now),
+      status: "ADMIN_CONFIRMED",
+      playerMemo: null,
+      adminMemo: null,
+      rejectionReason: null,
+      submittedAt: null,
+      adminConfirmedAt: now,
+      rejectedAt: null
     }
   });
 
@@ -292,10 +316,17 @@ export async function confirmScoreAction(formData: FormData) {
     return;
   }
 
+  const now = new Date();
+
   await prisma.score.update({
     where: { id: score.id },
     data: {
-      scoreData: confirmedScoreData(score.scoreData)
+      scoreData: confirmedScoreData(score.scoreData, {}, now),
+      status: "ADMIN_CONFIRMED",
+      adminConfirmedAt: now,
+      rejectedAt: null,
+      rejectionReason: null,
+      adminMemo: null
     }
   });
 
@@ -308,6 +339,7 @@ export async function rejectScoreAction(formData: FormData) {
 
   const scoreId = String(formData.get("scoreId") ?? "");
   const reason = String(formData.get("rejectionReason") ?? "").trim();
+  const rejectionReason = reason || "관리자 반려";
   const score = await prisma.score.findUnique({
     where: { id: scoreId },
     select: {
@@ -321,11 +353,18 @@ export async function rejectScoreAction(formData: FormData) {
     return;
   }
 
+  const now = new Date();
+
   await prisma.score.update({
     where: { id: score.id },
     data: {
       rank: null,
-      scoreData: rejectedScoreData(score.scoreData, reason || "관리자 반려")
+      status: "ADMIN_REJECTED",
+      adminMemo: rejectionReason,
+      rejectionReason,
+      rejectedAt: now,
+      adminConfirmedAt: null,
+      scoreData: rejectedScoreData(score.scoreData, rejectionReason, now)
     }
   });
 

@@ -1,5 +1,15 @@
 # Spec Changelog
 
+## 2026-05-13 - Security Report Follow-Up Hardening
+
+- Reviewed the M0-M4 security and improvement report and split follow-up items into safe-now fixes and later backlog items.
+- Added global Next.js security headers and a CSP, and restricted optimized remote images to Google profile images plus Cloudflare R2 hosts.
+- Added regression coverage for the security header/image host configuration.
+- Added a session-owned player lookup helper for score input actions and covered its Prisma query boundary with a unit test.
+- Added normalized `Score` column dual writes for player submission and admin confirmation/rejection while keeping JSON `scoreData` compatibility.
+- Serialized tournament rank recalculation with a tournament-scoped PostgreSQL advisory transaction lock.
+- Added public result fallback logging so database read failures are visible in server logs instead of silently falling back.
+
 ## 2026-05-10 - M0 Foundation
 
 - Created the initial executable specs document from PRD v0.3.

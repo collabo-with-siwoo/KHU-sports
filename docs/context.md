@@ -5,7 +5,7 @@
 - Date: 2026-05-13
 - Active milestone: M5 member management and withdrawal lifecycle MVP.
 - M0 progress: Vercel and Supabase project setup completed by the user; R2 public bucket credentials are now configured locally; Resend production setup remains for later milestones.
-- Latest action: Began `feature/m5-member-management` to complete admin member operations, user withdrawal request, and lightweight My Page loading.
+- Latest action: Began `feature/report-security-hardening` to apply safe follow-ups from the M0-M4 security/improvement report after M5 cleanup.
 - Required docs note: `docs/specs.md` now exists and should be kept synchronized with code changes.
 
 ## Recent Changes
@@ -93,6 +93,9 @@
 - Added bounded admin member read models for list/detail views.
 - `/admin/members` now uses server-side search, filters, and pagination; `/admin/members/[userId]` provides a single-member operations page.
 - `/mypage` now avoids eager full score archive reads and exposes an ACTIVE-user withdrawal request flow.
+- New branch: `feature/report-security-hardening`.
+- Reviewed `reference/KHU-Sports M0~M4 보안·개선 리포트.txt`.
+- Applied safe follow-ups: global Next.js security headers/CSP, remote image host allowlisting, tournament-scoped advisory locking for rank recalculation, session-owned player score-input lookup helper, normalized Score column dual writes, public result fallback logging, and focused regression tests.
 
 ## Remaining M0 External Tasks
 
@@ -160,3 +163,4 @@
 - 2026-05-11 hole-by-hole golf scoring verification: `npm run db:push`, `npm run typecheck`, `npm run prisma:validate`, `npm test`, `npm run lint`, and `npm run build` passed after adding `Tournament.courseData`.
 - 2026-05-11 route smoke checks on local production server: `/results` returned 200, `/admin/tournaments` returned 307 unauthenticated redirect, and `/mypage/scores` returned 307 unauthenticated redirect.
 - 2026-05-12 auth/score performance verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test`, and `npm run build` passed.
+- 2026-05-13 security report follow-up verification: focused Vitest regression tests passed with 2 files and 4 tests; `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test` passed with 15 files and 84 tests, and `npm run build` passed.

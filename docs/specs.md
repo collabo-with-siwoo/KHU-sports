@@ -25,6 +25,7 @@
 - File storage: Cloudflare R2 via presigned URLs.
 - Forms: zod validation.
 - Rich text: Tiptap content stored as sanitized HTML or JSON.
+- Browser hardening: `next.config.ts` sets baseline security headers for all routes, including HSTS, frame denial, content-type sniffing protection, strict referrer policy, a restrictive permissions policy, and a CSP. Remote image optimization is allowlisted to Google profile images and Cloudflare R2 hosts instead of arbitrary hosts.
 
 ## Legal/Privacy Policy
 
@@ -183,7 +184,10 @@ SESSION_MAX_AGE_HOURS
 - The score input form collects 18 hole scores. The server calculates `front9`, `back9`, `roundTotal`, round par, and `toPar` from the tournament hole-par setup before writing.
 - Score submission states are normalized to `DRAFT`, `SUBMITTED`, `ADMIN_CONFIRMED`, and `ADMIN_REJECTED`. My Page renders the required user-facing status messages for every state.
 - Public `/results`, Full Leaderboard, and public Scorecard filter runtime rows through the confirmed-score predicate; only `ADMIN_CONFIRMED` compatible score data is exposed publicly.
+- Score writes dual-write transitional state fields: JSON `scoreData` remains the compatibility source, while `Score.status`, `playerMemo`, `adminMemo`, `rejectionReason`, `submittedAt`, `adminConfirmedAt`, and `rejectedAt` are also maintained for the normalized schema path.
 - `/admin/scores` can confirm or reject existing score rows. Confirmation writes `scoreData.status = ADMIN_CONFIRMED`, clears rejection fields, recalculates tournament ranks from confirmed scores, and revalidates result/My Page surfaces. Rejection writes `scoreData.status = ADMIN_REJECTED`, clears public rank, and stores `scoreData.rejectionReason`/`scoreData.adminMemo` for owner/admin views.
+- Tournament rank recalculation runs inside a transaction with a tournament-scoped PostgreSQL advisory lock so concurrent admin confirmations do not interleave rank updates.
+- Player self-entry derives the editable `Player` row through a session-owned lookup helper scoped by `session.user.id`, sport, tournament, and round.
 - Player-facing DTOs may expose rejection reason to the owner. Public DTOs never return `playerMemo`, `adminMemo`, `rejectionReason`, or review logs.
 
 ### M4 Result Search And Sorting
@@ -208,6 +212,7 @@ SESSION_MAX_AGE_HOURS
 ### M4 QA And Test Coverage
 
 - `npm test` runs Vitest unit tests for Full Leaderboard, public Scorecard, My Page score ownership/privacy, and admin export authorization/logging boundaries.
+- Additional regression tests cover the Next.js security header/image host configuration and player score-input ownership lookup.
 - QA checklist for Full Leaderboard, Scorecard, My Page Score, and Admin Export lives in `docs/qa-results-score-features.md`.
 - Player-visible rejection reason must come only from `scoreData.rejectionReason`; `scoreData.adminMemo` is admin-only and must not be used as a fallback in My Page DTOs.
 

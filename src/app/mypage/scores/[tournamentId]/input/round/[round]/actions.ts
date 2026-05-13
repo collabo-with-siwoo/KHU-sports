@@ -5,6 +5,7 @@ import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { buildRoundSummary, parseHoleScoresFromFormData } from "@/lib/golf-scoring";
 import { getCurrentMember } from "@/lib/members";
+import { findOwnedGolfPlayerForScoreInput } from "@/lib/player-ownership";
 import { prisma } from "@/lib/prisma";
 import { getScoreSubmissionStatus, isPlayerEditableScoreStatus, isTournamentScoreInputOpen } from "@/lib/results";
 
@@ -35,9 +36,11 @@ function buildPlayerScoreData(
     holePars: unknown;
     playerMemo?: string;
     status: "DRAFT" | "SUBMITTED";
+    now?: Date;
   }
 ): Prisma.JsonObject {
   const summary = buildRoundSummary(values.holeScores, values.holePars);
+  const submittedAt = values.status === "SUBMITTED" ? (values.now ?? new Date()).toISOString() : null;
 
   return {
     ...scoreDataObject(existing),
@@ -53,7 +56,7 @@ function buildPlayerScoreData(
     playerMemo: values.playerMemo?.trim() || null,
     status: values.status,
     adminConfirmed: false,
-    submittedAt: values.status === "SUBMITTED" ? new Date().toISOString() : null,
+    submittedAt,
     rejectionReason: null,
     adminMemo: null
   };
@@ -146,25 +149,11 @@ export async function savePlayerScoreAction(
     };
   }
 
-  const player = await prisma.player.findFirst({
-    where: {
-      sportId: tournament.sportId,
-      userId: member.id
-    },
-    select: {
-      id: true,
-      scores: {
-        where: {
-          tournamentId: tournament.id,
-          round: parsed.data.round
-        },
-        select: {
-          id: true,
-          scoreData: true
-        },
-        take: 1
-      }
-    }
+  const player = await findOwnedGolfPlayerForScoreInput({
+    userId: member.id,
+    sportId: tournament.sportId,
+    tournamentId: tournament.id,
+    round: parsed.data.round
   });
 
   if (!player) {
@@ -184,11 +173,13 @@ export async function savePlayerScoreAction(
   }
 
   const nextStatus = parsed.data.intent === "submit" ? "SUBMITTED" : "DRAFT";
+  const now = new Date();
   const scoreData = buildPlayerScoreData(existing?.scoreData ?? {}, {
     holeScores,
     holePars: tournament.courseData,
     playerMemo: parsed.data.playerMemo,
-    status: nextStatus
+    status: nextStatus,
+    now
   });
 
   await prisma.score.upsert({
@@ -201,14 +192,28 @@ export async function savePlayerScoreAction(
     },
     update: {
       rank: null,
-      scoreData
+      scoreData,
+      status: nextStatus,
+      playerMemo: parsed.data.playerMemo?.trim() || null,
+      adminMemo: null,
+      rejectionReason: null,
+      submittedAt: nextStatus === "SUBMITTED" ? now : null,
+      adminConfirmedAt: null,
+      rejectedAt: null
     },
     create: {
       tournamentId: tournament.id,
       playerId: player.id,
       round: parsed.data.round,
       rank: null,
-      scoreData
+      scoreData,
+      status: nextStatus,
+      playerMemo: parsed.data.playerMemo?.trim() || null,
+      adminMemo: null,
+      rejectionReason: null,
+      submittedAt: nextStatus === "SUBMITTED" ? now : null,
+      adminConfirmedAt: null,
+      rejectedAt: null
     }
   });
 
