@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { PublicQueryTimeoutError, withPublicQueryTimeout } from "@/lib/public-query-timeout";
 
 export const noticeCategories = ["전체", "대회 안내", "일정", "규정", "선수 안내", "긴급"];
 
@@ -88,7 +89,7 @@ function isDatabaseConfigured() {
 
 function logNoticeFallback(message: string, error: unknown) {
   if (process.env.NODE_ENV !== "production") {
-    console.warn(message, error);
+    console.warn(message, error instanceof PublicQueryTimeoutError ? error.message : error);
   }
 }
 
@@ -153,14 +154,17 @@ export async function listPublishedNotices(): Promise<NoticeView[]> {
   }
 
   try {
-    const notices = await prisma.notice.findMany({
-      where: {
-        OR: [{ publishedAt: { lte: new Date() } }, { publishedAt: null }]
-      },
-      orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
-      include: { attachments: true },
-      take: 30
-    });
+    const notices = await withPublicQueryTimeout(
+      "listPublishedNotices",
+      prisma.notice.findMany({
+        where: {
+          OR: [{ publishedAt: { lte: new Date() } }, { publishedAt: null }]
+        },
+        orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+        include: { attachments: true },
+        take: 30
+      })
+    );
 
     return notices.length > 0 ? notices.map(toNoticeView) : seededNotices;
   } catch (error) {
@@ -194,13 +198,16 @@ export async function getPublishedNotice(id: string): Promise<NoticeView | null>
   }
 
   try {
-    const notice = await prisma.notice.findFirst({
-      where: {
-        id,
-        OR: [{ publishedAt: { lte: new Date() } }, { publishedAt: null }]
-      },
-      include: { attachments: true }
-    });
+    const notice = await withPublicQueryTimeout(
+      "getPublishedNotice",
+      prisma.notice.findFirst({
+        where: {
+          id,
+          OR: [{ publishedAt: { lte: new Date() } }, { publishedAt: null }]
+        },
+        include: { attachments: true }
+      })
+    );
 
     return notice ? toNoticeView(notice) : seededNotices.find((item) => item.id === id) ?? null;
   } catch (error) {

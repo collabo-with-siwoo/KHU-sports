@@ -21,6 +21,8 @@ describe("next security config", () => {
     expect(headerMap.get("Referrer-Policy")).toBe("strict-origin-when-cross-origin");
     expect(headerMap.get("Permissions-Policy")).toContain("camera=()");
     expect(headerMap.get("Content-Security-Policy")).toContain("frame-ancestors 'none'");
+    expect(headerMap.get("Content-Security-Policy")).toContain("https://cdn.jsdelivr.net");
+    expect(headerMap.get("Content-Security-Policy")).toContain("font-src 'self' data:");
   });
 
   it("does not allow arbitrary remote image hosts", () => {

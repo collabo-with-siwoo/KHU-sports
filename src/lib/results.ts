@@ -5,6 +5,7 @@ import {
   extractHoleScores
 } from "@/lib/golf-scoring";
 import { prisma } from "@/lib/prisma";
+import { withPublicQueryTimeout } from "@/lib/public-query-timeout";
 
 export { formatToPar } from "@/lib/golf-scoring";
 
@@ -824,7 +825,7 @@ function logPublicResultFallback(scope: string, error: unknown, context: Record<
     return;
   }
 
-  console.error(`[results] ${scope} fallback`, {
+  console.warn(`[results] ${scope} fallback`, {
     ...context,
     error: error instanceof Error ? error.message : String(error)
   });
@@ -832,20 +833,23 @@ function logPublicResultFallback(scope: string, error: unknown, context: Record<
 
 export async function getTournamentDetail(tournamentId: string): Promise<TournamentDetail | null> {
   try {
-    const tournament = await prisma.tournament.findFirst({
-      where: {
-        id: tournamentId,
-        sport: { code: "GOLF", active: true }
-      },
-      select: {
-        id: true,
-        name: true,
-        venue: true,
-        startDate: true,
-        endDate: true,
-        rounds: true
-      }
-    });
+    const tournament = await withPublicQueryTimeout(
+      "getTournamentDetail",
+      prisma.tournament.findFirst({
+        where: {
+          id: tournamentId,
+          sport: { code: "GOLF", active: true }
+        },
+        select: {
+          id: true,
+          name: true,
+          venue: true,
+          startDate: true,
+          endDate: true,
+          rounds: true
+        }
+      })
+    );
 
     return tournament ? toTournamentDetail(tournament) : null;
   } catch (error) {
@@ -862,42 +866,45 @@ export async function getTournamentLeaderboard(
   const pageSize = normalizeLeaderboardPageSize(filters.pageSize);
 
   try {
-    const tournament = await prisma.tournament.findFirst({
-      where: {
-        id: tournamentId,
-        sport: { code: "GOLF", active: true }
-      },
-      select: {
-        id: true,
-        name: true,
-        venue: true,
-        startDate: true,
-        endDate: true,
-        rounds: true,
-        courseData: true,
-        scores: {
-          select: {
-            playerId: true,
-            round: true,
-            rank: true,
-            scoreData: true,
-            player: {
-              select: {
-                id: true,
-                name: true,
-                affiliation: true,
-                user: {
-                  select: {
-                    gender: true
+    const tournament = await withPublicQueryTimeout(
+      "getTournamentLeaderboard",
+      prisma.tournament.findFirst({
+        where: {
+          id: tournamentId,
+          sport: { code: "GOLF", active: true }
+        },
+        select: {
+          id: true,
+          name: true,
+          venue: true,
+          startDate: true,
+          endDate: true,
+          rounds: true,
+          courseData: true,
+          scores: {
+            select: {
+              playerId: true,
+              round: true,
+              rank: true,
+              scoreData: true,
+              player: {
+                select: {
+                  id: true,
+                  name: true,
+                  affiliation: true,
+                  user: {
+                    select: {
+                      gender: true
+                    }
                   }
                 }
               }
-            }
-          },
-          orderBy: [{ round: "asc" }, { rank: "asc" }, { createdAt: "asc" }]
+            },
+            orderBy: [{ round: "asc" }, { rank: "asc" }, { createdAt: "asc" }]
+          }
         }
-      }
-    });
+      })
+    );
 
     if (!tournament) {
       return fallbackLeaderboardResult(tournamentId, page, pageSize, filters) ?? {
@@ -1190,38 +1197,41 @@ export async function getPublicPlayerScorecard(
   tournamentPlayerId: string
 ): Promise<PublicScorecard | null> {
   try {
-    const tournament = await prisma.tournament.findFirst({
-      where: {
-        id: tournamentId,
-        sport: { code: "GOLF", active: true }
-      },
-      select: {
-        name: true,
-        courseData: true,
-        scores: {
-          where: {
-            playerId: tournamentPlayerId
-          },
-          select: {
-            round: true,
-            rank: true,
-            scoreData: true,
-            player: {
-              select: {
-                name: true,
-                affiliation: true,
-                user: {
-                  select: {
-                    gender: true
+    const tournament = await withPublicQueryTimeout(
+      "getPublicPlayerScorecard",
+      prisma.tournament.findFirst({
+        where: {
+          id: tournamentId,
+          sport: { code: "GOLF", active: true }
+        },
+        select: {
+          name: true,
+          courseData: true,
+          scores: {
+            where: {
+              playerId: tournamentPlayerId
+            },
+            select: {
+              round: true,
+              rank: true,
+              scoreData: true,
+              player: {
+                select: {
+                  name: true,
+                  affiliation: true,
+                  user: {
+                    select: {
+                      gender: true
+                    }
                   }
                 }
               }
-            }
-          },
-          orderBy: [{ round: "asc" }, { createdAt: "asc" }]
+            },
+            orderBy: [{ round: "asc" }, { createdAt: "asc" }]
+          }
         }
-      }
-    });
+      })
+    );
 
     if (!tournament) {
       return fallbackScorecard(tournamentId, tournamentPlayerId);
@@ -1273,36 +1283,39 @@ export async function getPublicPlayerScorecard(
 
 export async function listPublicTournamentResults(): Promise<PublicTournamentResult[]> {
   try {
-    const tournaments = await prisma.tournament.findMany({
-      where: {
-        sport: { code: "GOLF", active: true }
-      },
-      select: {
-        id: true,
-        name: true,
-        venue: true,
-        startDate: true,
-        endDate: true,
-        rounds: true,
-        courseData: true,
-        scores: {
-          select: {
-            round: true,
-            rank: true,
-            playerId: true,
-            scoreData: true,
-            player: {
-              select: {
-                name: true,
-                affiliation: true
+    const tournaments = await withPublicQueryTimeout(
+      "listPublicTournamentResults",
+      prisma.tournament.findMany({
+        where: {
+          sport: { code: "GOLF", active: true }
+        },
+        select: {
+          id: true,
+          name: true,
+          venue: true,
+          startDate: true,
+          endDate: true,
+          rounds: true,
+          courseData: true,
+          scores: {
+            select: {
+              round: true,
+              rank: true,
+              playerId: true,
+              scoreData: true,
+              player: {
+                select: {
+                  name: true,
+                  affiliation: true
+                }
               }
-            }
-          },
-          orderBy: [{ round: "asc" }, { rank: "asc" }, { createdAt: "asc" }]
-        }
-      },
-      orderBy: { startDate: "desc" }
-    });
+            },
+            orderBy: [{ round: "asc" }, { rank: "asc" }, { createdAt: "asc" }]
+          }
+        },
+        orderBy: { startDate: "desc" }
+      })
+    );
 
     if (!tournaments.length) {
       return fallbackTournaments;

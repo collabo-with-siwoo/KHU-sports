@@ -1,5 +1,13 @@
 # Spec Changelog
 
+## 2026-05-13 - M6 UI QA Polish
+
+- Created `feature/m6-ui-qa-polish`.
+- Added Korean M6 design, implementation plan, and QA scan documents under `docs/superpowers/` and `docs/qa-m6-ui-polish.md`.
+- Added bounded public query timeouts for public notice and result reads so seed fallback can render quickly when Supabase is slow or unreachable.
+- Polished mobile `/notices` category tabs and mobile `/results` overview table to avoid awkward viewport overflow.
+- Updated CSP to allow the Pretendard CDN stylesheet and font files already used by the app UI.
+
 ## 2026-05-13 - Security Report Follow-Up Hardening
 
 - Reviewed the M0-M4 security and improvement report and split follow-up items into safe-now fixes and later backlog items.

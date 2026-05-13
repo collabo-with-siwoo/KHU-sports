@@ -25,7 +25,7 @@
 - File storage: Cloudflare R2 via presigned URLs.
 - Forms: zod validation.
 - Rich text: Tiptap content stored as sanitized HTML or JSON.
-- Browser hardening: `next.config.ts` sets baseline security headers for all routes, including HSTS, frame denial, content-type sniffing protection, strict referrer policy, a restrictive permissions policy, and a CSP. Remote image optimization is allowlisted to Google profile images and Cloudflare R2 hosts instead of arbitrary hosts.
+- Browser hardening: `next.config.ts` sets baseline security headers for all routes, including HSTS, frame denial, content-type sniffing protection, strict referrer policy, a restrictive permissions policy, and a CSP. Remote image optimization is allowlisted to Google profile images and Cloudflare R2 hosts instead of arbitrary hosts. The CSP also allowlists the current Google Fonts and Pretendard CDN font/style origins used by the UI baseline.
 
 ## Legal/Privacy Policy
 
@@ -108,6 +108,7 @@ SESSION_MAX_AGE_HOURS
 
 - `src/lib/prisma.ts`: shared Prisma client singleton for server-side data access.
 - `src/lib/notices.ts`: notice read model and seed fallback. It exposes published notice list/detail reads, admin list reads, category labels, and static params for seed detail pages.
+- Public notice list/detail reads use a bounded public query timeout before falling back to seed notices, so a slow or unreachable database does not hold the public page past the 5-second loading target.
 - `/`: latest notice module reads the first three published notices from the shared notice source.
 - `/notices`: public notice list shows category tabs, search/filter controls, and published notice cards.
 - `/notices/[id]`: public detail route renders sanitized notice HTML and public attachment links when available.
@@ -145,6 +146,7 @@ SESSION_MAX_AGE_HOURS
 ## M4 Tournament And Score Contracts
 
 - `src/lib/results.ts` is the shared read model for public result summaries and admin tournament/score lists.
+- Public result index, leaderboard, and scorecard reads use a bounded public query timeout before seed fallback when the database is slow or unreachable.
 - `/results`: tournament index route. It lists ongoing and completed tournaments with name, venue, period, status, and a result-view action.
 - `/results/[tournamentId]`: tournament result detail route. It defaults to the Full Leaderboard tab and also provides a public Scorecard tab.
 - Full Leaderboard columns: rank, player name, school, participation type, gender, 1R, 2R, 36-hole total, final-day qualification, group, start time, and a Scorecard view action.
@@ -229,6 +231,7 @@ SESSION_MAX_AGE_HOURS
 - The public leaderboard page presents public competition fields and supports filtering/searching by name, school, participation type, gender, rank range, and final-day qualification.
 - Public Scorecard is a competition-record view, not a private profile view. It must not render phone, email, birth date, address, guardian contact, player memo, admin memo, or admin review logs.
 - The notices page uses category tabs and a feed layout; desktop screens add a left sidebar while mobile screens rely on the bottom navigation.
+- M6 mobile polish keeps `/notices` category tabs inside the viewport by wrapping chips on small screens, and keeps the `/results` overview readable by showing the primary rank/player/total columns without horizontal scrolling.
 - Public navigation uses hover lift/color transitions.
 - Homepage quick-link cards, notice rows, result rows, subpage cards, and admin preview modules provide hover feedback.
 - Public result views may show public scorecards, but only with approved public competition fields.

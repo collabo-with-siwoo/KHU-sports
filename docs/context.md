@@ -3,9 +3,9 @@
 ## Current Status
 
 - Date: 2026-05-13
-- Active milestone: M5 member management and withdrawal lifecycle MVP.
+- Active milestone: M6 UI QA and polish.
 - M0 progress: Vercel and Supabase project setup completed by the user; R2 public bucket credentials are now configured locally; Resend production setup remains for later milestones.
-- Latest action: Began `feature/report-security-hardening` to apply safe follow-ups from the M0-M4 security/improvement report after M5 cleanup.
+- Latest action: Began `feature/m6-ui-qa-polish` to run core route QA, tighten mobile public screens, and keep public fallback loads under the 5-second target.
 - Required docs note: `docs/specs.md` now exists and should be kept synchronized with code changes.
 
 ## Recent Changes
@@ -96,6 +96,12 @@
 - New branch: `feature/report-security-hardening`.
 - Reviewed `reference/KHU-Sports M0~M4 보안·개선 리포트.txt`.
 - Applied safe follow-ups: global Next.js security headers/CSP, remote image host allowlisting, tournament-scoped advisory locking for rank recalculation, session-owned player score-input lookup helper, normalized Score column dual writes, public result fallback logging, and focused regression tests.
+- New branch: `feature/m6-ui-qa-polish`.
+- Added M6 UI QA design and implementation plan documents in Korean under `docs/superpowers/`.
+- Added `docs/qa-m6-ui-polish.md` with desktop/mobile route scan results for public, auth, mypage, and admin-protected pages.
+- Public notice/result fallback reads now use a bounded public query timeout so a slow or unreachable Supabase database falls back to seed content without holding the page beyond the loading target.
+- Mobile `/notices` category tabs now wrap instead of leaking beyond the viewport, and mobile `/results` overview shows the key rank/player/total columns without requiring horizontal scroll.
+- CSP now explicitly allows the Pretendard CDN stylesheet and font files used by the current Stitch visual baseline.
 
 ## Remaining M0 External Tasks
 
@@ -164,3 +170,4 @@
 - 2026-05-11 route smoke checks on local production server: `/results` returned 200, `/admin/tournaments` returned 307 unauthenticated redirect, and `/mypage/scores` returned 307 unauthenticated redirect.
 - 2026-05-12 auth/score performance verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test`, and `npm run build` passed.
 - 2026-05-13 security report follow-up verification: focused Vitest regression tests passed with 2 files and 4 tests; `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test` passed with 15 files and 84 tests, and `npm run build` passed.
+- 2026-05-13 M6 UI QA polish verification: mobile `/notices` and `/results` overflow checks returned 0 overflowing elements; warm local responses for `/`, `/notices`, and `/results` stayed near 2 seconds with DB fallback timeout active. `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test` passed with 16 files and 86 tests, and `npm run build` passed.

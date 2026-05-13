@@ -1984,7 +1984,9 @@ p {
   -webkit-overflow-scrolling: touch;
   border: 1px solid var(--line);
   border-radius: 12px;
+  max-width: 100%;
   overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 /* ── FULL LEADERBOARD TABLE ── */
@@ -2135,6 +2137,39 @@ p {
 
   .results-tournament-select button {
     min-width: unset;
+  }
+
+  .results-page .lb-table-wrap {
+    overflow-x: visible;
+  }
+
+  .results-page .lb-table {
+    min-width: 0;
+    table-layout: fixed;
+  }
+
+  .results-page .lb-table th,
+  .results-page .lb-table td {
+    padding: 12px 8px;
+  }
+
+  .results-page .lb-table th:nth-child(1),
+  .results-page .lb-table td:nth-child(1) {
+    width: 56px;
+  }
+
+  .results-page .lb-table th:nth-child(2),
+  .results-page .lb-table td:nth-child(2) {
+    width: auto;
+  }
+
+  .results-page .lb-table th:nth-child(3),
+  .results-page .lb-table td:nth-child(3),
+  .results-page .lb-table th:nth-child(5),
+  .results-page .lb-table td:nth-child(5),
+  .results-page .lb-table th:nth-child(n + 6):not(:last-child),
+  .results-page .lb-table td:nth-child(n + 6):not(:last-child) {
+    display: none;
   }
 }
 
@@ -3784,8 +3819,10 @@ p {
   display: flex;
   gap: 8px;
   margin-bottom: 24px;
+  max-width: 100%;
   overflow-x: auto;
   padding-bottom: 4px;
+  scrollbar-width: thin;
 }
 
 .notice-tabs button {
@@ -3999,6 +4036,11 @@ p {
   .stitch-filterbar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .notice-tabs {
+    flex-wrap: wrap;
+    overflow-x: visible;
   }
 
   .score-head,
