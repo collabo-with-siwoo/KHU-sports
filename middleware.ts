@@ -46,6 +46,17 @@ export async function middleware(request: NextRequest) {
     });
   }
 
+  const { pathname, search } = request.nextUrl;
+  const isAdminSubPath = pathname.startsWith("/admin/");
+  const isMyPage = pathname.startsWith("/mypage");
+
+  if (!hasUser && (isAdminSubPath || isMyPage)) {
+    const loginPath = isAdminSubPath ? "/admin" : "/login";
+    const redirectUrl = new URL(loginPath, request.url);
+    redirectUrl.searchParams.set("next", `${pathname}${search}`);
+    return NextResponse.redirect(redirectUrl);
+  }
+
   return response;
 }
 

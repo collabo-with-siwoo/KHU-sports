@@ -1263,10 +1263,26 @@ export async function listPublicTournamentResults(): Promise<PublicTournamentRes
       where: {
         sport: { code: "GOLF", active: true }
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        venue: true,
+        startDate: true,
+        endDate: true,
+        rounds: true,
+        courseData: true,
         scores: {
-          include: {
-            player: true
+          select: {
+            round: true,
+            rank: true,
+            playerId: true,
+            scoreData: true,
+            player: {
+              select: {
+                name: true,
+                affiliation: true
+              }
+            }
           },
           orderBy: [{ round: "asc" }, { rank: "asc" }, { createdAt: "asc" }]
         }
