@@ -46,6 +46,33 @@ const SENSITIVE_VALUE_MARKERS = [
   "private address"
 ];
 
+const PUBLIC_FORBIDDEN_KEYS = [
+  ...SENSITIVE_SCORE_DATA_KEYS,
+  "playerMemo",
+  "rejectionReason",
+  "adminConfirmed",
+  "userType",
+  "lastLoginAt",
+  "dormantAt",
+  "withdrawnAt",
+  "username",
+  "userId"
+];
+
+const PUBLIC_FORBIDDEN_VALUES = [
+  ...SENSITIVE_VALUE_MARKERS,
+  "private player memo",
+  "private rejection reason",
+  "private dormant marker",
+  "private withdrawn marker",
+  "ADMIN_CONFIRMED",
+  "ADMIN_REJECTED",
+  "SUBMITTED",
+  "DRAFT",
+  "WITHDRAWN_PENDING",
+  "WITHDRAWN_DELETED"
+];
+
 function expectNoSensitiveLeakage(value: unknown) {
   const serialized = JSON.stringify(value);
   for (const key of SENSITIVE_SCORE_DATA_KEYS) {
@@ -53,6 +80,16 @@ function expectNoSensitiveLeakage(value: unknown) {
   }
   for (const marker of SENSITIVE_VALUE_MARKERS) {
     expect(serialized).not.toContain(marker);
+  }
+}
+
+function expectNoPublicLeakage(value: unknown) {
+  const serialized = JSON.stringify(value);
+  for (const key of PUBLIC_FORBIDDEN_KEYS) {
+    expect(serialized, `public response must not contain key "${key}"`).not.toContain(`"${key}"`);
+  }
+  for (const marker of PUBLIC_FORBIDDEN_VALUES) {
+    expect(serialized, `public response must not contain value "${marker}"`).not.toContain(marker);
   }
 }
 
@@ -98,6 +135,7 @@ function score({
       birthDate: "2008-01-01",
       address: "private address",
       playerMemo: "private player memo",
+      rejectionReason: "private rejection reason",
       adminMemo: "private admin memo",
       reviewLog: [{ at: "2026-05-01T00:00:00Z", by: "admin@example.com", action: "REJECT" }],
       reviewedBy: "admin@example.com",
@@ -109,12 +147,19 @@ function score({
       id: playerId,
       name: playerName,
       affiliation: school,
+      userId: "00000000-0000-0000-0000-000000000099",
       user: {
         gender,
+        username: "leaky_user",
         phone: "010-0000-0000",
         email: "private@example.com",
         birthDate: new Date("2008-01-01T00:00:00.000Z"),
-        address: "private address"
+        address: "private address",
+        userType: "PLAYER",
+        status: "ACTIVE",
+        lastLoginAt: new Date("2026-05-10T12:34:56.000Z"),
+        dormantAt: "private dormant marker",
+        withdrawnAt: "private withdrawn marker"
       }
     }
   };
@@ -161,6 +206,7 @@ describe("Full Leaderboard public DTO", () => {
     expect(result.rows.map((row) => row.playerName)).toEqual(["김파이널", "박라운드"]);
     expect(result.rows.map((row) => row.rank)).toEqual([1, 2]);
     expectNoSensitiveLeakage(result);
+    expectNoPublicLeakage(result);
   });
 
   it("filters by name, school, category, gender, and final-round eligibility", async () => {
@@ -200,6 +246,7 @@ describe("Full Leaderboard public DTO", () => {
 
     expect(result.rows).toHaveLength(1);
     expect(result.rows[0].playerName).toBe("김경희");
+    expectNoPublicLeakage(result);
   });
 
   it("uses only ADMIN_CONFIRMED rows for Scorecard search", async () => {
@@ -214,6 +261,7 @@ describe("Full Leaderboard public DTO", () => {
     const result = await searchTournamentPlayers("11111111-1111-4111-8111-111111111111", { pageSize: 10 });
 
     expect(result.rows.map((row) => row.playerName)).toEqual(["김확정"]);
+    expectNoPublicLeakage(result);
   });
 });
 
@@ -248,8 +296,8 @@ describe("Public Scorecard", () => {
     expect(scorecard?.total36).toBe(141);
     expect(scorecard?.rounds[0].holeScores).toHaveLength(2);
     expect(scorecard?.rounds[1].holeScores).toBeNull();
-    expect(JSON.stringify(scorecard)).not.toContain("private player memo");
     expectNoSensitiveLeakage(scorecard);
+    expectNoPublicLeakage(scorecard);
   });
 });
 
@@ -278,6 +326,7 @@ describe("Public Tournament Results", () => {
     expect(results).toHaveLength(1);
     expect(results[0].rows.map((row) => row.name)).toEqual(["김확정"]);
     expectNoSensitiveLeakage(results);
+    expectNoPublicLeakage(results);
   });
 });
 
