@@ -1,8 +1,9 @@
 import Link from "next/link";
-import Header from "@/components/Header";
+import { requestWithdrawalAction } from "./actions";
 import Footer from "@/components/Footer";
+import Header from "@/components/Header";
 import { getCurrentMember } from "@/lib/members";
-import { getMyOpenScoreInputs, listMemberScoreArchive, type MyOpenScoreInput } from "@/lib/results";
+import { getMyOpenScoreInputs, type MyOpenScoreInput } from "@/lib/results";
 
 const mobileNavItems = [
   { label: "홈", icon: "home", href: "/" },
@@ -25,9 +26,7 @@ function ScoreInputShortcut({ items }: { items: MyOpenScoreInput[] }) {
       <div>
         <p className="stitch-label">Score Input</p>
         <h2 id="mypage-score-input-title">진행 중인 대회 스코어 입력</h2>
-        <p>
-          {primary.tournamentName} 스코어를 바로 입력할 수 있습니다. 임시저장 후 나중에 이어서 제출할 수 있습니다.
-        </p>
+        <p>{primary.tournamentName} 스코어를 바로 입력할 수 있습니다. 임시 저장 후 제출할 수 있습니다.</p>
       </div>
       {primary.primaryHref && primary.primaryActionLabel ? (
         <Link className="my-score-action primary" href={primary.primaryHref}>
@@ -42,11 +41,45 @@ function ScoreInputShortcut({ items }: { items: MyOpenScoreInput[] }) {
   );
 }
 
+function WithdrawalPanel({ isActive }: { isActive: boolean }) {
+  if (!isActive) {
+    return (
+      <section className="profile-preview">
+        <div>
+          <span>Withdrawal</span>
+          <strong>탈퇴 신청은 ACTIVE 회원만 가능합니다.</strong>
+          <p>현재 계정 상태에서는 마이페이지에서 직접 탈퇴 신청을 진행할 수 없습니다. 운영자에게 문의해주세요.</p>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="profile-preview">
+      <div>
+        <span>Withdrawal</span>
+        <strong>회원 탈퇴 신청</strong>
+        <p>
+          신청 즉시 로그인이 차단되고 30일 유예 상태로 전환됩니다. 대회 공식 기록은 Player 기록으로 익명화되어
+          보존될 수 있습니다.
+        </p>
+      </div>
+      <form action={requestWithdrawalAction} className="member-inline-form">
+        <input name="confirmText" placeholder="탈퇴 신청" />
+        <button className="button ghost" type="submit">
+          탈퇴 신청
+        </button>
+      </form>
+    </section>
+  );
+}
+
 export default async function MyPage() {
   const member = await getCurrentMember();
-  const scoreArchive = member ? await listMemberScoreArchive(member.id).catch(() => []) : [];
   const openScoreInputs =
-    member?.userType === "PLAYER" ? await getMyOpenScoreInputs(member.id).catch(() => []) : [];
+    member?.userType === "PLAYER" && member.status === "ACTIVE"
+      ? await getMyOpenScoreInputs(member.id).catch(() => [])
+      : [];
 
   return (
     <main className="home-app">
@@ -57,8 +90,7 @@ export default async function MyPage() {
           <p className="stitch-label">My Page</p>
           <h1>내 기록</h1>
           <p>
-            본인 정보, 선수 등록 안내, PLAYER 승인 후 본인 상세 스코어카드를
-            확인하는 공간입니다.
+            회원 정보, 선수 승인 상태, 진행 중인 스코어 입력, 개인 기록 아카이브로 이동하는 가벼운 대시보드입니다.
           </p>
         </div>
 
@@ -68,8 +100,8 @@ export default async function MyPage() {
             <strong>회원 정보</strong>
             <p>
               {member
-                ? `${member.name}님은 현재 ${member.userType} 회원입니다.`
-                : "가입 직후에는 GENERAL 회원으로 시작합니다. 관리자가 확인 후 PLAYER로 전환합니다."}
+                ? `${member.name}님은 현재 ${member.userType} 회원이며 상태는 ${member.status}입니다.`
+                : "로그인하면 회원 상태와 선수 승인 상태를 확인할 수 있습니다."}
             </p>
           </article>
           <article className="stitch-bento-card">
@@ -77,11 +109,11 @@ export default async function MyPage() {
             <strong>{member?.userType === "PLAYER" ? "스코어 입력" : "선수 등록"}</strong>
             <p>
               {member?.userType === "PLAYER"
-                ? "진행 중인 대회가 있으면 마이페이지에서 바로 라운드 스코어를 입력합니다."
-                : "로그인 후 참가 신청을 진행하면 관리자가 확인 후 승인합니다."}
+                ? "진행 중인 대회가 있으면 마이페이지에서 바로 라운드별 스코어를 입력할 수 있습니다."
+                : "가입 직후에는 GENERAL 회원입니다. 관리자 승인 후 PLAYER 기록 기능을 사용할 수 있습니다."}
             </p>
             <Link className="text-link" href="/mypage/scores">
-              {member?.userType === "PLAYER" ? "스코어 입력/기록 보기" : "내 기록 아카이브 보기"}
+              {member?.userType === "PLAYER" ? "스코어 입력으로 이동" : "선수 기록 안내 보기"}
             </Link>
             {member?.userType === "PLAYER" ? (
               <Link className="text-link" href="/mypage/score-results">
@@ -96,13 +128,11 @@ export default async function MyPage() {
         <section className="profile-preview" style={{ marginTop: "48px" }}>
           <div>
             <span>{member?.userType ?? "GENERAL"}</span>
-            <strong>
-              {member ? `${member.name}님의 회원 상태: ${member.status}` : "선수 등록 승인이 필요합니다"}
-            </strong>
+            <strong>{member ? `${member.name}님의 회원 상태: ${member.status}` : "로그인이 필요합니다"}</strong>
             <p>
               {member
                 ? `아이디 ${member.username} / 이메일 ${member.email}`
-                : "가입 직후에는 일반 회원으로 시작합니다. 로그인 후 참가 신청을 진행하면 관리자가 확인 후 PLAYER로 전환합니다."}
+                : "로그인 후 마이페이지에서 선수 승인 상태와 개인 기록을 확인할 수 있습니다."}
             </p>
           </div>
           <div className="profile-actions">
@@ -111,8 +141,8 @@ export default async function MyPage() {
                 로그인
               </Link>
             )}
-            <Link className="button ghost" href="/signup">
-              {member ? "회원 정보 수정 예정" : "회원가입"}
+            <Link className="button ghost" href={member ? "/mypage/score-results" : "/signup"}>
+              {member ? "기록 아카이브" : "회원가입"}
             </Link>
           </div>
         </section>
@@ -122,8 +152,8 @@ export default async function MyPage() {
             <p className="stitch-label">Score Archive</p>
             <h2>내 기록 아카이브</h2>
             <p>
-              PLAYER 승인 후 관리자 입력이 완료된 대회 기록과 라운드별 상세 스코어카드를
-              본인에게만 표시합니다.
+              마이페이지 첫 화면은 빠르게 열리도록 전체 기록 목록을 즉시 불러오지 않습니다. 상세 기록은 전용 화면에서
+              확인합니다.
             </p>
           </div>
 
@@ -131,7 +161,7 @@ export default async function MyPage() {
             <div className="result-privacy-panel">
               <span className="material-symbols-outlined">login</span>
               <div>
-                <strong>로그인이 필요합니다</strong>
+                <strong>로그인이 필요합니다.</strong>
                 <p>본인 기록 아카이브는 로그인 후 확인할 수 있습니다.</p>
                 <Link href="/login">로그인</Link>
               </div>
@@ -140,60 +170,23 @@ export default async function MyPage() {
             <div className="result-privacy-panel">
               <span className="material-symbols-outlined">lock_person</span>
               <div>
-                <strong>선수 등록 승인이 필요합니다</strong>
-                <p>
-                  현재 회원 유형은 {member.userType}입니다. 관리자가 PLAYER로 승인한 뒤
-                  본인의 상세 스코어카드와 누적 기록을 확인할 수 있습니다.
-                </p>
+                <strong>선수 등록 승인이 필요합니다.</strong>
+                <p>현재 회원 유형은 {member.userType}입니다. 관리자가 PLAYER로 승인한 뒤 본인 기록을 확인할 수 있습니다.</p>
               </div>
-            </div>
-          ) : scoreArchive.length ? (
-            <div className="score-archive-list">
-              {scoreArchive.map((archive) => (
-                <article className="score-archive-card" key={archive.tournamentId}>
-                  <header>
-                    <div>
-                      <span>{archive.status}</span>
-                      <strong>{archive.tournamentName}</strong>
-                      <p>
-                        {archive.period} · {archive.venue} · {archive.affiliation}
-                      </p>
-                    </div>
-                    <em>
-                      {archive.total}타 / {archive.topar > 0 ? `+${archive.topar}` : archive.topar}
-                    </em>
-                  </header>
-                  <div className="score-round-table">
-                    <div>
-                      <span>R</span>
-                      <span>전반</span>
-                      <span>후반</span>
-                      <span>합계</span>
-                      <span>순위</span>
-                    </div>
-                    {archive.rounds.map((round) => (
-                      <div key={round.id}>
-                        <strong>{round.round}R</strong>
-                        <span>{round.front9}</span>
-                        <span>{round.back9}</span>
-                        <span>{round.total}</span>
-                        <span>{round.rank ? `${round.rank}위` : "-"}</span>
-                      </div>
-                    ))}
-                  </div>
-                </article>
-              ))}
             </div>
           ) : (
             <div className="result-privacy-panel">
               <span className="material-symbols-outlined">scoreboard</span>
               <div>
-                <strong>아직 등록된 스코어가 없습니다</strong>
-                <p>관리자가 대회별 스코어를 입력하면 이곳에 내 기록이 누적됩니다.</p>
+                <strong>전용 화면에서 기록을 확인합니다.</strong>
+                <p>전체 스코어 기록과 대회별 상세 scorecard는 기록 아카이브 화면에서 조회합니다.</p>
+                <Link href="/mypage/score-results">기록 아카이브 열기</Link>
               </div>
             </div>
           )}
         </section>
+
+        {member ? <WithdrawalPanel isActive={member.status === "ACTIVE"} /> : null}
       </section>
 
       <Footer />
