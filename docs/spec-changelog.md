@@ -253,3 +253,13 @@
 - Raised the Next.js Server Action body limit for the notice form to 8MB so the current promotion image and application PDF packet can be submitted on Vercel without a pre-action 400 response.
 - Changed public notice detail thumbnails to render at natural image height instead of cropping to 16:9.
 - Added admin notice upload usage feedback for promotion image size, document attachment totals, per-document size, and aggregate upload request size.
+
+## 2026-05-13 - M5 Member Management MVP
+
+- Created `feature/m5-member-management`.
+- Added M5 design and implementation plan documents.
+- Added `src/lib/member-lifecycle.ts` for PLAYER conversion, member withdrawal request, admin recovery, operational status changes, User masking, and Player anonymization.
+- Added `src/lib/admin/members.ts` for bounded admin member list/detail reads with search, filters, pagination, and capped recent scores.
+- Reworked `/admin/members` to use server-side search/filter/pagination instead of loading the full member table.
+- Added `/admin/members/[userId]` for single-member operations, lifecycle controls, Player profile summary, and recent score summary.
+- Added `/mypage` withdrawal request flow for ACTIVE users and removed eager full score archive loading from the My Page landing surface.

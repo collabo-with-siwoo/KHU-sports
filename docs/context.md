@@ -2,10 +2,10 @@
 
 ## Current Status
 
-- Date: 2026-05-12
-- Active milestone: M2 notice upload completion after M4 foundation.
+- Date: 2026-05-13
+- Active milestone: M5 member management and withdrawal lifecycle MVP.
 - M0 progress: Vercel and Supabase project setup completed by the user; R2 public bucket credentials are now configured locally; Resend production setup remains for later milestones.
-- Latest action: Began `feature/m2-r2-notice-upload` to complete admin notice creation with Cloudflare R2 uploads.
+- Latest action: Began `feature/m5-member-management` to complete admin member operations, user withdrawal request, and lightweight My Page loading.
 - Required docs note: `docs/specs.md` now exists and should be kept synchronized with code changes.
 
 ## Recent Changes
@@ -87,6 +87,12 @@
 - Notice uploads are designed for the existing `asset` promotion image and `reference` application PDFs: the image becomes `Notice.thumbnailUrl`, and PDFs become `NoticeAttachment` rows backed by R2 object keys.
 - Next.js Server Action upload body limit for the notice form is set to 8MB so the current promotion image plus application PDFs can be submitted on Vercel without a pre-action 400 response.
 - Notice upload UX now previews selected file usage against image, document, and aggregate request limits, and public notice detail images render uncropped at their natural aspect ratio.
+- New branch: `feature/m5-member-management`.
+- Added M5 design and implementation plan documents under `docs/superpowers/`.
+- Added member lifecycle helpers for PLAYER conversion, withdrawal request, withdrawal recovery, final User masking, and Player anonymization.
+- Added bounded admin member read models for list/detail views.
+- `/admin/members` now uses server-side search, filters, and pagination; `/admin/members/[userId]` provides a single-member operations page.
+- `/mypage` now avoids eager full score archive reads and exposes an ACTIVE-user withdrawal request flow.
 
 ## Remaining M0 External Tasks
 

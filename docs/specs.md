@@ -4,7 +4,7 @@
 
 ## Milestone Status
 
-- Current milestone: M4, tournaments and scores foundation.
+- Current milestone: M5, member management and withdrawal lifecycle MVP.
 - M0 scope in this repository: Next.js App Router scaffold, TypeScript strict mode, Prisma schema validation, environment variable template, and documentation baseline.
 - External M0 tasks still require human/account work: Cloudflare R2 buckets, Resend domain, production domain DNS verification.
 - Visual foundation: public user view follows the Stitch "Majestic Green" direction with a hero image, sticky desktop navigation, mobile bottom navigation, bento-style quick links, notice modules, and result summary modules.
@@ -12,6 +12,7 @@
 - M2 notice foundation: public notice reads use Supabase `Notice` rows when available and fall back to PRD-aligned seed notices for empty or not-yet-migrated environments. Homepage latest notices, `/notices`, and `/notices/[id]` share the same read model.
 - M3 admin foundation: `/admin` signs administrators in through Supabase Auth and authorizes access through local `AdminUser` rows. `SUPER` admins bypass menu permissions; `MEMBER` admins require `permissions` JSON grants. Admin/member management screens are available behind RBAC.
 - M4 result foundation: `/results` reads Prisma `Tournament`, `Player`, and `Score` rows when available and falls back to seed summaries. Admin tournament/score screens provide protected create/update foundations, `/results/[tournamentId]` now supports Full Leaderboard plus public Scorecard lookup, `/mypage/scores` is the logged-in PLAYER score-input hub, and `/mypage/score-results` lists the player's personal score results.
+- M5 member management foundation: `/admin/members` now uses bounded server-side search, filters, and pagination; `/admin/members/[userId]` provides a single-member operational detail page; member lifecycle actions cover PLAYER conversion, dormant/active changes, withdrawal recovery, and manual withdrawal finalization with User masking and Player anonymization. `/mypage` exposes member withdrawal request and no longer eagerly loads the full score archive on first render.
 - Review deployment: use `https://khu-sports.vercel.app/` until the official production domain is connected.
 
 ## Technology Decisions
@@ -129,6 +130,16 @@ SESSION_MAX_AGE_HOURS
 - `/admin/admins`: requires `admins.read`; the upsert form requires `admins.write` and stores admin role, status, and menu permission JSON.
 - `/admin/members`: requires `members.read`; the approval form requires `members.write` and can switch users between `GENERAL` and `PLAYER`. Switching to `PLAYER` creates or updates the golf `Player` profile.
 - `npm run db:seed` seeds `INITIAL_SUPER_ADMIN_EMAIL` as `SUPER/ACTIVE` when the environment variable is present. A matching Supabase Auth user must also exist for login.
+
+## M5 Member Lifecycle Contracts
+
+- `/admin/members`: requires `members.read` and uses server-side search/filter/pagination with a default page size of 30. The list selects only member summary fields, a GOLF Player summary, and score counts.
+- `/admin/members/[userId]`: requires `members.read`; write controls require `members.write`. The detail page loads a single member, GOLF Player profile summary, and at most 10 recent score rows.
+- PLAYER conversion writes `User.userType = PLAYER` and creates or updates the GOLF `Player` profile. Converting back to GENERAL preserves Player and Score rows.
+- Member-facing withdrawal on `/mypage` is available only to ACTIVE logged-in users. Submitting it sets `User.status = WITHDRAWN_PENDING`, sets `withdrawnAt`, signs the user out, and relies on the existing ACTIVE-only login guard to block future login.
+- Admin recovery can return `WITHDRAWN_PENDING` users to `ACTIVE` and clears `withdrawnAt`.
+- Admin final withdrawal sets `User.status = WITHDRAWN_DELETED`, masks direct personal fields on User, sets linked `Player.userId = null`, sets `Player.anonymized = true`, and preserves Score rows for official sports records.
+- `/mypage` is kept lightweight for the 5-second loading target: it reads the current member and bounded open score-input CTA only, while full score history remains on `/mypage/score-results`.
 
 ## M4 Tournament And Score Contracts
 

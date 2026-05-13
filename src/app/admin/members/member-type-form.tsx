@@ -15,11 +15,7 @@ type MemberTypeFormProps = {
   defaultAffiliation: string;
 };
 
-export function MemberTypeForm({
-  userId,
-  defaultUserType,
-  defaultAffiliation
-}: MemberTypeFormProps) {
+export function MemberTypeForm({ userId, defaultUserType, defaultAffiliation }: MemberTypeFormProps) {
   const [state, formAction] = useActionState(updateMemberTypeAction, initialState);
 
   return (
@@ -30,7 +26,7 @@ export function MemberTypeForm({
         <option value="PLAYER">PLAYER</option>
       </select>
       <input defaultValue={defaultAffiliation} name="affiliation" placeholder="소속" />
-      <SubmitButton pendingLabel="저장 중">저장</SubmitButton>
+      <SubmitButton pendingLabel="저장 중...">저장</SubmitButton>
       {state.message ? <small className={`form-message ${state.status}`}>{state.message}</small> : null}
     </form>
   );
