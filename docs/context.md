@@ -3,9 +3,9 @@
 ## Current Status
 
 - Date: 2026-05-13
-- Active milestone: M6 UI QA and polish.
+- Active milestone: M7 beta launch preparation.
 - M0 progress: Vercel and Supabase project setup completed by the user; R2 public bucket credentials are now configured locally; Resend production setup remains for later milestones.
-- Latest action: Investigated the missing 27th tournament notice on `/notices`; raised the shared public query timeout and updated notice seed fallback so fallback renders the 27th tournament notice instead of the old example notice.
+- Latest action: Closed M6 UI QA and polish after confirming the deployed mobile `/notices` page now renders the 27th tournament notice and preparing the project for M7 beta launch work.
 - Required docs note: `docs/specs.md` now exists and should be kept synchronized with code changes.
 
 ## Recent Changes
@@ -103,6 +103,7 @@
 - Notice seed fallback now keeps the 27th KHU tournament application notice as the first public notice so database fallback does not show the old initial example notice.
 - Mobile `/notices` category tabs now wrap instead of leaking beyond the viewport, and mobile `/results` overview shows the key rank/player/total columns without requiring horizontal scroll.
 - CSP now explicitly allows the Pretendard CDN stylesheet and font files used by the current Stitch visual baseline.
+- M6 UI QA and polish is closed; the next milestone is M7 beta launch preparation.
 
 ## Remaining M0 External Tasks
 
@@ -172,3 +173,4 @@
 - 2026-05-12 auth/score performance verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test`, and `npm run build` passed.
 - 2026-05-13 security report follow-up verification: focused Vitest regression tests passed with 2 files and 4 tests; `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test` passed with 15 files and 84 tests, and `npm run build` passed.
 - 2026-05-13 M6 UI QA polish verification: mobile `/notices` and `/results` overflow checks returned 0 overflowing elements; warm local responses for `/`, `/notices`, and `/results` stayed near 2 seconds with DB fallback timeout active. `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test` passed with 16 files and 86 tests, and `npm run build` passed.
+- 2026-05-14 M6 closeout verification: `npm test` passed with 17 files and 88 tests; `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, and `npm run build` passed. Production `/notices` returned 200 for desktop and mobile user agents, included the 27th tournament notice, and did not include the old 7th tournament seed title.

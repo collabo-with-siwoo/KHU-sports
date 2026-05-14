@@ -4,7 +4,7 @@
 
 ## Milestone Status
 
-- Current milestone: M6, UI QA and polish.
+- Current milestone: M7, beta launch preparation.
 - M0 scope in this repository: Next.js App Router scaffold, TypeScript strict mode, Prisma schema validation, environment variable template, and documentation baseline.
 - External M0 tasks still require human/account work: Cloudflare R2 buckets, Resend domain, production domain DNS verification.
 - Visual foundation: public user view follows the Stitch "Majestic Green" direction with a hero image, sticky desktop navigation, mobile bottom navigation, bento-style quick links, notice modules, and result summary modules.
@@ -13,7 +13,7 @@
 - M3 admin foundation: `/admin` signs administrators in through Supabase Auth and authorizes access through local `AdminUser` rows. `SUPER` admins bypass menu permissions; `MEMBER` admins require `permissions` JSON grants. Admin/member management screens are available behind RBAC.
 - M4 result foundation: `/results` reads Prisma `Tournament`, `Player`, and `Score` rows when available and falls back to seed summaries. Admin tournament/score screens provide protected create/update foundations, `/results/[tournamentId]` now supports Full Leaderboard plus public Scorecard lookup, `/mypage/scores` is the logged-in PLAYER score-input hub, and `/mypage/score-results` lists the player's personal score results.
 - M5 member management foundation is closed: `/admin/members` now uses bounded server-side search, filters, and pagination; `/admin/members/[userId]` provides a single-member operational detail page; member lifecycle actions cover PLAYER conversion, dormant/active changes, withdrawal recovery, and manual withdrawal finalization with User masking and Player anonymization. `/mypage` exposes member withdrawal request and no longer eagerly loads the full score archive on first render.
-- M6 UI QA and polish is active: the first M6-A pass added route-level QA notes, mobile `/notices` and `/results` overflow fixes, bounded public fallback reads, and CSP updates for the current UI font stack.
+- M6 UI QA and polish is closed: the M6-A pass added route-level QA notes, mobile `/notices` and `/results` overflow fixes, bounded public fallback reads, notice fallback correction for the 27th tournament post, CSP updates for the current UI font stack, and final desktop/mobile smoke verification.
 - Review deployment: use `https://khu-sports.vercel.app/` until the official production domain is connected.
 
 ## Technology Decisions

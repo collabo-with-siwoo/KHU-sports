@@ -10,6 +10,7 @@
 - Synchronized milestone tracking so M5 is marked closed in the implementation plan and `docs/specs.md` now points to M6 as the active milestone.
 - Raised the default public query timeout from 1.5s to 4.5s so uploaded notice data is less likely to fall back to seed examples on slower public requests while staying under the 5-second loading target.
 - Updated the notice seed fallback to keep the 27th KHU tournament application notice as the first public notice instead of the old initial example notice.
+- Closed M6 after production mobile verification confirmed `/notices` renders the 27th tournament notice from the deployed build.
 
 ## 2026-05-13 - Security Report Follow-Up Hardening
 
