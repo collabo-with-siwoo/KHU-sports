@@ -11,6 +11,7 @@
 - Added M7-B public DTO privacy regression tests to catch accidental raw `scoreData`, `Player`, or `User` exposure in public result responses.
 - Added M7-C same-origin guard coverage for admin tournament export routes.
 - Added M7-D `npm run qa:beta-security` preflight checks for beta env readiness without secret-value output.
+- Added M7-E same-origin guard coverage for `POST /logout`.
 
 ## 2026-05-13 - M6 UI QA Polish
 

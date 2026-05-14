@@ -113,6 +113,7 @@
 - M7-B public DTO privacy regression coverage now recursively checks public result responses for private score, user, memo, and review keys.
 - M7-C same-origin export guards now reject explicit cross-site admin export requests before auth, workbook generation, or export logging.
 - M7-D beta security preflight adds `npm run qa:beta-security` for secret-safe env/config readiness checks.
+- M7-E logout same-origin guard now rejects explicit cross-site logout POSTs before Supabase sign-out and app-session cookie clearing.
 
 ## Remaining M0 External Tasks
 
@@ -187,3 +188,4 @@
 - 2026-05-14 M7-B public DTO privacy verification: `npm test -- src/lib/results.test.ts` passed with 9 tests; `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test` passed with 19 files and 104 tests, and `npm run build` passed.
 - 2026-05-14 M7-C same-origin export guard verification: focused same-origin/export route tests passed with 11 tests; `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test` passed with 20 files and 111 tests, and `npm run build` passed.
 - 2026-05-14 M7-D beta security preflight verification: `npm run qa:beta-security` passed without printing secret values; `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test` passed with 21 files and 116 tests, and `npm run build` passed.
+- 2026-05-14 M7-E logout same-origin guard verification: `npm run qa:beta-security`, `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test` passed with 22 files and 118 tests, and `npm run build` passed.

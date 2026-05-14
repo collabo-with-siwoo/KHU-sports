@@ -15,6 +15,7 @@ M7 beta hardening applies the safe-now items from the M0-M4 security/improvement
 - Public result DTO regression tests now recursively reject private score, user, memo, and review keys in leaderboard, scorecard search, scorecard detail, and tournament result index responses.
 - Admin tournament export routes now reject explicit cross-site browser requests before auth, workbook generation, or export logging.
 - `npm run qa:beta-security` runs a local preflight that checks required beta env vars and obvious R2/rate-limit/site URL issues without printing secret values.
+- `POST /logout` now rejects explicit cross-site browser requests before Supabase sign-out or app-session cookie clearing.
 
 ## Operator Checks Before Private Beta
 
@@ -26,6 +27,7 @@ M7 beta hardening applies the safe-now items from the M0-M4 security/improvement
 - Smoke-test actual accounts: member login, admin login, signup, password reset request, and player score draft/submit.
 - For private exports, verify a `MEMBER` without `privacy.export` is denied and a `SUPER` or `privacy.export` member can export only with a reason.
 - Verify admin export downloads still work from same-origin admin pages after deployment, and explicit cross-site requests return `403`.
+- Verify logout still works from the app UI and explicit cross-site logout POST attempts return `403`.
 
 ## Deferred Controls
 
