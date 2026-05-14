@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { canAccessAdmin, getCurrentAdmin } from "@/lib/admin/auth";
 import { buildTournamentScoreExport, isScoreExportType } from "@/lib/admin/score-exports";
 import { prisma } from "@/lib/prisma";
+import { isSameOriginRequest, sameOriginForbiddenResponse } from "@/lib/same-origin";
 
 type ExportRouteProps = {
   params: Promise<{
@@ -23,6 +24,10 @@ export async function GET(request: Request, { params }: ExportRouteProps) {
 
   if (!isScoreExportType(exportType)) {
     return new NextResponse("Not found", { status: 404 });
+  }
+
+  if (!isSameOriginRequest(request)) {
+    return sameOriginForbiddenResponse();
   }
 
   const admin = await getCurrentAdmin();

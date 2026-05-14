@@ -9,6 +9,7 @@
 - Added a nullable `ExportLog.tournamentId -> Tournament.id` FK with `ON DELETE SET NULL`.
 - Added `docs/qa-m7-beta-security.md` for beta security controls, operator checks, and deferred hardening items.
 - Added M7-B public DTO privacy regression tests to catch accidental raw `scoreData`, `Player`, or `User` exposure in public result responses.
+- Added M7-C same-origin guard coverage for admin tournament export routes.
 
 ## 2026-05-13 - M6 UI QA Polish
 

@@ -13,6 +13,7 @@ M7 beta hardening applies the safe-now items from the M0-M4 security/improvement
 - Existing orphan export log tournament IDs are nulled before the FK is added.
 - Admin permission tests now cover all `SUPER` permission combinations, full permission-map generation, and the `privacy.export` boundary for `MEMBER` admins.
 - Public result DTO regression tests now recursively reject private score, user, memo, and review keys in leaderboard, scorecard search, scorecard detail, and tournament result index responses.
+- Admin tournament export routes now reject explicit cross-site browser requests before auth, workbook generation, or export logging.
 
 ## Operator Checks Before Private Beta
 
@@ -23,6 +24,7 @@ M7 beta hardening applies the safe-now items from the M0-M4 security/improvement
 - Verify R2 public bucket policy exposes only intended notice assets and private bucket objects are not publicly reachable.
 - Smoke-test actual accounts: member login, admin login, signup, password reset request, and player score draft/submit.
 - For private exports, verify a `MEMBER` without `privacy.export` is denied and a `SUPER` or `privacy.export` member can export only with a reason.
+- Verify admin export downloads still work from same-origin admin pages after deployment, and explicit cross-site requests return `403`.
 
 ## Deferred Controls
 

@@ -31,6 +31,15 @@ function request(path: string) {
   return new Request(`http://localhost:3000${path}`);
 }
 
+function crossSiteRequest(path: string) {
+  return new Request(`http://localhost:3000${path}`, {
+    headers: {
+      origin: "https://evil.example",
+      "sec-fetch-site": "cross-site"
+    }
+  });
+}
+
 function params(exportType: string) {
   return {
     params: Promise.resolve({
@@ -45,6 +54,18 @@ beforeEach(() => {
 });
 
 describe("admin tournament export route", () => {
+  it("blocks explicit cross-site export requests before auth or export work", async () => {
+    const response = await GET(
+      crossSiteRequest("/admin/tournaments/11111111-1111-4111-8111-111111111111/exports/private?reason=ops"),
+      params("private")
+    );
+
+    expect(response.status).toBe(403);
+    expect(getCurrentAdminMock).not.toHaveBeenCalled();
+    expect(buildTournamentScoreExportMock).not.toHaveBeenCalled();
+    expect(exportLogCreate).not.toHaveBeenCalled();
+  });
+
   it("redirects unauthenticated users to admin login", async () => {
     getCurrentAdminMock.mockResolvedValue(null);
 
