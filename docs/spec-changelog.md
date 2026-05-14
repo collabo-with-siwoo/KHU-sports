@@ -7,6 +7,9 @@
 - Added bounded public query timeouts for public notice and result reads so seed fallback can render quickly when Supabase is slow or unreachable.
 - Polished mobile `/notices` category tabs and mobile `/results` overview table to avoid awkward viewport overflow.
 - Updated CSP to allow the Pretendard CDN stylesheet and font files already used by the app UI.
+- Synchronized milestone tracking so M5 is marked closed in the implementation plan and `docs/specs.md` now points to M6 as the active milestone.
+- Raised the default public query timeout from 1.5s to 4.5s so uploaded notice data is less likely to fall back to seed examples on slower public requests while staying under the 5-second loading target.
+- Updated the notice seed fallback to keep the 27th KHU tournament application notice as the first public notice instead of the old initial example notice.
 
 ## 2026-05-13 - Security Report Follow-Up Hardening
 

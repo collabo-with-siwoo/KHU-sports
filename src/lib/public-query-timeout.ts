@@ -1,4 +1,4 @@
-const DEFAULT_PUBLIC_QUERY_TIMEOUT_MS = 1500;
+const DEFAULT_PUBLIC_QUERY_TIMEOUT_MS = 4500;
 
 export class PublicQueryTimeoutError extends Error {
   constructor(scope: string, timeoutMs: number) {

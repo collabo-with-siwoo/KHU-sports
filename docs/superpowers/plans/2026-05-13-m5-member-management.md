@@ -29,7 +29,7 @@
 - Create: `src/lib/member-lifecycle.ts`
 - Test: `src/lib/member-lifecycle.test.ts`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create `src/lib/member-lifecycle.test.ts` with tests for:
 
@@ -67,13 +67,13 @@ describe("member lifecycle helpers", () => {
 });
 ```
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run: `npm test -- src/lib/member-lifecycle.test.ts`
 
 Expected: FAIL because `src/lib/member-lifecycle.ts` does not exist.
 
-- [ ] **Step 3: Implement helpers**
+- [x] **Step 3: Implement helpers**
 
 Create `src/lib/member-lifecycle.ts` with exported helper functions:
 
@@ -108,7 +108,7 @@ export function buildMaskedWithdrawnUserData(userId: string, withdrawnAt: Date):
 }
 ```
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run: `npm test -- src/lib/member-lifecycle.test.ts`
 
@@ -120,7 +120,7 @@ Expected: PASS.
 - Modify: `src/lib/member-lifecycle.ts`
 - Modify: `src/lib/member-lifecycle.test.ts`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Extend the test file by mocking `@/lib/prisma` and covering:
 
@@ -149,13 +149,13 @@ Add tests that verify:
 - `recoverPendingWithdrawal(userId)` sets status back to `ACTIVE` and clears `withdrawnAt`.
 - `finalizeWithdrawnMember(userId)` masks User and anonymizes linked Players inside a transaction.
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run: `npm test -- src/lib/member-lifecycle.test.ts`
 
 Expected: FAIL because lifecycle write functions are not implemented.
 
-- [ ] **Step 3: Implement minimal lifecycle functions**
+- [x] **Step 3: Implement minimal lifecycle functions**
 
 Add functions:
 
@@ -166,7 +166,7 @@ Add functions:
 
 Use Prisma `select` fields only. Use transactions for finalization. Throw user-safe `Error` messages for missing users or invalid statuses.
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run: `npm test -- src/lib/member-lifecycle.test.ts`
 
@@ -178,7 +178,7 @@ Expected: PASS.
 - Create: `src/lib/admin/members.ts`
 - Test: `src/lib/admin/members.test.ts`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 Create tests for:
 
@@ -187,13 +187,13 @@ Create tests for:
 - `listAdminMembers` calls `prisma.user.findMany` with `skip`, `take`, `select`, and no full `scores` include.
 - `getAdminMemberDetail` caps recent scores to 10 rows.
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run: `npm test -- src/lib/admin/members.test.ts`
 
 Expected: FAIL because `src/lib/admin/members.ts` does not exist.
 
-- [ ] **Step 3: Implement read model**
+- [x] **Step 3: Implement read model**
 
 Implement:
 
@@ -204,7 +204,7 @@ Implement:
 
 Use Prisma `select`, `take: 30`, and safe `OR` search over `name`, `username`, `email`, `phone`.
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run: `npm test -- src/lib/admin/members.test.ts`
 
@@ -218,7 +218,7 @@ Expected: PASS.
 - Create: `src/app/admin/members/[userId]/page.tsx`
 - Modify: `src/app/admin/members/member-type-form.tsx` to keep the inline PLAYER conversion form compatible with the refactored action state.
 
-- [ ] **Step 1: Refactor actions**
+- [x] **Step 1: Refactor actions**
 
 Replace direct Prisma mutation in `updateMemberTypeAction` with:
 
@@ -233,7 +233,7 @@ Add Server Actions:
 
 Each action calls `requireAdminPermission("members", "write", "/admin/members")`.
 
-- [ ] **Step 2: Update list page**
+- [x] **Step 2: Update list page**
 
 Use `listAdminMembers` and render:
 
@@ -244,7 +244,7 @@ Use `listAdminMembers` and render:
 - detail link
 - pagination links
 
-- [ ] **Step 3: Add detail page**
+- [x] **Step 3: Add detail page**
 
 Create `/admin/members/[userId]` with:
 
@@ -254,7 +254,7 @@ Create `/admin/members/[userId]` with:
 - user type form
 - lifecycle status controls
 
-- [ ] **Step 4: Verify UI compiles**
+- [x] **Step 4: Verify UI compiles**
 
 Run: `npm run typecheck`
 
@@ -267,11 +267,11 @@ Expected: PASS.
 - Modify: `src/app/mypage/page.tsx`
 - Keep: `src/lib/members.ts` unchanged unless TypeScript requires exporting the existing `CurrentMember` status union from that file.
 
-- [ ] **Step 1: Rely on lifecycle TDD boundary**
+- [x] **Step 1: Rely on lifecycle TDD boundary**
 
 Use the `requestMemberWithdrawal(userId)` tests from Task 2 as the behavior proof for the status transition. Keep the Server Action thin because cookie deletion, Supabase sign-out, and Next.js redirect are framework side effects that are already covered by compilation and route verification in this plan.
 
-- [ ] **Step 2: Create withdrawal action**
+- [x] **Step 2: Create withdrawal action**
 
 `requestWithdrawalAction` must:
 
@@ -282,15 +282,15 @@ Use the `requestMemberWithdrawal(userId)` tests from Task 2 as the behavior proo
 - call Supabase `signOut`
 - redirect to `/login?withdrawal=requested`
 
-- [ ] **Step 3: Lighten My Page**
+- [x] **Step 3: Lighten My Page**
 
 Remove eager `listMemberScoreArchive(member.id)` from `/mypage`. Keep the score archive CTA linking to `/mypage/score-results`. Keep open score input CTA only for PLAYER users.
 
-- [ ] **Step 4: Add withdrawal UI**
+- [x] **Step 4: Add withdrawal UI**
 
 Add a small My Page section for ACTIVE logged-in users with a confirmation checkbox/input and submit button.
 
-- [ ] **Step 5: Verify route compiles**
+- [x] **Step 5: Verify route compiles**
 
 Run: `npm run typecheck`
 
@@ -303,7 +303,7 @@ Expected: PASS.
 - Modify: `docs/specs.md`
 - Modify: `docs/spec-changelog.md`
 
-- [ ] **Step 1: Update specs**
+- [x] **Step 1: Update specs**
 
 Record:
 
@@ -313,7 +313,7 @@ Record:
 - Manual admin finalization masks User and anonymizes Player.
 - `/mypage` no longer eagerly loads full score archive.
 
-- [ ] **Step 2: Run focused tests**
+- [x] **Step 2: Run focused tests**
 
 Run:
 
@@ -323,7 +323,7 @@ npm test -- src/lib/member-lifecycle.test.ts src/lib/admin/members.test.ts
 
 Expected: PASS.
 
-- [ ] **Step 3: Run full verification**
+- [x] **Step 3: Run full verification**
 
 Run:
 
@@ -337,7 +337,7 @@ npm run build
 
 Expected: all PASS.
 
-- [ ] **Step 4: Final git review**
+- [x] **Step 4: Final git review**
 
 Run:
 

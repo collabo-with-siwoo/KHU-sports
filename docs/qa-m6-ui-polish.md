@@ -35,7 +35,8 @@ M6-A는 M0-M5에서 구현된 핵심 사용자 흐름을 대상으로 모바일 
 
 - 모바일 공지 목록의 카테고리 필터가 화면 폭 안에서 자연스럽게 줄바꿈되도록 정리했다.
 - 모바일 결과 목록의 표는 개요 화면에서 순위, 선수명, 합계 중심으로 보여 뷰포트 밖으로 새지 않도록 정리했다.
-- 공개 notice/result DB 조회에 1.5초 기본 timeout을 추가해 Supabase 접속 실패 시에도 seed fallback이 5초 목표 안에서 렌더링되도록 했다.
+- 공개 notice/result DB 조회 기본 timeout을 4.5초로 조정했다. 1.5초 설정은 일부 cold public read가 너무 빨리 seed fallback으로 내려가 모바일/데스크톱에서 공지 목록이 다르게 보이는 원인이 될 수 있었다.
+- DB가 비어 있거나 일시적으로 접근 불가할 때도 `/notices` 첫 seed fallback이 기존 7회 예시가 아니라 제27회 경희대학교 총장배 전국 골프대회 참가 신청 안내를 보여주도록 정리했다.
 - CSP에 Pretendard CDN의 stylesheet/font origin을 추가해 브라우저 콘솔 오류를 줄였다.
 
 ## 재스캔 결과

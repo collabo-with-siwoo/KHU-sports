@@ -4,15 +4,16 @@
 
 ## Milestone Status
 
-- Current milestone: M5, member management and withdrawal lifecycle MVP.
+- Current milestone: M6, UI QA and polish.
 - M0 scope in this repository: Next.js App Router scaffold, TypeScript strict mode, Prisma schema validation, environment variable template, and documentation baseline.
 - External M0 tasks still require human/account work: Cloudflare R2 buckets, Resend domain, production domain DNS verification.
 - Visual foundation: public user view follows the Stitch "Majestic Green" direction with a hero image, sticky desktop navigation, mobile bottom navigation, bento-style quick links, notice modules, and result summary modules.
 - M1 runtime foundation: login, signup, reset-password, and terms pages exist with Supabase Auth and Prisma-backed profile/agreement persistence. Vercel is the active review runtime because these Server Actions require server execution.
-- M2 notice foundation: public notice reads use Supabase `Notice` rows when available and fall back to PRD-aligned seed notices for empty or not-yet-migrated environments. Homepage latest notices, `/notices`, and `/notices/[id]` share the same read model.
+- M2 notice foundation: public notice reads use Supabase `Notice` rows when available and fall back to PRD-aligned seed notices for empty or not-yet-migrated environments. Homepage latest notices, `/notices`, and `/notices/[id]` share the same read model. The first seed fallback notice is the 27th KHU tournament application notice so fallback never reverts to the old initial example notice.
 - M3 admin foundation: `/admin` signs administrators in through Supabase Auth and authorizes access through local `AdminUser` rows. `SUPER` admins bypass menu permissions; `MEMBER` admins require `permissions` JSON grants. Admin/member management screens are available behind RBAC.
 - M4 result foundation: `/results` reads Prisma `Tournament`, `Player`, and `Score` rows when available and falls back to seed summaries. Admin tournament/score screens provide protected create/update foundations, `/results/[tournamentId]` now supports Full Leaderboard plus public Scorecard lookup, `/mypage/scores` is the logged-in PLAYER score-input hub, and `/mypage/score-results` lists the player's personal score results.
-- M5 member management foundation: `/admin/members` now uses bounded server-side search, filters, and pagination; `/admin/members/[userId]` provides a single-member operational detail page; member lifecycle actions cover PLAYER conversion, dormant/active changes, withdrawal recovery, and manual withdrawal finalization with User masking and Player anonymization. `/mypage` exposes member withdrawal request and no longer eagerly loads the full score archive on first render.
+- M5 member management foundation is closed: `/admin/members` now uses bounded server-side search, filters, and pagination; `/admin/members/[userId]` provides a single-member operational detail page; member lifecycle actions cover PLAYER conversion, dormant/active changes, withdrawal recovery, and manual withdrawal finalization with User masking and Player anonymization. `/mypage` exposes member withdrawal request and no longer eagerly loads the full score archive on first render.
+- M6 UI QA and polish is active: the first M6-A pass added route-level QA notes, mobile `/notices` and `/results` overflow fixes, bounded public fallback reads, and CSP updates for the current UI font stack.
 - Review deployment: use `https://khu-sports.vercel.app/` until the official production domain is connected.
 
 ## Technology Decisions
@@ -108,7 +109,8 @@ SESSION_MAX_AGE_HOURS
 
 - `src/lib/prisma.ts`: shared Prisma client singleton for server-side data access.
 - `src/lib/notices.ts`: notice read model and seed fallback. It exposes published notice list/detail reads, admin list reads, category labels, and static params for seed detail pages.
-- Public notice list/detail reads use a bounded public query timeout before falling back to seed notices, so a slow or unreachable database does not hold the public page past the 5-second loading target.
+- Public notice list/detail reads use a bounded public query timeout before falling back to seed notices. The default is 4.5 seconds so uploaded notice data has room to load on cold public requests while still staying under the 5-second loading target.
+- Notice seed fallback starts with the 27th KHU tournament application notice; this preserves the public tournament notice when the database is empty, slow, or temporarily unreachable.
 - `/`: latest notice module reads the first three published notices from the shared notice source.
 - `/notices`: public notice list shows category tabs, search/filter controls, and published notice cards.
 - `/notices/[id]`: public detail route renders sanitized notice HTML and public attachment links when available.
@@ -146,7 +148,7 @@ SESSION_MAX_AGE_HOURS
 ## M4 Tournament And Score Contracts
 
 - `src/lib/results.ts` is the shared read model for public result summaries and admin tournament/score lists.
-- Public result index, leaderboard, and scorecard reads use a bounded public query timeout before seed fallback when the database is slow or unreachable.
+- Public result index, leaderboard, and scorecard reads use a bounded public query timeout before seed fallback when the database is slow or unreachable. The shared default is 4.5 seconds and can be overridden by `PUBLIC_QUERY_TIMEOUT_MS` up to 5 seconds.
 - `/results`: tournament index route. It lists ongoing and completed tournaments with name, venue, period, status, and a result-view action.
 - `/results/[tournamentId]`: tournament result detail route. It defaults to the Full Leaderboard tab and also provides a public Scorecard tab.
 - Full Leaderboard columns: rank, player name, school, participation type, gender, 1R, 2R, 36-hole total, final-day qualification, group, start time, and a Scorecard view action.
