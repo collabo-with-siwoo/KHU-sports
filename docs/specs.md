@@ -14,7 +14,7 @@
 - M4 result foundation: `/results` reads Prisma `Tournament`, `Player`, and `Score` rows when available and falls back to seed summaries. Admin tournament/score screens provide protected create/update foundations, `/results/[tournamentId]` now supports Full Leaderboard plus public Scorecard lookup, `/mypage/scores` is the logged-in PLAYER score-input hub, and `/mypage/score-results` lists the player's personal score results.
 - M5 member management foundation is closed: `/admin/members` now uses bounded server-side search, filters, and pagination; `/admin/members/[userId]` provides a single-member operational detail page; member lifecycle actions cover PLAYER conversion, dormant/active changes, withdrawal recovery, and manual withdrawal finalization with User masking and Player anonymization. `/mypage` exposes member withdrawal request and no longer eagerly loads the full score archive on first render.
 - M6 UI QA and polish is closed: the M6-A pass added route-level QA notes, mobile `/notices` and `/results` overflow fixes, bounded public fallback reads, notice fallback correction for the 27th tournament post, CSP updates for the current UI font stack, and final desktop/mobile smoke verification.
-- M7 beta security hardening is in progress: high-risk Server Actions now use app-level rate limiting, `ExportLog.tournamentId` is being tightened with a Tournament FK, and admin permission regression tests cover the beta privacy-export boundary.
+- M7 beta security hardening is in progress: high-risk Server Actions now use app-level rate limiting, `ExportLog.tournamentId` is being tightened with a Tournament FK, admin permission regression tests cover the beta privacy-export boundary, and M7-B public DTO privacy tests guard result responses against raw private data leaks.
 - Review deployment: use `https://khu-sports.vercel.app/` until the official production domain is connected.
 
 ## Technology Decisions
@@ -221,6 +221,7 @@ RATE_LIMIT_ENABLED
 - `npm test` runs Vitest unit tests for Full Leaderboard, public Scorecard, My Page score ownership/privacy, and admin export authorization/logging boundaries.
 - Additional regression tests cover the Next.js security header/image host configuration and player score-input ownership lookup.
 - M7 regression tests cover the shared rate limiter, action-specific rate limit profiles, `SUPER` permission coverage, full permission-map generation, and `privacy.export` grants for `MEMBER` admins.
+- Public result DTO tests recursively assert that public leaderboard, scorecard search, scorecard detail, and tournament result index responses do not contain private score JSON keys, user profile fields, memo fields, review metadata, or workflow-only state keys.
 - QA checklist for Full Leaderboard, Scorecard, My Page Score, and Admin Export lives in `docs/qa-results-score-features.md`.
 - Player-visible rejection reason must come only from `scoreData.rejectionReason`; `scoreData.adminMemo` is admin-only and must not be used as a fallback in My Page DTOs.
 

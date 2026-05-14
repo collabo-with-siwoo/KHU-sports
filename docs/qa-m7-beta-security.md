@@ -12,6 +12,7 @@ M7 beta hardening applies the safe-now items from the M0-M4 security/improvement
 - `ExportLog.tournamentId` is now a nullable foreign key to `Tournament.id` with `ON DELETE SET NULL`.
 - Existing orphan export log tournament IDs are nulled before the FK is added.
 - Admin permission tests now cover all `SUPER` permission combinations, full permission-map generation, and the `privacy.export` boundary for `MEMBER` admins.
+- Public result DTO regression tests now recursively reject private score, user, memo, and review keys in leaderboard, scorecard search, scorecard detail, and tournament result index responses.
 
 ## Operator Checks Before Private Beta
 

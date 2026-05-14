@@ -110,6 +110,7 @@
 - Added `ExportLog.tournamentId` as a nullable Tournament FK with `ON DELETE SET NULL`.
 - Expanded admin permission regression tests for `SUPER`, full permission maps, and `privacy.export`.
 - Added `docs/qa-m7-beta-security.md` for implemented controls, operator checks, and deferred hardening items.
+- M7-B public DTO privacy regression coverage now recursively checks public result responses for private score, user, memo, and review keys.
 
 ## Remaining M0 External Tasks
 
@@ -181,3 +182,4 @@
 - 2026-05-13 M6 UI QA polish verification: mobile `/notices` and `/results` overflow checks returned 0 overflowing elements; warm local responses for `/`, `/notices`, and `/results` stayed near 2 seconds with DB fallback timeout active. `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test` passed with 16 files and 86 tests, and `npm run build` passed.
 - 2026-05-14 M6 closeout verification: `npm test` passed with 17 files and 88 tests; `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, and `npm run build` passed. Production `/notices` returned 200 for desktop and mobile user agents, included the 27th tournament notice, and did not include the old 7th tournament seed title.
 - 2026-05-14 M7 beta security hardening verification: `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test` passed with 19 files and 103 tests, and `npm run build` passed.
+- 2026-05-14 M7-B public DTO privacy verification: `npm test -- src/lib/results.test.ts` passed with 9 tests; `npm run typecheck`, `npm run lint`, `npm run prisma:validate`, `npm test` passed with 19 files and 104 tests, and `npm run build` passed.

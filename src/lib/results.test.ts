@@ -51,6 +51,9 @@ const PUBLIC_FORBIDDEN_KEYS = [
   "playerMemo",
   "rejectionReason",
   "adminConfirmed",
+  "submissionStatus",
+  "reviewStatus",
+  "reviewLogs",
   "userType",
   "lastLoginAt",
   "dormantAt",
@@ -91,6 +94,38 @@ function expectNoPublicLeakage(value: unknown) {
   for (const marker of PUBLIC_FORBIDDEN_VALUES) {
     expect(serialized, `public response must not contain value "${marker}"`).not.toContain(marker);
   }
+}
+
+function collectPublicLeakPaths(value: unknown, path = "$"): string[] {
+  const leaks: string[] = [];
+
+  if (!value || typeof value !== "object") {
+    return leaks;
+  }
+
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => {
+      leaks.push(...collectPublicLeakPaths(item, `${path}[${index}]`));
+    });
+    return leaks;
+  }
+
+  for (const [key, child] of Object.entries(value)) {
+    const childPath = `${path}.${key}`;
+
+    if (PUBLIC_FORBIDDEN_KEYS.includes(key)) {
+      leaks.push(childPath);
+    }
+
+    leaks.push(...collectPublicLeakPaths(child, childPath));
+  }
+
+  return leaks;
+}
+
+function expectPublicDtoAllowlist(value: unknown) {
+  expect(collectPublicLeakPaths(value)).toEqual([]);
+  expectNoPublicLeakage(value);
 }
 
 const startDate = new Date("2026-05-01T00:00:00.000Z");
@@ -181,6 +216,14 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
+describe("public DTO privacy assertion", () => {
+  it("detects forbidden nested keys when raw score data is exposed", () => {
+    expect(collectPublicLeakPaths({ row: { scoreData: { adminMemo: "private admin memo" } } })).toEqual([
+      "$.row.scoreData.adminMemo"
+    ]);
+  });
+});
+
 describe("Full Leaderboard public DTO", () => {
   it("sorts by finalRank and falls back to round1Rank", async () => {
     tournamentFindFirst.mockResolvedValue(
@@ -206,7 +249,7 @@ describe("Full Leaderboard public DTO", () => {
     expect(result.rows.map((row) => row.playerName)).toEqual(["김파이널", "박라운드"]);
     expect(result.rows.map((row) => row.rank)).toEqual([1, 2]);
     expectNoSensitiveLeakage(result);
-    expectNoPublicLeakage(result);
+    expectPublicDtoAllowlist(result);
   });
 
   it("filters by name, school, category, gender, and final-round eligibility", async () => {
@@ -246,7 +289,7 @@ describe("Full Leaderboard public DTO", () => {
 
     expect(result.rows).toHaveLength(1);
     expect(result.rows[0].playerName).toBe("김경희");
-    expectNoPublicLeakage(result);
+    expectPublicDtoAllowlist(result);
   });
 
   it("uses only ADMIN_CONFIRMED rows for Scorecard search", async () => {
@@ -261,7 +304,7 @@ describe("Full Leaderboard public DTO", () => {
     const result = await searchTournamentPlayers("11111111-1111-4111-8111-111111111111", { pageSize: 10 });
 
     expect(result.rows.map((row) => row.playerName)).toEqual(["김확정"]);
-    expectNoPublicLeakage(result);
+    expectPublicDtoAllowlist(result);
   });
 });
 
@@ -297,7 +340,7 @@ describe("Public Scorecard", () => {
     expect(scorecard?.rounds[0].holeScores).toHaveLength(2);
     expect(scorecard?.rounds[1].holeScores).toBeNull();
     expectNoSensitiveLeakage(scorecard);
-    expectNoPublicLeakage(scorecard);
+    expectPublicDtoAllowlist(scorecard);
   });
 });
 
@@ -326,7 +369,7 @@ describe("Public Tournament Results", () => {
     expect(results).toHaveLength(1);
     expect(results[0].rows.map((row) => row.name)).toEqual(["김확정"]);
     expectNoSensitiveLeakage(results);
-    expectNoPublicLeakage(results);
+    expectPublicDtoAllowlist(results);
   });
 });
 
