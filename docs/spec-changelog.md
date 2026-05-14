@@ -1,5 +1,14 @@
 # Spec Changelog
 
+## 2026-05-14 - M7 Beta Security Hardening
+
+- Created `feature/m7-beta-security-hardening`.
+- Added M7 design and implementation plan documents under `docs/superpowers/`.
+- Added app-level fixed-window rate limiting for member login, admin login, signup, password reset, and player score submission.
+- Added regression coverage for the shared limiter, action-specific rate limit profiles, and admin permission boundaries.
+- Added a nullable `ExportLog.tournamentId -> Tournament.id` FK with `ON DELETE SET NULL`.
+- Added `docs/qa-m7-beta-security.md` for beta security controls, operator checks, and deferred hardening items.
+
 ## 2026-05-13 - M6 UI QA Polish
 
 - Created `feature/m6-ui-qa-polish`.

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import type { Prisma } from "@prisma/client";
 import { z } from "zod";
+import { checkActionRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/action-rate-limit";
 import { buildRoundSummary, parseHoleScoresFromFormData } from "@/lib/golf-scoring";
 import { getCurrentMember } from "@/lib/members";
 import { findOwnedGolfPlayerForScoreInput } from "@/lib/player-ownership";
@@ -132,6 +133,19 @@ export async function savePlayerScoreAction(
     return {
       status: "error",
       message: "대회를 찾을 수 없습니다."
+    };
+  }
+
+  const rateLimit = checkActionRateLimit("player-score-submit", [
+    member.id,
+    tournament.id,
+    parsed.data.round
+  ]);
+
+  if (!rateLimit.allowed) {
+    return {
+      status: "error",
+      message: RATE_LIMIT_MESSAGE
     };
   }
 

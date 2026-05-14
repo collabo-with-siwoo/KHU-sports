@@ -1,12 +1,14 @@
 "use server";
 
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { ensureDefaultAgreements, getRequiredAgreementVersionIdsFrom } from "@/lib/agreement-service";
+import { checkActionRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/action-rate-limit";
 import { createSignupSchema, loginSchema, resetPasswordSchema } from "@/lib/auth/schemas";
 import { APP_SESSION_COOKIE_NAME, getAppSessionCookieOptions } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
+import { getRequestIp } from "@/lib/request-ip";
 import { createSupabaseAdminClient, createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type AuthActionState = {
@@ -34,13 +36,6 @@ function getFormStrings(formData: FormData) {
       .filter((value): value is string => typeof value === "string"),
     ageConfirmed: String(formData.get("ageConfirmed") ?? "")
   };
-}
-
-async function getRequestIp() {
-  const headerList = await headers();
-  const forwardedFor = headerList.get("x-forwarded-for");
-
-  return forwardedFor?.split(",")[0]?.trim() || headerList.get("x-real-ip") || "unknown";
 }
 
 function getSiteUrl() {
@@ -79,6 +74,16 @@ export async function signInAction(
     return {
       status: "error",
       message: firstIssueMessage(parsed.error.issues[0]?.message, "로그인 정보를 확인해주세요.")
+    };
+  }
+
+  const requestIp = await getRequestIp();
+  const rateLimit = checkActionRateLimit("member-login", [parsed.data.username, requestIp]);
+
+  if (!rateLimit.allowed) {
+    return {
+      status: "error",
+      message: RATE_LIMIT_MESSAGE
     };
   }
 
@@ -176,6 +181,15 @@ export async function signUpAction(
 
   const email = parsed.data.email.toLowerCase();
   const username = parsed.data.username.toLowerCase();
+  const requestIp = await getRequestIp();
+  const rateLimit = checkActionRateLimit("signup", [username, email, requestIp]);
+
+  if (!rateLimit.allowed) {
+    return {
+      status: "error",
+      message: RATE_LIMIT_MESSAGE
+    };
+  }
 
   let duplicate;
 
@@ -235,7 +249,7 @@ export async function signUpAction(
   }
 
   try {
-    const ipAddress = await getRequestIp();
+    const ipAddress = requestIp;
 
     await prisma.$transaction(async (tx) => {
       await tx.user.create({
@@ -292,11 +306,22 @@ export async function resetPasswordAction(
     };
   }
 
+  const email = parsed.data.email.toLowerCase();
+  const requestIp = await getRequestIp();
+  const rateLimit = checkActionRateLimit("password-reset", [email, requestIp]);
+
+  if (!rateLimit.allowed) {
+    return {
+      status: "error",
+      message: RATE_LIMIT_MESSAGE
+    };
+  }
+
   let resetError;
 
   try {
     const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email.toLowerCase(), {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${getSiteUrl().replace(/\/$/, "")}/reset-password`
     });
     resetError = error;

@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { canAccessAdmin, requireAdminPermission } from "@/lib/admin/auth";
+import {
+  adminPermissionKeys,
+  canAccessAdmin,
+  fullAdminPermissions,
+  requireAdminPermission
+} from "@/lib/admin/auth";
 import type { CurrentAdmin } from "@/lib/admin/auth";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -70,6 +75,26 @@ describe("canAccessAdmin", () => {
     expect(canAccessAdmin(superAdmin(), "privacy", "export")).toBe(true);
   });
 
+  it("grants SUPER every known key/action combination", () => {
+    const admin = superAdmin();
+
+    for (const key of adminPermissionKeys) {
+      expect(canAccessAdmin(admin, key, "read")).toBe(true);
+      expect(canAccessAdmin(admin, key, "write")).toBe(true);
+      expect(canAccessAdmin(admin, key, "export")).toBe(true);
+    }
+  });
+
+  it("fullAdminPermissions grants every known key/action combination", () => {
+    const admin = memberAdmin(fullAdminPermissions());
+
+    for (const key of adminPermissionKeys) {
+      expect(canAccessAdmin(admin, key, "read")).toBe(true);
+      expect(canAccessAdmin(admin, key, "write")).toBe(true);
+      expect(canAccessAdmin(admin, key, "export")).toBe(true);
+    }
+  });
+
   it("grants MEMBER only the actions explicitly listed", () => {
     const admin = memberAdmin({ members: { read: true } });
 
@@ -81,6 +106,15 @@ describe("canAccessAdmin", () => {
   it("denies MEMBER when no permission map entries match", () => {
     const admin = memberAdmin({});
     expect(canAccessAdmin(admin, "members", "read")).toBe(false);
+  });
+
+  it("requires explicit privacy.export for MEMBER private exports", () => {
+    expect(canAccessAdmin(memberAdmin({ privacy: { read: true } }), "privacy", "export")).toBe(
+      false
+    );
+    expect(canAccessAdmin(memberAdmin({ privacy: { export: true } }), "privacy", "export")).toBe(
+      true
+    );
   });
 });
 

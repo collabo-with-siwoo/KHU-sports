@@ -14,6 +14,7 @@
 - M4 result foundation: `/results` reads Prisma `Tournament`, `Player`, and `Score` rows when available and falls back to seed summaries. Admin tournament/score screens provide protected create/update foundations, `/results/[tournamentId]` now supports Full Leaderboard plus public Scorecard lookup, `/mypage/scores` is the logged-in PLAYER score-input hub, and `/mypage/score-results` lists the player's personal score results.
 - M5 member management foundation is closed: `/admin/members` now uses bounded server-side search, filters, and pagination; `/admin/members/[userId]` provides a single-member operational detail page; member lifecycle actions cover PLAYER conversion, dormant/active changes, withdrawal recovery, and manual withdrawal finalization with User masking and Player anonymization. `/mypage` exposes member withdrawal request and no longer eagerly loads the full score archive on first render.
 - M6 UI QA and polish is closed: the M6-A pass added route-level QA notes, mobile `/notices` and `/results` overflow fixes, bounded public fallback reads, notice fallback correction for the 27th tournament post, CSP updates for the current UI font stack, and final desktop/mobile smoke verification.
+- M7 beta security hardening is in progress: high-risk Server Actions now use app-level rate limiting, `ExportLog.tournamentId` is being tightened with a Tournament FK, and admin permission regression tests cover the beta privacy-export boundary.
 - Review deployment: use `https://khu-sports.vercel.app/` until the official production domain is connected.
 
 ## Technology Decisions
@@ -79,6 +80,7 @@ RESEND_API_KEY
 NEXT_PUBLIC_SITE_URL
 INITIAL_SUPER_ADMIN_EMAIL
 SESSION_MAX_AGE_HOURS
+RATE_LIMIT_ENABLED
 ```
 
 ## M1 Implementation Notes
@@ -209,6 +211,7 @@ SESSION_MAX_AGE_HOURS
 - `/admin/tournaments/[tournamentId]/exports/admin-scores` requires `scores.read` and exports the administrator score-status view: player identity by competition fields, round totals, round statuses, 36-hole total, final rank, player submitted date, admin confirmed date, rejection flag, admin memo, and player memo. It does not select or include private contact fields.
 - `/admin/tournaments/[tournamentId]/exports/scorecards` requires `scores.read` and exports confirmed public scorecard round details: player name, school, category, gender, round, front9, back9, roundTotal, group, and start time.
 - `/admin/tournaments/[tournamentId]/exports/private` is restricted to `SUPER` admins or `privacy.export` members. It requires a `reason` query parameter, may include phone, email, and birth date, and records an `ExportLog` row with `adminUserId`, `exportType`, `tournamentId`, `exportedAt`, `rowCount`, and `reason`.
+- `ExportLog.tournamentId` is a nullable FK to `Tournament.id` with `ON DELETE SET NULL` so audit rows survive tournament deletion while invalid tournament references are prevented.
 - The current `User` model does not store guardian contact, so the private export keeps the guardian contact column present but blank until a source field is introduced.
 - Player self-submission now writes `scoreData.submittedAt` on submit. Admin confirmation writes `scoreData.adminConfirmedAt` and rejection writes `scoreData.rejectedAt` so exports can display operational timestamps.
 - `AdminUser.permissions` now supports the `privacy` permission key and `export` action in addition to existing read/write menu grants.
@@ -217,8 +220,17 @@ SESSION_MAX_AGE_HOURS
 
 - `npm test` runs Vitest unit tests for Full Leaderboard, public Scorecard, My Page score ownership/privacy, and admin export authorization/logging boundaries.
 - Additional regression tests cover the Next.js security header/image host configuration and player score-input ownership lookup.
+- M7 regression tests cover the shared rate limiter, action-specific rate limit profiles, `SUPER` permission coverage, full permission-map generation, and `privacy.export` grants for `MEMBER` admins.
 - QA checklist for Full Leaderboard, Scorecard, My Page Score, and Admin Export lives in `docs/qa-results-score-features.md`.
 - Player-visible rejection reason must come only from `scoreData.rejectionReason`; `scoreData.adminMemo` is admin-only and must not be used as a fallback in My Page DTOs.
+
+## M7 Beta Security Contracts
+
+- Member login, admin login, signup, password reset, and player score submission are protected by app-level fixed-window rate limits.
+- Rate limit keys must never include passwords, raw form bodies, private memo text, or full request payloads.
+- `RATE_LIMIT_ENABLED=false` disables the app-level limiter for local development or emergency operator recovery.
+- Rate limiting is best-effort in the app process. Private beta production should still consider edge/WAF or distributed storage if traffic or abuse increases.
+- M7 beta security QA and operator checks live in `docs/qa-m7-beta-security.md`.
 
 ## Vercel Review Deployment
 

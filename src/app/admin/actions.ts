@@ -3,8 +3,10 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { checkActionRateLimit, RATE_LIMIT_MESSAGE } from "@/lib/action-rate-limit";
 import { APP_SESSION_COOKIE_NAME, getAppSessionCookieOptions } from "@/lib/auth/session";
 import { prisma } from "@/lib/prisma";
+import { getRequestIp } from "@/lib/request-ip";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type AdminActionState = {
@@ -45,6 +47,16 @@ export async function adminSignInAction(
 
   const email = parsed.data.email.toLowerCase();
   const nextPath = safeNextPath(parsed.data.next);
+  const requestIp = await getRequestIp();
+  const rateLimit = checkActionRateLimit("admin-login", [email, requestIp]);
+
+  if (!rateLimit.allowed) {
+    return {
+      status: "error",
+      message: RATE_LIMIT_MESSAGE
+    };
+  }
+
   let supabase;
 
   try {
