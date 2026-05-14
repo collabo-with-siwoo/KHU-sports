@@ -14,6 +14,7 @@ M7 beta hardening applies the safe-now items from the M0-M4 security/improvement
 - Admin permission tests now cover all `SUPER` permission combinations, full permission-map generation, and the `privacy.export` boundary for `MEMBER` admins.
 - Public result DTO regression tests now recursively reject private score, user, memo, and review keys in leaderboard, scorecard search, scorecard detail, and tournament result index responses.
 - Admin tournament export routes now reject explicit cross-site browser requests before auth, workbook generation, or export logging.
+- `npm run qa:beta-security` runs a local preflight that checks required beta env vars and obvious R2/rate-limit/site URL issues without printing secret values.
 
 ## Operator Checks Before Private Beta
 
@@ -40,6 +41,7 @@ M7 beta hardening applies the safe-now items from the M0-M4 security/improvement
 To complete M7, run:
 
 ```powershell
+npm run qa:beta-security
 npm run typecheck
 npm run lint
 npm run prisma:validate

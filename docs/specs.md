@@ -14,7 +14,7 @@
 - M4 result foundation: `/results` reads Prisma `Tournament`, `Player`, and `Score` rows when available and falls back to seed summaries. Admin tournament/score screens provide protected create/update foundations, `/results/[tournamentId]` now supports Full Leaderboard plus public Scorecard lookup, `/mypage/scores` is the logged-in PLAYER score-input hub, and `/mypage/score-results` lists the player's personal score results.
 - M5 member management foundation is closed: `/admin/members` now uses bounded server-side search, filters, and pagination; `/admin/members/[userId]` provides a single-member operational detail page; member lifecycle actions cover PLAYER conversion, dormant/active changes, withdrawal recovery, and manual withdrawal finalization with User masking and Player anonymization. `/mypage` exposes member withdrawal request and no longer eagerly loads the full score archive on first render.
 - M6 UI QA and polish is closed: the M6-A pass added route-level QA notes, mobile `/notices` and `/results` overflow fixes, bounded public fallback reads, notice fallback correction for the 27th tournament post, CSP updates for the current UI font stack, and final desktop/mobile smoke verification.
-- M7 beta security hardening is in progress: high-risk Server Actions now use app-level rate limiting, `ExportLog.tournamentId` is being tightened with a Tournament FK, admin permission regression tests cover the beta privacy-export boundary, M7-B public DTO privacy tests guard result responses against raw private data leaks, and M7-C same-origin guards protect admin export routes from explicit cross-site requests.
+- M7 beta security hardening is in progress: high-risk Server Actions now use app-level rate limiting, `ExportLog.tournamentId` is being tightened with a Tournament FK, admin permission regression tests cover the beta privacy-export boundary, M7-B public DTO privacy tests guard result responses against raw private data leaks, M7-C same-origin guards protect admin export routes from explicit cross-site requests, and M7-D adds a local beta security preflight command.
 - Review deployment: use `https://khu-sports.vercel.app/` until the official production domain is connected.
 
 ## Technology Decisions
@@ -233,6 +233,7 @@ RATE_LIMIT_ENABLED
 - `RATE_LIMIT_ENABLED=false` disables the app-level limiter for local development or emergency operator recovery.
 - Rate limiting is best-effort in the app process. Private beta production should still consider edge/WAF or distributed storage if traffic or abuse increases.
 - Sensitive admin Route Handlers should call the same-origin guard when they read or export private operational data.
+- `npm run qa:beta-security` checks required private-beta env vars and obvious configuration contradictions without printing secret values.
 - M7 beta security QA and operator checks live in `docs/qa-m7-beta-security.md`.
 
 ## Vercel Review Deployment
@@ -263,4 +264,5 @@ npm run typecheck
 npm run lint
 npm run prisma:validate
 npm test
+npm run qa:beta-security
 ```

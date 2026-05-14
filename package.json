@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
+    "qa:beta-security": "node --env-file-if-exists=.env scripts/beta-security-check.js",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "prisma:validate": "prisma validate"
